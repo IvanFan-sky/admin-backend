@@ -20,10 +20,30 @@ import jakarta.validation.ConstraintViolationException;
 import java.nio.file.AccessDeniedException;
 import java.util.stream.Collectors;
 
+/**
+ * 全局异常处理器
+ * 
+ * 统一处理系统中的各类异常
+ * 提供友好的错误响应格式和详细的异常日志记录
+ *
+ * @author admin
+ * @version 1.0
+ * @since 2024-01-15
+ */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * 处理业务异常
+     * 
+     * 处理业务逻辑中主动抛出的ServiceException异常
+     * 记录异常日志并返回友好的错误提示
+     *
+     * @param e 业务异常对象
+     * @param request HTTP请求对象
+     * @return 错误响应结果
+     */
     @ExceptionHandler(ServiceException.class)
     public R<?> handleServiceException(ServiceException e, HttpServletRequest request) {
         log.error("请求地址'{}',发生业务异常.", request.getRequestURI(), e);
@@ -31,6 +51,16 @@ public class GlobalExceptionHandler {
         return code != null ? R.error(code, e.getMessage()) : R.error(e.getMessage());
     }
 
+    /**
+     * 处理404异常
+     * 
+     * 当请求的URL不存在时触发
+     * 记录错误日志并返回标准的404响应
+     *
+     * @param e 404异常对象
+     * @param request HTTP请求对象
+     * @return 错误响应结果
+     */
     @ExceptionHandler(NoHandlerFoundException.class)
     public R<?> handleNoHandlerFoundException(NoHandlerFoundException e, HttpServletRequest request) {
         log.error("请求地址'{}',发生系统异常.", request.getRequestURI(), e);

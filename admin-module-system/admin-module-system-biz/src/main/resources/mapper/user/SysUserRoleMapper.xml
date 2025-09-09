@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.admin.module.system.biz.dal.mapper.SysUserRoleMapper">
+
+    <resultMap type="com.admin.module.system.biz.dal.dataobject.SysUserRoleDO" id="SysUserRoleResult">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="roleId" column="role_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <delete id="deleteUserRoleByUserId" parameterType="Long">
+        delete from sys_user_role where user_id = #{userId}
+    </delete>
+
+    <insert id="batchUserRole">
+        insert into sys_user_role(user_id, role_id, create_by, create_time) values
+        <foreach item="item" index="index" collection="userRoleList" separator=",">
+            (#{item.userId}, #{item.roleId}, #{item.createBy}, #{item.createTime})
+        </foreach>
+    </insert>
+
+    <select id="selectRoleIdsByUserId" resultType="Long">
+        select role_id from sys_user_role where user_id = #{userId}
+    </select>
+
+</mapper>
