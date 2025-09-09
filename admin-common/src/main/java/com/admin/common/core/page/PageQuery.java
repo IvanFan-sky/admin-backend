@@ -1,0 +1,71 @@
+package com.admin.common.core.page;
+
+import lombok.Data;
+
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import java.io.Serializable;
+
+@Data
+public class PageQuery implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public static final int DEFAULT_PAGE_NUM = 1;
+    public static final int DEFAULT_PAGE_SIZE = 10;
+    public static final int MAX_PAGE_SIZE = 500;
+
+    @NotNull(message = "页码不能为空")
+    @Min(value = 1, message = "页码最小值为 1")
+    private Integer pageNum = DEFAULT_PAGE_NUM;
+
+    @NotNull(message = "每页条数不能为空")
+    @Min(value = 1, message = "每页条数最小值为 1")
+    @Max(value = MAX_PAGE_SIZE, message = "每页条数最大值为 500")
+    private Integer pageSize = DEFAULT_PAGE_SIZE;
+
+    private String orderByColumn;
+
+    private String isAsc;
+
+    public String getOrderBy() {
+        if (orderByColumn == null || orderByColumn.trim().isEmpty()) {
+            return "";
+        }
+        String orderBy = toUnderScoreCase(orderByColumn);
+        if ("asc".equalsIgnoreCase(isAsc)) {
+            return orderBy + " ASC";
+        } else if ("desc".equalsIgnoreCase(isAsc)) {
+            return orderBy + " DESC";
+        }
+        return orderBy + " DESC";
+    }
+
+    private String toUnderScoreCase(String str) {
+        if (str == null) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        boolean preCharIsUpperCase = true;
+        boolean curreCharIsUpperCase;
+        boolean nexteCharIsUpperCase = true;
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (i < (str.length() - 1)) {
+                nexteCharIsUpperCase = Character.isUpperCase(str.charAt(i + 1));
+            }
+
+            curreCharIsUpperCase = Character.isUpperCase(c);
+
+            if (curreCharIsUpperCase && (i > 0 && !preCharIsUpperCase || nexteCharIsUpperCase && !preCharIsUpperCase)) {
+                sb.append("_");
+            }
+            sb.append(Character.toLowerCase(c));
+
+            preCharIsUpperCase = curreCharIsUpperCase;
+        }
+
+        return sb.toString();
+    }
+}

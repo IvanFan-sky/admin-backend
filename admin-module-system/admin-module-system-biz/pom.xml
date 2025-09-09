@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.admin</groupId>
+        <artifactId>admin-module-system</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>admin-module-system-biz</artifactId>
+    <packaging>jar</packaging>
+    
+    <name>admin-module-system-biz</name>
+    <description>Admin管理系统后端 - 系统管理模块业务实现</description>
+
+    <dependencies>
+        <!-- 同模块API -->
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-module-system-api</artifactId>
+        </dependency>
+        
+        <!-- 框架组件 -->
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-mybatis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-redis</artifactId>
+        </dependency>
+        
+    </dependencies>
+
+</project>

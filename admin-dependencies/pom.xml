@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.admin</groupId>
+    <artifactId>admin-dependencies</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    
+    <name>admin-dependencies</name>
+    <description>Admin管理系统后端 - 依赖管理</description>
+
+    <properties>
+        <spring-boot.version>3.2.1</spring-boot.version>
+        <mybatis-plus.version>3.5.5</mybatis-plus.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <knife4j.version>4.4.0</knife4j.version>
+        <hutool.version>5.8.24</hutool.version>
+        <redisson.version>3.25.2</redisson.version>
+        <minio.version>8.5.7</minio.version>
+        <easyexcel.version>3.3.2</easyexcel.version>
+        <jakarta.validation.version>3.0.2</jakarta.validation.version>
+        <mysql.version>8.0.35</mysql.version>
+        <hikaricp.version>5.0.1</hikaricp.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Boot BOM -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            
+            <!-- 数据库相关 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>${hikaricp.version}</version>
+            </dependency>
+            
+            <!-- 缓存相关 -->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
+            </dependency>
+            
+            <!-- 对象转换 -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+            
+            <!-- 参数校验 -->
+            <dependency>
+                <groupId>jakarta.validation</groupId>
+                <artifactId>jakarta.validation-api</artifactId>
+                <version>${jakarta.validation.version}</version>
+            </dependency>
+            
+            <!-- API文档 -->
+            <dependency>
+                <groupId>com.github.xiaoymin</groupId>
+                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+                <version>${knife4j.version}</version>
+            </dependency>
+            
+            <!-- 文件存储 -->
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
+            </dependency>
+            
+            <!-- Excel处理 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>easyexcel</artifactId>
+                <version>${easyexcel.version}</version>
+            </dependency>
+            
+            <!-- 工具类 -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+            
+            <!-- 项目内模块依赖 -->
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-common</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            
+            <!-- Framework模块 -->
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-spring-boot-starter-web</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-spring-boot-starter-security</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-spring-boot-starter-mybatis</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-spring-boot-starter-redis</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            
+            <!-- 业务模块API -->
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-module-system-api</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-module-infra-api</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            
+            <!-- 业务模块BIZ -->
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-module-system-biz</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-module-infra-biz</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            
+        </dependencies>
+    </dependencyManagement>
+
+</project>
