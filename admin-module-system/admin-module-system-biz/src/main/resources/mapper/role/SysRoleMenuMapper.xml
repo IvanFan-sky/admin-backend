@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.admin.module.system.biz.dal.mapper.SysRoleMenuMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.admin.module.system.biz.dal.dataobject.SysRoleMenuDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="role_id" property="roleId" jdbcType="BIGINT"/>
+        <result column="menu_id" property="menuId" jdbcType="BIGINT"/>
+        <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 基础字段列表 -->
+    <sql id="Base_Column_List">
+        id, role_id, menu_id, create_by, create_time, remark
+    </sql>
+
+    <!-- 根据角色ID查询菜单ID列表 -->
+    <select id="selectMenuIdsByRoleId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        SELECT menu_id
+        FROM sys_role_menu
+        WHERE role_id = #{roleId,jdbcType=BIGINT}
+        ORDER BY menu_id ASC
+    </select>
+
+    <!-- 根据菜单ID查询角色ID列表 -->
+    <select id="selectRoleIdsByMenuId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        SELECT role_id
+        FROM sys_role_menu
+        WHERE menu_id = #{menuId,jdbcType=BIGINT}
+        ORDER BY role_id ASC
+    </select>
+
+    <!-- 根据角色ID删除角色菜单关联 -->
+    <delete id="deleteByRoleId" parameterType="java.lang.Long">
+        DELETE FROM sys_role_menu
+        WHERE role_id = #{roleId,jdbcType=BIGINT}
+    </delete>
+
+    <!-- 根据菜单ID删除角色菜单关联 -->
+    <delete id="deleteByMenuId" parameterType="java.lang.Long">
+        DELETE FROM sys_role_menu
+        WHERE menu_id = #{menuId,jdbcType=BIGINT}
+    </delete>
+
+    <!-- 批量插入角色菜单关联 -->
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO sys_role_menu (role_id, menu_id, create_by, create_time, remark)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.roleId,jdbcType=BIGINT}, 
+             #{item.menuId,jdbcType=BIGINT}, 
+             #{item.createBy,jdbcType=VARCHAR}, 
+             #{item.createTime,jdbcType=TIMESTAMP},
+             #{item.remark,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <!-- 根据角色ID列表删除角色菜单关联 -->
+    <delete id="deleteByRoleIds">
+        DELETE FROM sys_role_menu
+        WHERE role_id IN
+        <foreach collection="roleIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 根据菜单ID列表删除角色菜单关联 -->
+    <delete id="deleteByMenuIds">
+        DELETE FROM sys_role_menu
+        WHERE menu_id IN
+        <foreach collection="menuIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 查询角色菜单关联是否存在 -->
+    <select id="existsRoleMenuRelation" resultType="java.lang.Boolean">
+        SELECT COUNT(1) > 0
+        FROM sys_role_menu
+        WHERE role_id = #{roleId,jdbcType=BIGINT}
+          AND menu_id = #{menuId,jdbcType=BIGINT}
+        LIMIT 1
+    </select>
+
+    <!-- 根据条件查询角色菜单关联列表 -->
+    <select id="selectRoleMenuList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_role_menu
+        WHERE 1=1
+        <if test="roleId != null">
+            AND role_id = #{roleId,jdbcType=BIGINT}
+        </if>
+        <if test="menuId != null">
+            AND menu_id = #{menuId,jdbcType=BIGINT}
+        </if>
+        ORDER BY role_id ASC, menu_id ASC
+    </select>
+
+</mapper>

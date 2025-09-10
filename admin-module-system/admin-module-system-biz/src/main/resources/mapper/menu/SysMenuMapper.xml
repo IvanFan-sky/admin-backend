@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.admin.module.system.biz.dal.mapper.SysMenuMapper">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.admin.module.system.biz.dal.dataobject.SysMenuDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="parent_id" property="parentId" jdbcType="BIGINT"/>
+        <result column="menu_name" property="menuName" jdbcType="VARCHAR"/>
+        <result column="menu_type" property="menuType" jdbcType="TINYINT"/>
+        <result column="path" property="path" jdbcType="VARCHAR"/>
+        <result column="component" property="component" jdbcType="VARCHAR"/>
+        <result column="permission" property="permission" jdbcType="VARCHAR"/>
+        <result column="icon" property="icon" jdbcType="VARCHAR"/>
+        <result column="sort_order" property="sortOrder" jdbcType="INTEGER"/>
+        <result column="visible" property="visible" jdbcType="TINYINT"/>
+        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="is_frame" property="isFrame" jdbcType="TINYINT"/>
+        <result column="is_cache" property="isCache" jdbcType="TINYINT"/>
+        <result column="ancestors" property="ancestors" jdbcType="VARCHAR"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="version" property="version" jdbcType="INTEGER"/>
+        <result column="deleted" property="deleted" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <!-- 基础字段列表 -->
+    <sql id="Base_Column_List">
+        id, parent_id, menu_name, menu_type, path, component, permission, icon, 
+        sort_order, visible, status, is_frame, is_cache, ancestors, remark,
+        create_by, create_time, update_by, update_time, version, deleted
+    </sql>
+
+    <!-- 根据菜单名称查询菜单 -->
+    <select id="selectByMenuName" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_menu
+        WHERE menu_name = #{menuName,jdbcType=VARCHAR}
+          AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- 根据权限标识查询菜单 -->
+    <select id="selectByPermission" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_menu
+        WHERE permission = #{permission,jdbcType=VARCHAR}
+          AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- 根据父菜单ID查询子菜单数量 -->
+    <select id="selectChildrenCountByParentId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM sys_menu
+        WHERE parent_id = #{parentId,jdbcType=BIGINT}
+          AND deleted = 0
+    </select>
+
+    <!-- 根据角色ID查询菜单列表 -->
+    <select id="selectMenusByRoleId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT DISTINCT
+        m.id, m.parent_id, m.menu_name, m.menu_type, m.path, m.component, m.permission, m.icon,
+        m.sort_order, m.visible, m.status, m.is_frame, m.is_cache, m.ancestors, m.remark,
+        m.create_by, m.create_time, m.update_by, m.update_time, m.version, m.deleted
+        FROM sys_menu m
+        INNER JOIN sys_role_menu rm ON m.id = rm.menu_id
+        WHERE rm.role_id = #{roleId,jdbcType=BIGINT}
+          AND m.deleted = 0
+          AND m.status = 1
+        ORDER BY m.sort_order ASC, m.create_time DESC
+    </select>
+
+    <!-- 根据用户ID查询菜单列表 -->
+    <select id="selectMenusByUserId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT DISTINCT
+        m.id, m.parent_id, m.menu_name, m.menu_type, m.path, m.component, m.permission, m.icon,
+        m.sort_order, m.visible, m.status, m.is_frame, m.is_cache, m.ancestors, m.remark,
+        m.create_by, m.create_time, m.update_by, m.update_time, m.version, m.deleted
+        FROM sys_menu m
+        INNER JOIN sys_role_menu rm ON m.id = rm.menu_id
+        INNER JOIN sys_user_role ur ON rm.role_id = ur.role_id
+        INNER JOIN sys_role r ON ur.role_id = r.id
+        WHERE ur.user_id = #{userId,jdbcType=BIGINT}
+          AND m.deleted = 0
+          AND m.status = 1
+          AND m.visible = 1
+          AND r.deleted = 0
+          AND r.status = 1
+        ORDER BY m.sort_order ASC, m.create_time DESC
+    </select>
+
+    <!-- 查询所有启用且显示的菜单 -->
+    <select id="selectEnabledAndVisibleMenus" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_menu
+        WHERE status = 1
+          AND visible = 1
+          AND deleted = 0
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 根据父菜单ID查询子菜单列表 -->
+    <select id="selectMenusByParentId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_menu
+        WHERE parent_id = #{parentId,jdbcType=BIGINT}
+          AND deleted = 0
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 根据菜单类型查询菜单列表 -->
+    <select id="selectMenusByType" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_menu
+        WHERE menu_type = #{menuType,jdbcType=TINYINT}
+          AND deleted = 0
+          AND status = 1
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 根据祖先路径查询所有子菜单 -->
+    <select id="selectMenusByAncestors" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_menu
+        WHERE ancestors LIKE CONCAT(#{ancestors}, '%')
+          AND deleted = 0
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 根据条件分页查询菜单 -->
+    <select id="selectMenuPageByCondition" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_menu
+        WHERE deleted = 0
+        <if test="menuName != null and menuName != ''">
+            AND menu_name LIKE CONCAT('%', #{menuName}, '%')
+        </if>
+        <if test="menuType != null">
+            AND menu_type = #{menuType}
+        </if>
+        <if test="visible != null">
+            AND visible = #{visible}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="permission != null and permission != ''">
+            AND permission LIKE CONCAT('%', #{permission}, '%')
+        </if>
+        <if test="parentId != null">
+            AND parent_id = #{parentId}
+        </if>
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 查询可作为父菜单的选项（排除按钮类型） -->
+    <select id="selectParentMenuOptions" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_menu
+        WHERE menu_type != 3
+          AND status = 1
+          AND deleted = 0
+        <if test="excludeId != null">
+            AND id != #{excludeId,jdbcType=BIGINT}
+            AND ancestors NOT LIKE CONCAT('%,', #{excludeId}, ',%')
+            AND ancestors NOT LIKE CONCAT(#{excludeId}, ',%')
+        </if>
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 根据菜单ID列表查询菜单信息 -->
+    <select id="selectMenusByIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM sys_menu
+        WHERE id IN
+        <foreach collection="menuIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND deleted = 0
+        ORDER BY sort_order ASC, create_time DESC
+    </select>
+
+    <!-- 更新子菜单的祖先路径 -->
+    <update id="updateChildrenAncestors">
+        UPDATE sys_menu
+        SET ancestors = REPLACE(ancestors, #{oldAncestors}, #{newAncestors})
+        WHERE ancestors LIKE CONCAT(#{oldAncestors}, '%')
+          AND deleted = 0
+    </update>
+
+</mapper>
