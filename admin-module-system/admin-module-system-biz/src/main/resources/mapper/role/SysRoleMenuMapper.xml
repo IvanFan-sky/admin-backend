@@ -51,7 +51,7 @@
     <insert id="insertBatch" parameterType="java.util.List">
         INSERT INTO sys_role_menu (role_id, menu_id, create_by, create_time, remark)
         VALUES
-        <foreach collection="list" item="item" separator=",">
+        <foreach collection="roleMenuList" item="item" separator=",">
             (#{item.roleId,jdbcType=BIGINT}, 
              #{item.menuId,jdbcType=BIGINT}, 
              #{item.createBy,jdbcType=VARCHAR}, 

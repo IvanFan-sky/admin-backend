@@ -15,14 +15,18 @@
     </delete>
 
     <insert id="batchUserRole">
-        insert into sys_user_role(user_id, role_id, create_by, create_time) values
+        insert into sys_user_role(user_id, role_id, create_by, create_time, remark) values
         <foreach item="item" index="index" collection="userRoleList" separator=",">
-            (#{item.userId}, #{item.roleId}, #{item.createBy}, #{item.createTime})
+            (#{item.userId}, #{item.roleId}, #{item.createBy}, #{item.createTime}, #{item.remark})
         </foreach>
     </insert>
 
     <select id="selectRoleIdsByUserId" resultType="Long">
         select role_id from sys_user_role where user_id = #{userId}
+    </select>
+
+    <select id="selectUserIdsByRoleId" resultType="Long">
+        select user_id from sys_user_role where role_id = #{roleId}
     </select>
 
 </mapper>

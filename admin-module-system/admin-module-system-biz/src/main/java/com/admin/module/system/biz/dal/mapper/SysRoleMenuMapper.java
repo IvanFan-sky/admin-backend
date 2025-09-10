@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 角色菜单关联数据访问层
@@ -60,4 +61,21 @@ public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenuDO> {
      * @return 插入的记录数
      */
     int insertBatch(@Param("roleMenuList") List<SysRoleMenuDO> roleMenuList);
+
+    /**
+     * 根据菜单ID列表批量删除关联关系
+     * 
+     * @param menuIds 菜单ID列表
+     * @return 删除的记录数
+     */
+    int deleteByMenuIds(@Param("menuIds") Set<Long> menuIds);
+
+    /**
+     * 检查角色菜单关联是否存在
+     * 
+     * @param roleId 角色ID
+     * @param menuId 菜单ID
+     * @return 是否存在关联
+     */
+    Boolean existsRoleMenuRelation(@Param("roleId") Long roleId, @Param("menuId") Long menuId);
 }
