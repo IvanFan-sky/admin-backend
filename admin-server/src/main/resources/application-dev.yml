@@ -58,6 +58,13 @@ knife4j:
   setting:
     language: zh_cn
 
+# JWT认证配置
+admin:
+  jwt:
+    secret: adminSecretKeyForJWTTokenGenerationMustBeLongEnoughForHS512
+    expiration: 1800000  # 访问令牌过期时间：30分钟（毫秒）
+    refresh-expiration: 2592000000  # 刷新令牌过期时间：30天（毫秒）
+
 # 日志配置
 logging:
   level:
