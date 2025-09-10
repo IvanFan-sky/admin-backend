@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.admin.module.system.biz.dal.mapper.SysDictTypeMapper">
+
+    <!-- 基本的ResultMap定义 -->
+    <resultMap id="BaseResultMap" type="com.admin.module.system.biz.dal.dataobject.SysDictTypeDO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="dict_name" property="dictName" jdbcType="VARCHAR"/>
+        <result column="dict_type" property="dictType" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="version" property="version" jdbcType="INTEGER"/>
+        <result column="deleted" property="deleted" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- 基本字段列表 -->
+    <sql id="Base_Column_List">
+        id, dict_name, dict_type, status, remark, 
+        create_by, create_time, update_by, update_time, version, deleted
+    </sql>
+
+    <!-- 根据字典类型查询字典类型信息 -->
+    <select id="selectByDictType" resultMap="BaseResultMap">
+        SELECT 
+            <include refid="Base_Column_List" />
+        FROM sys_dict_type 
+        WHERE dict_type = #{dictType,jdbcType=VARCHAR} 
+          AND deleted = 0
+    </select>
+
+    <!-- 根据字典名称查询字典类型信息 -->
+    <select id="selectByDictName" resultMap="BaseResultMap">
+        SELECT 
+            <include refid="Base_Column_List" />
+        FROM sys_dict_type 
+        WHERE dict_name = #{dictName,jdbcType=VARCHAR} 
+          AND deleted = 0
+    </select>
+
+    <!-- 查询所有启用状态的字典类型 -->
+    <select id="selectEnabledDictTypes" resultMap="BaseResultMap">
+        SELECT 
+            <include refid="Base_Column_List" />
+        FROM sys_dict_type 
+        WHERE status = 1 
+          AND deleted = 0
+        ORDER BY dict_type ASC
+    </select>
+
+    <!-- 检查字典类型是否被字典数据使用 -->
+    <select id="countDictDataByType" resultType="java.lang.Long">
+        SELECT COUNT(1) 
+        FROM sys_dict_data 
+        WHERE dict_type = #{dictType,jdbcType=VARCHAR} 
+          AND deleted = 0
+    </select>
+
+</mapper>
