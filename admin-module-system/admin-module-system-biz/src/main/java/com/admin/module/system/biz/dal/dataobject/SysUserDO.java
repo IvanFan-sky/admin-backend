@@ -51,9 +51,9 @@ public class SysUserDO extends BaseEntity {
     @TableField("status")
     private Integer status;
 
-    @TableField("del_flag")
+    @TableField("deleted")
     @TableLogic
-    private Integer delFlag;
+    private Integer deleted;
 
     @TableField("login_ip")
     private String loginIp;

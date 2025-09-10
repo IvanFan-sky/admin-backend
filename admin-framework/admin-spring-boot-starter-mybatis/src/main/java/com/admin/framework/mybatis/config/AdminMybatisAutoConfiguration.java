@@ -72,7 +72,7 @@ public class AdminMybatisAutoConfiguration {
                 this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, now);
                 this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, now);
                 // 填充标志字段
-                this.strictInsertFill(metaObject, "delFlag", Integer.class, 0);
+                this.strictInsertFill(metaObject, "deleted", Integer.class, 0);
                 this.strictInsertFill(metaObject, "version", Integer.class, 1);
                 
                 // 填充用户字段

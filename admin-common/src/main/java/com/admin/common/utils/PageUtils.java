@@ -3,6 +3,7 @@ package com.admin.common.utils;
 import com.admin.common.core.domain.PageResult;
 import com.admin.common.core.page.PageQuery;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.util.List;
@@ -38,12 +39,12 @@ public class PageUtils {
             if (orderBy != null && !orderBy.isEmpty()) {
                 if (orderBy.toUpperCase().contains("ASC")) {
                     String column = orderBy.replace(" ASC", "").trim();
-                    page.addOrder(com.baomidou.mybatisplus.core.conditions.query.OrderItem.asc(column));
+                    page.addOrder(OrderItem.asc(column));
                 } else if (orderBy.toUpperCase().contains("DESC")) {
                     String column = orderBy.replace(" DESC", "").trim();
-                    page.addOrder(com.baomidou.mybatisplus.core.conditions.query.OrderItem.desc(column));
+                    page.addOrder(OrderItem.desc(column));
                 } else {
-                    page.addOrder(com.baomidou.mybatisplus.core.conditions.query.OrderItem.desc(orderBy));
+                    page.addOrder(OrderItem.desc(orderBy));
                 }
             }
             return page;
@@ -67,12 +68,12 @@ public class PageUtils {
         if (page.orders().isEmpty() && defaultOrderBy != null && !defaultOrderBy.isEmpty()) {
             if (defaultOrderBy.toUpperCase().contains("ASC")) {
                 String column = defaultOrderBy.replace(" ASC", "").trim();
-                page.addOrder(com.baomidou.mybatisplus.core.conditions.query.OrderItem.asc(column));
+                page.addOrder(OrderItem.asc(column));
             } else if (defaultOrderBy.toUpperCase().contains("DESC")) {
                 String column = defaultOrderBy.replace(" DESC", "").trim();
-                page.addOrder(com.baomidou.mybatisplus.core.conditions.query.OrderItem.desc(column));
+                page.addOrder(OrderItem.desc(column));
             } else {
-                page.addOrder(com.baomidou.mybatisplus.core.conditions.query.OrderItem.desc(defaultOrderBy));
+                page.addOrder(OrderItem.desc(defaultOrderBy));
             }
         }
         return page;
