@@ -4,6 +4,7 @@ package com.admin.framework.security.config;
 import com.admin.framework.security.filter.JwtAuthenticationFilter;
 import com.admin.framework.security.handler.JwtAccessDeniedHandler;
 import com.admin.framework.security.handler.JwtAuthenticationEntryPoint;
+import com.admin.framework.security.service.JwtBlacklistService;
 import com.admin.framework.security.utils.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -41,6 +42,7 @@ import java.util.Arrays;
 public class AdminSecurityAutoConfiguration {
 
     private final JwtTokenUtil jwtTokenUtil;
+    private final JwtBlacklistService jwtBlacklistService;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
@@ -65,7 +67,7 @@ public class AdminSecurityAutoConfiguration {
      */
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtTokenUtil);
+        return new JwtAuthenticationFilter(jwtTokenUtil, jwtBlacklistService);
     }
 
     /**

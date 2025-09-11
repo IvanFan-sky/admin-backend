@@ -2,6 +2,7 @@ package com.admin.framework.security.filter;
 
 import com.admin.framework.security.utils.JwtTokenUtil;
 import com.admin.framework.security.core.LoginUser;
+import com.admin.framework.security.service.JwtBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
+    private final JwtBlacklistService jwtBlacklistService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, 
@@ -45,8 +47,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 如果令牌存在且当前无认证信息，则进行认证
         if (StringUtils.hasText(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
-                // 验证令牌
+                // 验证令牌格式和有效性
                 if (jwtTokenUtil.validateToken(token)) {
+                    // 检查令牌是否在黑名单中
+                    if (jwtBlacklistService.isBlacklisted(token)) {
+                        log.debug("令牌在黑名单中，拒绝认证");
+                        SecurityContextHolder.clearContext();
+                        filterChain.doFilter(request, response);
+                        return;
+                    }
                     // 获取用户信息
                     String username = jwtTokenUtil.getUsernameFromToken(token);
                     Long userId = jwtTokenUtil.getUserIdFromToken(token);

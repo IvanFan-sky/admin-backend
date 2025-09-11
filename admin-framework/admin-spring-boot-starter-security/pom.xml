@@ -23,6 +23,11 @@
             <groupId>com.admin</groupId>
             <artifactId>admin-common</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-redis</artifactId>
+        </dependency>
         
         <!-- Spring Security -->
         <dependency>
