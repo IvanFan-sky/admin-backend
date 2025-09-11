@@ -2,6 +2,7 @@ package com.admin.module.system.biz.service.dict;
 
 import cn.hutool.core.util.StrUtil;
 import com.admin.common.core.domain.PageResult;
+import com.admin.common.enums.ErrorCode;
 import com.admin.common.exception.ServiceException;
 import com.admin.module.system.api.dto.dict.SysDictDataCreateDTO;
 import com.admin.module.system.api.dto.dict.SysDictDataQueryDTO;
@@ -49,12 +50,12 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     public Long createDictData(SysDictDataCreateDTO createDTO) {
         // 校验字典值是否已存在
         if (existsDictValue(createDTO.getDictType(), createDTO.getDictValue())) {
-            throw new ServiceException("字典值已存在");
+            throw new ServiceException(ErrorCode.DICT_DATA_ALREADY_EXISTS);
         }
         
         // 校验字典标签是否已存在
         if (existsDictLabel(createDTO.getDictType(), createDTO.getDictLabel())) {
-            throw new ServiceException("字典标签已存在");
+            throw new ServiceException(ErrorCode.DICT_DATA_ALREADY_EXISTS);
         }
 
         // 如果没有设置排序值，自动获取下一个排序值
@@ -78,20 +79,20 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         // 校验字典数据是否存在
         SysDictDataDO existingDictData = dictDataMapper.selectById(updateDTO.getId());
         if (existingDictData == null) {
-            throw new ServiceException("字典数据不存在");
+            throw new ServiceException(ErrorCode.DICT_DATA_NOT_FOUND);
         }
 
         // 如果字典值发生变化，需要校验新的字典值是否已存在
         if (!existingDictData.getDictValue().equals(updateDTO.getDictValue())) {
             if (existsDictValue(updateDTO.getDictType(), updateDTO.getDictValue())) {
-                throw new ServiceException("字典值已存在");
+                throw new ServiceException(ErrorCode.DICT_DATA_ALREADY_EXISTS);
             }
         }
 
         // 如果字典标签发生变化，需要校验新的字典标签是否已存在
         if (!existingDictData.getDictLabel().equals(updateDTO.getDictLabel())) {
             if (existsDictLabel(updateDTO.getDictType(), updateDTO.getDictLabel())) {
-                throw new ServiceException("字典标签已存在");
+                throw new ServiceException(ErrorCode.DICT_DATA_ALREADY_EXISTS);
             }
         }
 
@@ -110,7 +111,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         // 校验字典数据是否存在
         SysDictDataDO dictDataDO = dictDataMapper.selectById(id);
         if (dictDataDO == null) {
-            throw new ServiceException("字典数据不存在");
+            throw new ServiceException(ErrorCode.DICT_DATA_NOT_FOUND);
         }
 
         // 删除字典数据
@@ -146,7 +147,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     public SysDictDataVO getDictData(Long id) {
         SysDictDataDO dictDataDO = dictDataMapper.selectById(id);
         if (dictDataDO == null) {
-            throw new ServiceException("字典数据不存在");
+            throw new ServiceException(ErrorCode.DICT_DATA_NOT_FOUND);
         }
         
         return SysDictDataConvert.INSTANCE.convert(dictDataDO);
@@ -235,7 +236,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
         // 校验字典数据是否存在
         SysDictDataDO dictDataDO = dictDataMapper.selectById(id);
         if (dictDataDO == null) {
-            throw new ServiceException("字典数据不存在");
+            throw new ServiceException(ErrorCode.DICT_DATA_NOT_FOUND);
         }
 
         // 更新状态

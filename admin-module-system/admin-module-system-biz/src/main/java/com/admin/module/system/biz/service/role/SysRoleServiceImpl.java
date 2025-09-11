@@ -1,5 +1,6 @@
 package com.admin.module.system.biz.service.role;
 
+import com.admin.common.enums.ErrorCode;
 import com.admin.common.core.domain.PageResult;
 import com.admin.common.exception.ServiceException;
 import com.admin.common.utils.PageUtils;
@@ -99,7 +100,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         int updateCount = roleMapper.updateById(existingRole);
         
         if (updateCount == 0) {
-            throw new ServiceException("角色更新失败，数据可能已被其他人修改，请刷新后重试");
+            throw new ServiceException(ErrorCode.ROLE_UPDATE_FAILED);
         }
 
         log.info("角色更新成功，角色ID: {}, 角色名称: {}", updateDTO.getId(), updateDTO.getRoleName());
@@ -276,7 +277,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         int updateCount = roleMapper.updateById(roleDO);
         
         if (updateCount == 0) {
-            throw new ServiceException("角色状态更新失败");
+            throw new ServiceException(ErrorCode.ROLE_STATUS_UPDATE_FAILED);
         }
 
         log.info("角色状态更新成功，角色ID: {}, 新状态: {}", id, status);
@@ -288,7 +289,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     private SysRoleDO validateRoleExists(Long id) {
         SysRoleDO roleDO = roleMapper.selectById(id);
         if (roleDO == null) {
-            throw new ServiceException("角色不存在");
+            throw new ServiceException(ErrorCode.ROLE_NOT_FOUND);
         }
         return roleDO;
     }
@@ -299,7 +300,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     private void validateRoleNameUnique(Long excludeId, String roleName) {
         SysRoleDO role = roleMapper.selectByRoleName(roleName);
         if (role != null && !role.getId().equals(excludeId)) {
-            throw new ServiceException("角色名称已存在");
+            throw new ServiceException(ErrorCode.ROLE_NAME_ALREADY_EXISTS);
         }
     }
 
@@ -309,7 +310,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     private void validateRoleCodeUnique(Long excludeId, String roleCode) {
         SysRoleDO role = roleMapper.selectByRoleCode(roleCode);
         if (role != null && !role.getId().equals(excludeId)) {
-            throw new ServiceException("角色编码已存在");
+            throw new ServiceException(ErrorCode.ROLE_CODE_ALREADY_EXISTS);
         }
     }
 
@@ -323,7 +324,7 @@ public class SysRoleServiceImpl implements SysRoleService {
         
         Long count = userRoleMapper.selectCount(wrapper);
         if (count > 0) {
-            throw new ServiceException("角色正在被使用，无法删除");
+            throw new ServiceException(ErrorCode.ROLE_IN_USE);
         }
     }
 }

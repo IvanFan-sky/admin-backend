@@ -1,5 +1,6 @@
 package com.admin.common.exception;
 
+import com.admin.common.enums.ErrorCode;
 import lombok.Getter;
 
 /**
@@ -35,6 +36,27 @@ public class ServiceException extends RuntimeException {
         this.message = message;
     }
 
+    /**
+     * 基于ErrorCode枚举构造异常
+     *
+     * @param errorCode 错误码枚举
+     */
+    public ServiceException(ErrorCode errorCode) {
+        this.code = errorCode.getCode();
+        this.message = errorCode.getMessage();
+    }
+
+    /**
+     * 基于ErrorCode枚举和自定义消息构造异常
+     *
+     * @param errorCode 错误码枚举
+     * @param customMessage 自定义错误消息，如果为null则使用默认消息
+     */
+    public ServiceException(ErrorCode errorCode, String customMessage) {
+        this.code = errorCode.getCode();
+        this.message = customMessage != null ? customMessage : errorCode.getMessage();
+    }
+
     public ServiceException(String message, Integer code) {
         this.message = message;
         this.code = code;
@@ -48,6 +70,18 @@ public class ServiceException extends RuntimeException {
     public ServiceException(String message, Throwable e) {
         super(message, e);
         this.message = message;
+    }
+
+    /**
+     * 基于ErrorCode枚举和根异常构造异常
+     *
+     * @param errorCode 错误码枚举
+     * @param e 根异常
+     */
+    public ServiceException(ErrorCode errorCode, Throwable e) {
+        super(errorCode.getMessage(), e);
+        this.code = errorCode.getCode();
+        this.message = errorCode.getMessage();
     }
 
     @Override

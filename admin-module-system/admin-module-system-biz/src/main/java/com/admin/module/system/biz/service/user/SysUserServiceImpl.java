@@ -1,6 +1,7 @@
 package com.admin.module.system.biz.service.user;
 
 import com.admin.common.core.domain.PageResult;
+import com.admin.common.enums.ErrorCode;
 import com.admin.common.exception.ServiceException;
 import com.admin.common.utils.PageUtils;
 import com.admin.framework.redis.constants.CacheConstants;
@@ -83,7 +84,7 @@ public class SysUserServiceImpl implements SysUserService {
     public SysUserVO getUser(Long id) {
         SysUserDO user = userMapper.selectById(id);
         if (user == null) {
-            throw new ServiceException("用户不存在");
+            throw new ServiceException(ErrorCode.USER_NOT_FOUND);
         }
         return SysUserConvert.INSTANCE.convert(user);
     }
@@ -107,7 +108,7 @@ public class SysUserServiceImpl implements SysUserService {
         
         // 2. 转换DTO为数据对象
         SysUserDO user = SysUserConvert.INSTANCE.convert(createDTO);
-        user.setPassword(createDTO.getPassword()); // TODO: 密码加密
+        user.setPassword(passwordEncoder.encode(createDTO.getPassword())); // 使用BCrypt加密密码
         user.setStatus(createDTO.getStatus() != null ? createDTO.getStatus() : 1);
         
         // 3. 插入用户基本信息
@@ -128,7 +129,7 @@ public class SysUserServiceImpl implements SysUserService {
     public void updateUser(SysUserUpdateDTO updateDTO) {
         SysUserDO existUser = userMapper.selectById(updateDTO.getId());
         if (existUser == null) {
-            throw new ServiceException("用户不存在");
+            throw new ServiceException(ErrorCode.USER_NOT_FOUND);
         }
         
         validateUserForCreateOrUpdate(updateDTO.getId(), null, updateDTO.getPhone(), updateDTO.getEmail());
@@ -148,7 +149,7 @@ public class SysUserServiceImpl implements SysUserService {
     })
     public void deleteUser(Long id) {
         if (SysUserDO.isAdmin(id)) {
-            throw new ServiceException("不允许删除超级管理员用户");
+            throw new ServiceException(ErrorCode.CANNOT_DELETE_ADMIN_USER);
         }
         
         userMapper.deleteById(id);
@@ -161,7 +162,7 @@ public class SysUserServiceImpl implements SysUserService {
     public void deleteUsers(Long[] ids) {
         for (Long id : ids) {
             if (SysUserDO.isAdmin(id)) {
-                throw new ServiceException("不允许删除超级管理员用户");
+                throw new ServiceException(ErrorCode.CANNOT_DELETE_ADMIN_USER);
             }
         }
         
@@ -176,10 +177,10 @@ public class SysUserServiceImpl implements SysUserService {
     public void resetUserPwd(SysUserResetPwdDTO resetPwdDTO) {
         SysUserDO user = userMapper.selectById(resetPwdDTO.getId());
         if (user == null) {
-            throw new ServiceException("用户不存在");
+            throw new ServiceException(ErrorCode.USER_NOT_FOUND);
         }
         
-        user.setPassword(resetPwdDTO.getPassword()); // TODO: 密码加密
+        user.setPassword(passwordEncoder.encode(resetPwdDTO.getPassword())); // 使用BCrypt加密密码
         user.setVersion(resetPwdDTO.getVersion());
         userMapper.updateById(user);
     }
@@ -188,7 +189,7 @@ public class SysUserServiceImpl implements SysUserService {
     @CacheEvict(value = CacheConstants.SYS_USER_CACHE, key = "#id")
     public void updateUserStatus(Long id, Integer status) {
         if (SysUserDO.isAdmin(id)) {
-            throw new ServiceException("不允许修改超级管理员用户状态");
+            throw new ServiceException(ErrorCode.CANNOT_DISABLE_ADMIN_USER);
         }
         
         SysUserDO user = new SysUserDO();
@@ -232,13 +233,13 @@ public class SysUserServiceImpl implements SysUserService {
      */
     private void validateUserForCreateOrUpdate(Long id, String username, String phone, String email) {
         if (StringUtils.hasText(username) && !checkUsernameUnique(username, id)) {
-            throw new ServiceException("用户账号已存在");
+            throw new ServiceException(ErrorCode.USERNAME_ALREADY_EXISTS);
         }
         if (!checkPhoneUnique(phone, id)) {
-            throw new ServiceException("手机号码已存在");
+            throw new ServiceException(ErrorCode.PHONE_ALREADY_EXISTS);
         }
         if (!checkEmailUnique(email, id)) {
-            throw new ServiceException("邮箱已存在");
+            throw new ServiceException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
     }
 

@@ -2,6 +2,7 @@ package com.admin.module.system.biz.service.dict;
 
 import cn.hutool.core.util.StrUtil;
 import com.admin.common.core.domain.PageResult;
+import com.admin.common.enums.ErrorCode;
 import com.admin.common.exception.ServiceException;
 import com.admin.module.system.api.dto.dict.SysDictTypeCreateDTO;
 import com.admin.module.system.api.dto.dict.SysDictTypeQueryDTO;
@@ -51,12 +52,12 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     public Long createDictType(SysDictTypeCreateDTO createDTO) {
         // 校验字典类型是否已存在
         if (existsDictType(createDTO.getDictType())) {
-            throw new ServiceException("字典类型已存在");
+            throw new ServiceException(ErrorCode.DICT_TYPE_ALREADY_EXISTS);
         }
         
         // 校验字典名称是否已存在
         if (existsDictName(createDTO.getDictName())) {
-            throw new ServiceException("字典名称已存在");
+            throw new ServiceException(ErrorCode.DICT_TYPE_ALREADY_EXISTS);
         }
 
         // 转换并保存
@@ -73,20 +74,20 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         // 校验字典类型是否存在
         SysDictTypeDO existingDictType = dictTypeMapper.selectById(updateDTO.getId());
         if (existingDictType == null) {
-            throw new ServiceException("字典类型不存在");
+            throw new ServiceException(ErrorCode.DICT_TYPE_NOT_FOUND);
         }
 
         // 如果字典类型发生变化，需要校验新的字典类型是否已存在
         if (!existingDictType.getDictType().equals(updateDTO.getDictType())) {
             if (existsDictType(updateDTO.getDictType())) {
-                throw new ServiceException("字典类型已存在");
+                throw new ServiceException(ErrorCode.DICT_TYPE_ALREADY_EXISTS);
             }
         }
 
         // 如果字典名称发生变化，需要校验新的字典名称是否已存在
         if (!existingDictType.getDictName().equals(updateDTO.getDictName())) {
             if (existsDictName(updateDTO.getDictName())) {
-                throw new ServiceException("字典名称已存在");
+                throw new ServiceException(ErrorCode.DICT_TYPE_ALREADY_EXISTS);
             }
         }
 
@@ -103,12 +104,12 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         // 校验字典类型是否存在
         SysDictTypeDO dictTypeDO = dictTypeMapper.selectById(id);
         if (dictTypeDO == null) {
-            throw new ServiceException("字典类型不存在");
+            throw new ServiceException(ErrorCode.DICT_TYPE_NOT_FOUND);
         }
 
         // 校验是否可以删除
         if (!canDeleteDictType(dictTypeDO.getDictType())) {
-            throw new ServiceException("字典类型正在使用中，无法删除");
+            throw new ServiceException(ErrorCode.CANNOT_DELETE_SYSTEM_DICT);
         }
 
         // 删除字典类型
@@ -143,7 +144,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     public SysDictTypeVO getDictType(Long id) {
         SysDictTypeDO dictTypeDO = dictTypeMapper.selectById(id);
         if (dictTypeDO == null) {
-            throw new ServiceException("字典类型不存在");
+            throw new ServiceException(ErrorCode.DICT_TYPE_NOT_FOUND);
         }
         
         return SysDictTypeConvert.INSTANCE.convert(dictTypeDO);
@@ -216,7 +217,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
         // 校验字典类型是否存在
         SysDictTypeDO dictTypeDO = dictTypeMapper.selectById(id);
         if (dictTypeDO == null) {
-            throw new ServiceException("字典类型不存在");
+            throw new ServiceException(ErrorCode.DICT_TYPE_NOT_FOUND);
         }
 
         // 更新状态

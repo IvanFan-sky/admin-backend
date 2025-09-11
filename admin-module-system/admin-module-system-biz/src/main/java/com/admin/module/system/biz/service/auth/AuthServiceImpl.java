@@ -1,5 +1,6 @@
 package com.admin.module.system.biz.service.auth;
 
+import com.admin.common.enums.ErrorCode;
 import com.admin.common.exception.ServiceException;
 import com.admin.common.utils.AuthorityUtils;
 import com.admin.framework.redis.service.UserCacheService;
@@ -62,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
             // 2. 检查账户是否被锁定
             if (loginLimitService.isAccountLocked(loginDTO.getUsername())) {
                 long remainingTime = loginLimitService.getRemainingLockTime(loginDTO.getUsername());
-                throw new ServiceException(String.format("账户已被锁定，请 %d 分钟后重试", remainingTime / 60));
+                throw new ServiceException(ErrorCode.ACCOUNT_LOCKED);
             }
             
             // 3. 查找用户（先从缓存查找）
@@ -70,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
             if (user == null) {
                 // 记录登录失败
                 loginLimitService.recordLoginFail(loginDTO.getUsername());
-                throw new ServiceException("用户名或密码错误");
+                throw new ServiceException(ErrorCode.INVALID_CREDENTIALS);
             }
             
             // 4. 验证用户状态
@@ -81,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
                 log.warn("用户密码验证失败，用户: {}", loginDTO.getUsername());
                 // 记录登录失败
                 loginLimitService.recordLoginFail(loginDTO.getUsername());
-                throw new ServiceException("用户名或密码错误");
+                throw new ServiceException(ErrorCode.INVALID_CREDENTIALS);
             }
             
             // 6. 登录成功，清除失败记录
@@ -115,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
             throw e;
         } catch (Exception e) {
             log.error("用户登录异常，用户: {}, 错误: {}", loginDTO.getUsername(), e.getMessage(), e);
-            throw new ServiceException("登录失败，请稍后重试");
+            throw new ServiceException(ErrorCode.SYSTEM_ERROR);
         }
     }
 
@@ -158,7 +159,7 @@ public class AuthServiceImpl implements AuthService {
         
         // 1. 验证刷新令牌
         if (!jwtTokenUtil.validateToken(refreshToken) || !jwtTokenUtil.isRefreshToken(refreshToken)) {
-            throw new ServiceException("刷新令牌无效");
+            throw new ServiceException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
         
         // 2. 获取用户信息
@@ -167,7 +168,7 @@ public class AuthServiceImpl implements AuthService {
         
         SysUserDO user = userMapper.selectById(userId);
         if (user == null) {
-            throw new ServiceException("用户不存在");
+            throw new ServiceException(ErrorCode.USER_NOT_FOUND);
         }
         
         // 3. 验证用户状态
@@ -195,12 +196,12 @@ public class AuthServiceImpl implements AuthService {
     public UserInfoVO getCurrentUserInfo() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof LoginUser loginUser)) {
-            throw new ServiceException("未找到当前登录用户信息");
+            throw new ServiceException(ErrorCode.USER_NOT_LOGIN);
         }
         
         SysUserDO user = userMapper.selectById(loginUser.getUserId());
         if (user == null) {
-            throw new ServiceException("用户不存在");
+            throw new ServiceException(ErrorCode.USER_NOT_FOUND);
         }
         
         String authorities = buildUserAuthorities(user);
@@ -212,10 +213,10 @@ public class AuthServiceImpl implements AuthService {
      */
     private void validateLoginParams(LoginDTO loginDTO) {
         if (!StringUtils.hasText(loginDTO.getUsername())) {
-            throw new ServiceException("用户名不能为空");
+            throw new ServiceException(ErrorCode.PARAMETER_ERROR);
         }
         if (!StringUtils.hasText(loginDTO.getPassword())) {
-            throw new ServiceException("密码不能为空");
+            throw new ServiceException(ErrorCode.PARAMETER_ERROR);
         }
     }
 
@@ -241,7 +242,7 @@ public class AuthServiceImpl implements AuthService {
      */
     private void validateUserStatus(SysUserDO user) {
         if (user.getStatus() == null || user.getStatus() != 1) {
-            throw new ServiceException("账户已被禁用，请联系管理员");
+            throw new ServiceException(ErrorCode.ACCOUNT_DISABLED);
         }
     }
 

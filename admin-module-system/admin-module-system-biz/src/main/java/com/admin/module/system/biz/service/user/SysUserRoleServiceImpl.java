@@ -1,5 +1,6 @@
 package com.admin.module.system.biz.service.user;
 
+import com.admin.common.enums.ErrorCode;
 import com.admin.common.exception.ServiceException;
 import com.admin.module.system.api.dto.user.SysUserRoleDTO;
 import com.admin.module.system.api.service.role.SysRoleService;
@@ -217,7 +218,7 @@ public class SysUserRoleServiceImpl implements SysUserRoleService {
      */
     private void validateUserExists(Long userId) {
         if (userService.getUser(userId) == null) {
-            throw new ServiceException("用户不存在");
+            throw new ServiceException(ErrorCode.USER_NOT_FOUND);
         }
     }
 
@@ -226,7 +227,7 @@ public class SysUserRoleServiceImpl implements SysUserRoleService {
      */
     private void validateRoleExists(Long roleId) {
         if (roleService.getRole(roleId) == null) {
-            throw new ServiceException("角色不存在");
+            throw new ServiceException(ErrorCode.ROLE_NOT_FOUND);
         }
     }
 

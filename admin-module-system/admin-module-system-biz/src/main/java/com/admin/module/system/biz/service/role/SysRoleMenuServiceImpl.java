@@ -1,5 +1,6 @@
 package com.admin.module.system.biz.service.role;
 
+import com.admin.common.enums.ErrorCode;
 import com.admin.common.exception.ServiceException;
 import com.admin.module.system.api.dto.role.SysRoleMenuDTO;
 import com.admin.module.system.api.service.menu.SysMenuService;
@@ -282,7 +283,7 @@ public class SysRoleMenuServiceImpl implements SysRoleMenuService {
      */
     private void validateRoleExists(Long roleId) {
         if (roleService.getRole(roleId) == null) {
-            throw new ServiceException("角色不存在");
+            throw new ServiceException(ErrorCode.ROLE_NOT_FOUND);
         }
     }
 
@@ -291,7 +292,7 @@ public class SysRoleMenuServiceImpl implements SysRoleMenuService {
      */
     private void validateMenuExists(Long menuId) {
         if (menuService.getMenu(menuId) == null) {
-            throw new ServiceException("菜单不存在");
+            throw new ServiceException(ErrorCode.MENU_NOT_FOUND);
         }
     }
 

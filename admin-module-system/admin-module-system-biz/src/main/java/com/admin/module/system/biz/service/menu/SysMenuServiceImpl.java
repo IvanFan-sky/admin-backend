@@ -1,6 +1,7 @@
 package com.admin.module.system.biz.service.menu;
 
 import com.admin.common.core.domain.PageResult;
+import com.admin.common.enums.ErrorCode;
 import com.admin.common.exception.ServiceException;
 import com.admin.common.utils.PageUtils;
 import com.admin.module.system.api.dto.menu.SysMenuCreateDTO;
@@ -123,7 +124,7 @@ public class SysMenuServiceImpl implements SysMenuService {
         int updateCount = menuMapper.updateById(existingMenu);
         
         if (updateCount == 0) {
-            throw new ServiceException("菜单更新失败，数据可能已被其他人修改，请刷新后重试");
+            throw new ServiceException(ErrorCode.DATA_VERSION_CONFLICT);
         }
 
         log.info("菜单更新成功，菜单ID: {}, 菜单名称: {}", updateDTO.getId(), updateDTO.getMenuName());
@@ -281,7 +282,7 @@ public class SysMenuServiceImpl implements SysMenuService {
         int updateCount = menuMapper.updateById(menuDO);
         
         if (updateCount == 0) {
-            throw new ServiceException("菜单状态更新失败");
+            throw new ServiceException(ErrorCode.DATA_UPDATE_FAILED);
         }
 
         log.info("菜单状态更新成功，菜单ID: {}, 新状态: {}", id, status);
@@ -386,7 +387,7 @@ public class SysMenuServiceImpl implements SysMenuService {
     private SysMenuDO validateMenuExists(Long id) {
         SysMenuDO menuDO = menuMapper.selectById(id);
         if (menuDO == null) {
-            throw new ServiceException("菜单不存在");
+            throw new ServiceException(ErrorCode.MENU_NOT_FOUND);
         }
         return menuDO;
     }
@@ -405,7 +406,7 @@ public class SysMenuServiceImpl implements SysMenuService {
         
         SysMenuDO menu = menuMapper.selectOne(wrapper);
         if (menu != null) {
-            throw new ServiceException("同级菜单下已存在该菜单名称");
+            throw new ServiceException(ErrorCode.MENU_NAME_ALREADY_EXISTS);
         }
     }
 
@@ -415,7 +416,7 @@ public class SysMenuServiceImpl implements SysMenuService {
     private void validatePermissionUnique(Long excludeId, String permission) {
         SysMenuDO menu = menuMapper.selectByPermission(permission);
         if (menu != null && !menu.getId().equals(excludeId)) {
-            throw new ServiceException("权限标识已存在");
+            throw new ServiceException(ErrorCode.PERMISSION_ALREADY_EXISTS);
         }
     }
 
@@ -426,7 +427,7 @@ public class SysMenuServiceImpl implements SysMenuService {
         // 不能将菜单移动到自己的子菜单下
         String ancestors = buildAncestors(newParentId);
         if (ancestors.contains(menuId.toString())) {
-            throw new ServiceException("不能将菜单移动到自己的子菜单下");
+            throw new ServiceException(ErrorCode.CANNOT_SELECT_CHILD_AS_PARENT);
         }
     }
 
@@ -436,7 +437,7 @@ public class SysMenuServiceImpl implements SysMenuService {
     private void validateNoChildrenMenus(Long menuId) {
         Long childrenCount = menuMapper.selectChildrenCountByParentId(menuId);
         if (childrenCount > 0) {
-            throw new ServiceException("存在子菜单，不允许删除");
+            throw new ServiceException(ErrorCode.MENU_HAS_CHILDREN);
         }
     }
 
@@ -450,7 +451,7 @@ public class SysMenuServiceImpl implements SysMenuService {
         
         Long count = roleMenuMapper.selectCount(wrapper);
         if (count > 0) {
-            throw new ServiceException("菜单正在被角色使用，无法删除");
+            throw new ServiceException(ErrorCode.MENU_ASSIGNED_TO_ROLE);
         }
     }
 }
