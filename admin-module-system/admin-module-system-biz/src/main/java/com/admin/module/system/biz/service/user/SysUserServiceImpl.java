@@ -98,6 +98,11 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
+    public List<Long> getUserIdsByRoleId(Long roleId) {
+        return List.of();
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(value = CacheConstants.SYS_USER_CACHE, allEntries = true)
     public Long createUser(SysUserCreateDTO createDTO) {
@@ -152,6 +157,11 @@ public class SysUserServiceImpl implements SysUserService {
         
         userMapper.deleteById(id);
         userRoleMapper.deleteUserRoleByUserId(id);
+    }
+
+    @Override
+    public void resetUserPassword(SysUserResetPwdDTO resetPwdDTO) {
+
     }
 
     @Override

@@ -31,6 +31,11 @@ import java.util.List;
 @ConditionalOnProperty(name = "admin.openapi.enabled", havingValue = "true", matchIfMissing = true)
 public class OpenApiConfig {
 
+    /**
+     * 禁用默认分组，避免与自定义分组重复
+     * 当定义了GroupedOpenApi时，SpringDoc会自动禁用默认的全局分组
+     */
+
     private final OpenApiProperties openApiProperties;
 
     /**
@@ -127,12 +132,7 @@ public class OpenApiConfig {
     public GroupedOpenApi systemApi() {
         return GroupedOpenApi.builder()
                 .group("01-系统管理")
-                .pathsToMatch("/admin-api/system/**")
-                .addOperationCustomizer((operation, handlerMethod) -> {
-                    // 为系统管理接口添加通用标签
-                    operation.addTagsItem("系统管理");
-                    return operation;
-                })
+                .pathsToMatch("/system/cache/**")
                 .build();
     }
 
@@ -143,11 +143,7 @@ public class OpenApiConfig {
     public GroupedOpenApi userApi() {
         return GroupedOpenApi.builder()
                 .group("02-用户管理")
-                .pathsToMatch("/admin-api/system/users/**", "/admin-api/system/user-roles/**")
-                .addOperationCustomizer((operation, handlerMethod) -> {
-                    operation.addTagsItem("用户管理");
-                    return operation;
-                })
+                .pathsToMatch("/admin/system/user/**")
                 .build();
     }
 
@@ -158,11 +154,19 @@ public class OpenApiConfig {
     public GroupedOpenApi roleApi() {
         return GroupedOpenApi.builder()
                 .group("03-角色权限")
-                .pathsToMatch("/admin-api/system/roles/**", "/admin-api/system/role-menus/**", "/admin-api/system/menus/**")
-                .addOperationCustomizer((operation, handlerMethod) -> {
-                    operation.addTagsItem("角色权限");
-                    return operation;
-                })
+                .pathsToMatch("/system/role/**", "/system/menu/**")
+                .pathsToExclude("/system/role-menu/**")
+                .build();
+    }
+
+    /**
+     * 用户角色关联API分组
+     */
+    @Bean
+    public GroupedOpenApi userRoleApi() {
+        return GroupedOpenApi.builder()
+                .group("04-用户角色关联")
+                .pathsToMatch("/system/user-role/**", "/system/role-menu/**")
                 .build();
     }
 
@@ -172,12 +176,8 @@ public class OpenApiConfig {
     @Bean
     public GroupedOpenApi dictApi() {
         return GroupedOpenApi.builder()
-                .group("04-字典管理")
-                .pathsToMatch("/admin-api/system/dict/**")
-                .addOperationCustomizer((operation, handlerMethod) -> {
-                    operation.addTagsItem("字典管理");
-                    return operation;
-                })
+                .group("05-字典管理")
+                .pathsToMatch("/system/dict-type/**", "/system/dict-data/**")
                 .build();
     }
 
@@ -187,12 +187,19 @@ public class OpenApiConfig {
     @Bean
     public GroupedOpenApi authApi() {
         return GroupedOpenApi.builder()
-                .group("05-认证授权")
-                .pathsToMatch("/admin-api/system/auth/**", "/admin-api/system/cache/**")
-                .addOperationCustomizer((operation, handlerMethod) -> {
-                    operation.addTagsItem("认证授权");
-                    return operation;
-                })
+                .group("06-认证授权")
+                .pathsToMatch("/auth/**")
+                .build();
+    }
+
+    /**
+     * 日志管理API分组
+     */
+    @Bean
+    public GroupedOpenApi logApi() {
+        return GroupedOpenApi.builder()
+                .group("07-日志管理")
+                .pathsToMatch("/system/log/**")
                 .build();
     }
 
@@ -202,12 +209,8 @@ public class OpenApiConfig {
     @Bean
     public GroupedOpenApi infraApi() {
         return GroupedOpenApi.builder()
-                .group("06-基础设施")
+                .group("08-基础设施")
                 .pathsToMatch("/admin-api/infra/**")
-                .addOperationCustomizer((operation, handlerMethod) -> {
-                    operation.addTagsItem("基础设施");
-                    return operation;
-                })
                 .build();
     }
 
@@ -217,12 +220,8 @@ public class OpenApiConfig {
     @Bean
     public GroupedOpenApi monitorApi() {
         return GroupedOpenApi.builder()
-                .group("07-监控运维")
+                .group("09-监控运维")
                 .pathsToMatch("/admin-api/monitor/**", "/actuator/**")
-                .addOperationCustomizer((operation, handlerMethod) -> {
-                    operation.addTagsItem("监控运维");
-                    return operation;
-                })
                 .build();
     }
 }

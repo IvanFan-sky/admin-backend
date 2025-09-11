@@ -30,7 +30,7 @@ import jakarta.validation.Valid;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "认证管理", description = "用户登录、登出、令牌刷新等认证相关接口")

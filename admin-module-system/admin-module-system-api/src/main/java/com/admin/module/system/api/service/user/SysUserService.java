@@ -55,6 +55,14 @@ public interface SysUserService {
     SysUserVO getUserByUsername(String username);
 
     /**
+     * 根据角色ID查询用户ID列表
+     *
+     * @param roleId 角色ID
+     * @return 拥有该角色的用户ID列表
+     */
+    List<Long> getUserIdsByRoleId(Long roleId);
+
+    /**
      * 创建用户
      * 
      * 1. 校验用户名、手机号、邮箱唯一性
@@ -91,6 +99,17 @@ public interface SysUserService {
      * @throws com.admin.common.exception.ServiceException 当尝试删除超级管理员时抛出
      */
     void deleteUser(Long id);
+
+    /**
+     * 重置用户密码
+     * 
+     * 管理员重置指定用户的登录密码
+     * 密码将进行加密存储
+     *
+     * @param resetPwdDTO 重置密码请求参数
+     * @throws com.admin.common.exception.ServiceException 当用户不存在时抛出
+     */
+    void resetUserPassword(SysUserResetPwdDTO resetPwdDTO);
 
     /**
      * 批量删除用户

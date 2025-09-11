@@ -26,7 +26,7 @@ import java.util.Set;
  */
 @Slf4j
 @RestController
-@RequestMapping("/admin-api/system/cache")
+@RequestMapping("/system/cache")
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "缓存管理", description = "Redis缓存管理相关接口")

@@ -124,6 +124,7 @@ public class SysUserController {
         return R.ok(unique);
     }
 
+
     @Operation(summary = "校验手机号是否唯一")
     @GetMapping("/checkPhoneUnique")
     // @PreAuthorize("hasPermission('system:user:query')")

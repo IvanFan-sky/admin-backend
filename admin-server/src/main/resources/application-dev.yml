@@ -1,3 +1,4 @@
+
 # 开发环境配置
 
 # 数据源配置
@@ -44,9 +45,45 @@ mybatis-plus:
       logic-not-delete-value: 0
   mapper-locations: classpath*:mapper/**/*.xml
 
+# SpringDoc OpenAPI配置
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+    # 禁用默认分组，避免与自定义分组重复
+    groups:
+      enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    show-extensions: true
+    show-common-extensions: true
+  # 禁用默认的全局API文档生成，只使用分组
+  default-flat-param-object: false
+  # 只扫描指定包，避免生成默认分组
+  packages-to-scan: com.admin.module
+
 # Knife4j配置
 knife4j:
   enable: true
+  setting:
+    language: zh_cn
+    enable-version: true
+    enable-reload-cache-parameter: true
+    enable-after-script: true
+    enable-filter-multipart-apis: true
+    enable-filter-multipart-api-method-type: POST
+    enable-request-cache: true
+    enable-home-custom: true
+    home-custom-path: classpath:knife4j/home.md
+  # 自定义文档配置 - 移除默认分组配置
+  # documents:
+  #   - group: default
+  #     name: 接口文档说明
+  #     locations: classpath:knife4j/home.md
   openapi:
     title: Admin管理系统API文档
     description: Admin管理系统后端接口文档
@@ -54,8 +91,6 @@ knife4j:
     contact:
       name: Admin Team
       email: admin@example.com
-  setting:
-    language: zh_cn
 
 # JWT认证配置
 admin:
