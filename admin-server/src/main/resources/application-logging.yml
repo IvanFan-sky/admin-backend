@@ -1,0 +1,215 @@
+# 日志监控和管理配置
+# 可以在主配置文件中通过 spring.config.import 引入
+
+# 日志级别动态调整配置
+logging:
+  level:
+    # 根日志级别
+    root: ${LOG_LEVEL_ROOT:INFO}
+    
+    # 业务包日志级别
+    com.admin: ${LOG_LEVEL_BUSINESS:INFO}
+    
+    # 框架日志级别
+    org.springframework: ${LOG_LEVEL_SPRING:WARN}
+    org.springframework.web: ${LOG_LEVEL_SPRING_WEB:INFO}
+    org.springframework.security: ${LOG_LEVEL_SECURITY:WARN}
+    org.springframework.transaction: ${LOG_LEVEL_TRANSACTION:WARN}
+    
+    # 数据库相关日志级别
+    com.baomidou.mybatisplus: ${LOG_LEVEL_MYBATIS:WARN}
+    org.apache.ibatis: ${LOG_LEVEL_IBATIS:WARN}
+    com.zaxxer.hikari: ${LOG_LEVEL_HIKARI:WARN}
+    
+    # Redis相关日志级别
+    org.redisson: ${LOG_LEVEL_REDISSON:WARN}
+    io.lettuce: ${LOG_LEVEL_LETTUCE:WARN}
+    
+    # HTTP客户端日志级别
+    org.apache.http: ${LOG_LEVEL_HTTP_CLIENT:WARN}
+    okhttp3: ${LOG_LEVEL_OKHTTP:WARN}
+    
+    # 第三方库日志级别
+    com.fasterxml.jackson: ${LOG_LEVEL_JACKSON:WARN}
+    org.hibernate.validator: ${LOG_LEVEL_VALIDATOR:WARN}
+    
+    # 特殊日志记录器
+    BUSINESS: ${LOG_LEVEL_BUSINESS_LOGGER:INFO}
+    PERFORMANCE: ${LOG_LEVEL_PERFORMANCE_LOGGER:INFO}
+    SECURITY: ${LOG_LEVEL_SECURITY_LOGGER:INFO}
+    API: ${LOG_LEVEL_API_LOGGER:INFO}
+    
+  # 日志文件配置
+  file:
+    # 日志文件路径
+    path: ${LOG_FILE_PATH:/app/logs}
+    # 日志文件名
+    name: ${LOG_FILE_PATH:/app/logs}/${spring.application.name:admin-backend}.log
+    
+  # 日志轮转配置
+  logback:
+    rollingpolicy:
+      # 单个文件最大大小
+      max-file-size: ${LOG_FILE_MAX_SIZE:100MB}
+      # 历史文件保留天数
+      max-history: ${LOG_FILE_MAX_HISTORY:30}
+      # 总日志文件大小限制
+      total-size-cap: ${LOG_FILE_TOTAL_SIZE:3GB}
+      # 启动时清理历史文件
+      clean-history-on-start: ${LOG_FILE_CLEAN_HISTORY_ON_START:false}
+
+# 日志监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers,httptrace,threaddump
+  endpoint:
+    # 启用日志级别管理端点
+    loggers:
+      enabled: true
+    # 启用HTTP追踪端点
+    httptrace:
+      enabled: true
+    # 启用线程转储端点
+    threaddump:
+      enabled: true
+  
+  # 度量配置
+  metrics:
+    enable:
+      # 启用JVM度量
+      jvm: true
+      # 启用系统度量
+      system: true
+      # 启用HTTP度量
+      http: true
+      # 启用数据库连接池度量
+      hikaricp: true
+    export:
+      # Prometheus集成（如果需要）
+      prometheus:
+        enabled: ${METRICS_PROMETHEUS_ENABLED:false}
+        step: ${METRICS_PROMETHEUS_STEP:1m}
+      # 简单度量输出
+      simple:
+        enabled: ${METRICS_SIMPLE_ENABLED:true}
+        step: ${METRICS_SIMPLE_STEP:1m}
+
+# 日志采样配置（用于高并发场景）
+admin:
+  logging:
+    # 是否启用日志采样
+    sampling:
+      enabled: ${LOG_SAMPLING_ENABLED:false}
+      # 采样率（0.1表示10%的日志会被记录）
+      rate: ${LOG_SAMPLING_RATE:0.1}
+    
+    # 慢查询日志配置
+    slow-query:
+      # 是否启用慢查询日志
+      enabled: ${SLOW_QUERY_LOG_ENABLED:true}
+      # 慢查询阈值（毫秒）
+      threshold: ${SLOW_QUERY_THRESHOLD:1000}
+    
+    # 性能日志配置
+    performance:
+      # 是否启用性能日志
+      enabled: ${PERFORMANCE_LOG_ENABLED:true}
+      # 性能警告阈值（毫秒）
+      warn-threshold: ${PERFORMANCE_WARN_THRESHOLD:2000}
+      # 性能错误阈值（毫秒）
+      error-threshold: ${PERFORMANCE_ERROR_THRESHOLD:5000}
+    
+    # 安全日志配置
+    security:
+      # 是否启用安全日志
+      enabled: ${SECURITY_LOG_ENABLED:true}
+      # 是否记录登录失败详情
+      log-login-failures: ${SECURITY_LOG_LOGIN_FAILURES:true}
+      # 是否记录权限检查失败
+      log-access-denied: ${SECURITY_LOG_ACCESS_DENIED:true}
+    
+    # 链路追踪配置
+    trace:
+      # 是否启用链路追踪
+      enabled: ${TRACE_ENABLED:true}
+      # TraceId长度
+      trace-id-length: ${TRACE_ID_LENGTH:32}
+      # SpanId长度
+      span-id-length: ${SPAN_ID_LENGTH:16}
+
+# 环境特定配置
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+      
+# 开发环境日志配置
+logging:
+  level:
+    root: INFO
+    com.admin: DEBUG
+    org.springframework.web: DEBUG
+    com.baomidou.mybatisplus: DEBUG
+    PERFORMANCE: DEBUG
+
+admin:
+  logging:
+    sampling:
+      enabled: false
+    slow-query:
+      threshold: 500
+    performance:
+      warn-threshold: 1000
+      error-threshold: 3000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+# 生产环境日志配置
+logging:
+  level:
+    root: INFO
+    com.admin: INFO
+    org.springframework: WARN
+    org.springframework.web: WARN
+    BUSINESS: INFO
+    PERFORMANCE: INFO
+    SECURITY: INFO
+    API: INFO
+
+admin:
+  logging:
+    sampling:
+      enabled: true
+      rate: 0.1
+    slow-query:
+      threshold: 2000
+    performance:
+      warn-threshold: 3000
+      error-threshold: 8000
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+
+# 测试环境日志配置
+logging:
+  level:
+    root: INFO
+    com.admin: DEBUG
+    PERFORMANCE: INFO
+    
+admin:
+  logging:
+    sampling:
+      enabled: false
+    slow-query:
+      threshold: 1000

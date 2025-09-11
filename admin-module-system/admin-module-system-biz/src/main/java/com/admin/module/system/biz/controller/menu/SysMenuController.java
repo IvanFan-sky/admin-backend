@@ -1,5 +1,6 @@
 package com.admin.module.system.biz.controller.menu;
 
+import com.admin.common.annotation.OperationLog;
 import com.admin.common.core.domain.PageResult;
 import com.admin.common.core.domain.R;
 import com.admin.module.system.api.dto.menu.SysMenuCreateDTO;
@@ -52,6 +53,7 @@ public class SysMenuController {
     @Operation(summary = "创建菜单")
     @PostMapping
     @PreAuthorize("@ss.hasPermission('system:menu:create')")
+    @OperationLog(title = "菜单管理", businessType = OperationLog.BusinessType.INSERT, description = "创建菜单")
     public R<Long> createMenu(@Valid @RequestBody SysMenuCreateDTO createDTO) {
         Long menuId = menuService.createMenu(createDTO);
         return R.ok(menuId);
@@ -66,6 +68,7 @@ public class SysMenuController {
     @Operation(summary = "更新菜单")
     @PutMapping
     @PreAuthorize("@ss.hasPermission('system:menu:update')")
+    @OperationLog(title = "菜单管理", businessType = OperationLog.BusinessType.UPDATE, description = "更新菜单")
     public R<Void> updateMenu(@Valid @RequestBody SysMenuUpdateDTO updateDTO) {
         menuService.updateMenu(updateDTO);
         return R.ok();
@@ -81,6 +84,7 @@ public class SysMenuController {
     @Parameter(name = "id", description = "菜单编号", required = true, example = "1")
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:menu:delete')")
+    @OperationLog(title = "菜单管理", businessType = OperationLog.BusinessType.DELETE, description = "删除菜单")
     public R<Void> deleteMenu(@PathVariable @NotNull @Positive Long id) {
         menuService.deleteMenu(id);
         return R.ok();
@@ -95,6 +99,7 @@ public class SysMenuController {
     @Operation(summary = "批量删除菜单")
     @DeleteMapping("/batch")
     @PreAuthorize("@ss.hasPermission('system:menu:delete')")
+    @OperationLog(title = "菜单管理", businessType = OperationLog.BusinessType.DELETE, description = "批量删除菜单")
     public R<Integer> deleteMenusBatch(@RequestBody @NotEmpty Set<@NotNull @Positive Long> ids) {
         int deleteCount = menuService.deleteMenusBatch(ids);
         return R.ok(deleteCount);

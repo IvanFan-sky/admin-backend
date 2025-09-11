@@ -105,7 +105,17 @@ public @interface OperationLog {
         /**
          * 清空数据
          */
-        CLEAN(9, "清空数据");
+        CLEAN(9, "清空数据"),
+
+        /**
+         * 登录
+         */
+        LOGIN(10, "登录"),
+
+        /**
+         * 登出
+         */
+        LOGOUT(11, "登出");
 
         private final int code;
         private final String description;

@@ -1,5 +1,6 @@
 package com.admin.module.system.biz.controller.user;
 
+import com.admin.common.annotation.OperationLog;
 import com.admin.common.core.domain.R;
 import com.admin.module.system.api.dto.user.SysUserRoleDTO;
 import com.admin.module.system.api.service.user.SysUserRoleService;
@@ -49,6 +50,7 @@ public class SysUserRoleController {
     @Operation(summary = "分配用户角色")
     @PostMapping("/assign")
     @PreAuthorize("@ss.hasPermission('system:user:assign')")
+    @OperationLog(title = "用户角色管理", businessType = OperationLog.BusinessType.GRANT, description = "分配用户角色")
     public R<Void> assignUserRoles(@Valid @RequestBody SysUserRoleDTO userRoleDTO) {
         userRoleService.assignUserRoles(userRoleDTO);
         return R.ok();
@@ -96,6 +98,7 @@ public class SysUserRoleController {
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @DeleteMapping("/user/{userId}/role/{roleId}")
     @PreAuthorize("@ss.hasPermission('system:user:assign')")
+    @OperationLog(title = "用户角色管理", businessType = OperationLog.BusinessType.DELETE, description = "移除用户角色")
     public R<Void> removeUserRole(@PathVariable @NotNull @Positive Long userId,
                                   @PathVariable @NotNull @Positive Long roleId) {
         userRoleService.removeUserRole(userId, roleId);

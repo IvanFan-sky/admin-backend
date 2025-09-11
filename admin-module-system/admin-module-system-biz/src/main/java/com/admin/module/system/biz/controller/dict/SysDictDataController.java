@@ -1,5 +1,6 @@
 package com.admin.module.system.biz.controller.dict;
 
+import com.admin.common.annotation.OperationLog;
 import com.admin.common.core.domain.PageResult;
 import com.admin.common.core.domain.R;
 import com.admin.module.system.api.dto.dict.*;
@@ -48,6 +49,7 @@ public class SysDictDataController {
      */
     @Operation(summary = "创建字典数据")
     @PostMapping
+    @OperationLog(title = "字典管理", businessType = OperationLog.BusinessType.INSERT, description = "创建字典数据")
     public R<Long> createDictData(@Valid @RequestBody SysDictDataCreateDTO createDTO) {
         Long dictDataId = dictDataService.createDictData(createDTO);
         return R.ok(dictDataId);
@@ -61,6 +63,7 @@ public class SysDictDataController {
      */
     @Operation(summary = "更新字典数据")
     @PutMapping
+    @OperationLog(title = "字典管理", businessType = OperationLog.BusinessType.UPDATE, description = "更新字典数据")
     public R<Void> updateDictData(@Valid @RequestBody SysDictDataUpdateDTO updateDTO) {
         dictDataService.updateDictData(updateDTO);
         return R.ok();
@@ -75,6 +78,7 @@ public class SysDictDataController {
     @Operation(summary = "删除字典数据")
     @Parameter(name = "id", description = "字典数据编号", required = true, example = "1")
     @DeleteMapping("/{id}")
+    @OperationLog(title = "字典管理", businessType = OperationLog.BusinessType.DELETE, description = "删除字典数据")
     public R<Void> deleteDictData(@PathVariable @NotNull @Positive Long id) {
         dictDataService.deleteDictData(id);
         return R.ok();
@@ -88,6 +92,7 @@ public class SysDictDataController {
      */
     @Operation(summary = "批量删除字典数据")
     @DeleteMapping("/batch")
+    @OperationLog(title = "字典管理", businessType = OperationLog.BusinessType.DELETE, description = "批量删除字典数据")
     public R<Integer> deleteDictDatasBatch(@RequestBody @NotEmpty Set<@NotNull @Positive Long> ids) {
         int deleteCount = dictDataService.deleteDictDatasBatch(ids);
         return R.ok(deleteCount);

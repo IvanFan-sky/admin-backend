@@ -1,5 +1,6 @@
 package com.admin.module.system.biz.controller.auth;
 
+import com.admin.common.annotation.OperationLog;
 import com.admin.common.core.domain.R;
 import com.admin.framework.redis.service.UserCacheService;
 import com.admin.framework.security.service.LoginLimitService;
@@ -49,6 +50,13 @@ public class AuthController {
         summary = "用户登录", 
         description = "用户通过用户名和密码进行身份认证，成功后返回访问令牌和用户信息"
     )
+    @OperationLog(
+        title = "用户认证", 
+        businessType = OperationLog.BusinessType.LOGIN,
+        description = "用户登录",
+        recordRequestParam = false,  // 不记录密码等敏感信息
+        recordResponseResult = false // 不记录令牌等敏感信息
+    )
     public R<LoginVO> login(@Valid @RequestBody LoginDTO loginDTO) {
         log.info("用户登录请求，用户名: {}", loginDTO.getUsername());
         
@@ -63,6 +71,11 @@ public class AuthController {
     @Operation(
         summary = "用户登出", 
         description = "用户退出登录，清除认证信息并将令牌加入黑名单，防止令牌被滥用"
+    )
+    @OperationLog(
+        title = "用户认证", 
+        businessType = OperationLog.BusinessType.LOGOUT,
+        description = "用户登出"
     )
     public R<Void> logout(HttpServletRequest request) {
         // 从请求头获取令牌

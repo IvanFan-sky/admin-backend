@@ -3,7 +3,7 @@ package com.admin.module.system.biz.service.log;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.admin.common.annotation.OperationLog;
-import com.admin.common.constants.ErrorCodes;
+import com.admin.common.enums.ErrorCode;
 import com.admin.common.constants.SystemConstants;
 import com.admin.common.core.domain.PageResult;
 import com.admin.common.exception.ServiceException;
@@ -54,7 +54,7 @@ public class SysOperationLogServiceImpl implements SysOperationLogService {
             log.debug("保存操作日志成功，日志ID: {}", logDO.getId());
         } catch (Exception e) {
             log.error("保存操作日志失败: {}", e.getMessage(), e);
-            throw new ServiceException(ErrorCodes.OPERATION_LOG_RECORD_FAILED, "操作日志保存失败");
+            throw new ServiceException(ErrorCode.OPERATION_LOG_RECORD_FAILED);
         }
     }
 
@@ -89,7 +89,7 @@ public class SysOperationLogServiceImpl implements SysOperationLogService {
             return operationLogConvert.convertPage(result);
         } catch (Exception e) {
             log.error("查询操作日志分页失败: {}", e.getMessage(), e);
-            throw new ServiceException(ErrorCodes.LOG_QUERY_FAILED, "操作日志查询失败");
+            throw new ServiceException(ErrorCode.LOG_QUERY_FAILED);
         }
     }
 
@@ -99,14 +99,14 @@ public class SysOperationLogServiceImpl implements SysOperationLogService {
         try {
             SysOperationLogDO logDO = operationLogMapper.selectById(id);
             if (logDO == null) {
-                throw new ServiceException(ErrorCodes.OPERATION_LOG_NOT_FOUND, "操作日志不存在");
+                throw new ServiceException(ErrorCode.OPERATION_LOG_NOT_FOUND);
             }
             return operationLogConvert.convert(logDO);
         } catch (ServiceException e) {
             throw e;
         } catch (Exception e) {
             log.error("获取操作日志详情失败，ID: {}, 错误: {}", id, e.getMessage(), e);
-            throw new ServiceException(ErrorCodes.LOG_QUERY_FAILED, "获取操作日志详情失败");
+            throw new ServiceException(ErrorCode.LOG_QUERY_FAILED);
         }
     }
 
@@ -125,7 +125,7 @@ public class SysOperationLogServiceImpl implements SysOperationLogService {
             
         } catch (Exception e) {
             log.error("批量删除操作日志失败: {}", e.getMessage(), e);
-            throw new ServiceException(ErrorCodes.LOG_DELETE_FAILED, "删除操作日志失败");
+            throw new ServiceException(ErrorCode.LOG_DELETE_FAILED);
         }
     }
 
@@ -135,7 +135,7 @@ public class SysOperationLogServiceImpl implements SysOperationLogService {
     public int deleteOperationLogsByTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
         try {
             if (startTime == null || endTime == null) {
-                throw new ServiceException(ErrorCodes.LOG_DELETE_FAILED, "开始时间和结束时间不能为空");
+                throw new ServiceException(ErrorCode.LOG_DELETE_FAILED);
             }
             
             int deleteCount = operationLogMapper.deleteByTimeRange(startTime, endTime);
@@ -146,7 +146,7 @@ public class SysOperationLogServiceImpl implements SysOperationLogService {
             throw e;
         } catch (Exception e) {
             log.error("按时间范围删除操作日志失败: {}", e.getMessage(), e);
-            throw new ServiceException(ErrorCodes.LOG_DELETE_FAILED, "删除操作日志失败");
+            throw new ServiceException(ErrorCode.LOG_DELETE_FAILED);
         }
     }
 
@@ -160,7 +160,7 @@ public class SysOperationLogServiceImpl implements SysOperationLogService {
             return deleteCount;
         } catch (Exception e) {
             log.error("清空操作日志失败: {}", e.getMessage(), e);
-            throw new ServiceException(ErrorCodes.LOG_CLEAR_FAILED, "清空操作日志失败");
+            throw new ServiceException(ErrorCode.LOG_CLEAR_FAILED);
         }
     }
 
@@ -181,7 +181,7 @@ public class SysOperationLogServiceImpl implements SysOperationLogService {
             
         } catch (Exception e) {
             log.error("清理过期操作日志失败: {}", e.getMessage(), e);
-            throw new ServiceException(ErrorCodes.LOG_CLEAR_FAILED, "清理过期操作日志失败");
+            throw new ServiceException(ErrorCode.LOG_CLEAR_FAILED);
         }
     }
 
@@ -209,7 +209,7 @@ public class SysOperationLogServiceImpl implements SysOperationLogService {
             
         } catch (Exception e) {
             log.error("导出操作日志失败: {}", e.getMessage(), e);
-            throw new ServiceException(ErrorCodes.LOG_EXPORT_FAILED, "导出操作日志失败");
+            throw new ServiceException(ErrorCode.LOG_EXPORT_FAILED, "导出操作日志失败");
         }
     }
 
@@ -244,7 +244,7 @@ public class SysOperationLogServiceImpl implements SysOperationLogService {
             
         } catch (Exception e) {
             log.error("获取操作日志统计信息失败: {}", e.getMessage(), e);
-            throw new ServiceException(ErrorCodes.LOG_STATISTICS_FAILED, "获取操作日志统计信息失败");
+            throw new ServiceException(ErrorCode.LOG_STATISTICS_FAILED);
         }
     }
 
@@ -263,7 +263,7 @@ public class SysOperationLogServiceImpl implements SysOperationLogService {
             return operationLogConvert.convertList(logList);
         } catch (Exception e) {
             log.error("获取用户操作日志失败，用户ID: {}, 错误: {}", userId, e.getMessage(), e);
-            throw new ServiceException(ErrorCodes.LOG_QUERY_FAILED, "获取用户操作日志失败");
+            throw new ServiceException(ErrorCode.LOG_QUERY_FAILED, "获取用户操作日志失败");
         }
     }
 

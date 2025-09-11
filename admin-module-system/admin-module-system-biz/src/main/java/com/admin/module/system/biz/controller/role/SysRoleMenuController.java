@@ -1,5 +1,6 @@
 package com.admin.module.system.biz.controller.role;
 
+import com.admin.common.annotation.OperationLog;
 import com.admin.common.core.domain.R;
 import com.admin.module.system.api.dto.role.SysRoleMenuDTO;
 import com.admin.module.system.api.service.role.SysRoleMenuService;
@@ -111,6 +112,7 @@ public class SysRoleMenuController {
     @Parameter(name = "menuId", description = "菜单编号", required = true, example = "1")
     @DeleteMapping("/role/{roleId}/menu/{menuId}")
     @PreAuthorize("@ss.hasPermission('system:role:assign')")
+    @OperationLog(title = "角色权限管理", businessType = OperationLog.BusinessType.DELETE, description = "移除角色菜单权限")
     public R<Void> removeRoleMenu(@PathVariable @NotNull @Positive Long roleId,
                                   @PathVariable @NotNull @Positive Long menuId) {
         roleMenuService.removeRoleMenu(roleId, menuId);

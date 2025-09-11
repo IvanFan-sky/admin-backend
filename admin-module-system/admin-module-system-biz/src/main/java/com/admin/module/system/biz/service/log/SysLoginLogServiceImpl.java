@@ -1,7 +1,8 @@
 package com.admin.module.system.biz.service.log;
 
-import com.admin.common.constants.ErrorCodes;
+
 import com.admin.common.core.domain.PageResult;
+import com.admin.common.enums.ErrorCode;
 import com.admin.common.exception.ServiceException;
 import com.admin.module.system.api.dto.log.SysLoginLogQueryDTO;
 import com.admin.module.system.api.service.log.SysLoginLogService;
@@ -50,7 +51,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
             save(loginLog);
         } catch (Exception e) {
             log.error("保存登录日志失败", e);
-            throw new ServiceException(ErrorCodes.LOG_SAVE_FAILED, "保存登录日志失败");
+            throw new ServiceException(ErrorCode.LOG_SAVE_FAILED);
         }
     }
 
@@ -61,7 +62,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
             loginLogMapper.updateLogoutInfo(tokenId, LocalDateTime.now(), logoutType, null);
         } catch (Exception e) {
             log.error("更新登出信息失败", e);
-            throw new ServiceException(ErrorCodes.LOGOUT_FAILED, "更新登出信息失败");
+            throw new ServiceException(ErrorCode.LOGOUT_FAILED);
         }
     }
 
@@ -81,7 +82,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
             );
         } catch (Exception e) {
             log.error("查询登录日志分页失败", e);
-            throw new ServiceException(ErrorCodes.LOG_QUERY_FAILED, "登录日志查询失败");
+            throw new ServiceException(ErrorCode.LOG_QUERY_FAILED);
         }
     }
 
@@ -99,7 +100,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
             return count;
         } catch (Exception e) {
             log.error("清理过期登录日志失败", e);
-            throw new ServiceException(ErrorCodes.LOG_SAVE_FAILED, "清理过期登录日志失败");
+            throw new ServiceException(ErrorCode.LOG_SAVE_FAILED);
         }
     }
 
@@ -108,7 +109,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
     public SysLoginLogVO getLoginLog(Long id) {
         SysLoginLogDO loginLog = getById(id);
         if (loginLog == null) {
-            throw new ServiceException(ErrorCodes.LOGIN_LOG_NOT_FOUND, "登录日志不存在");
+            throw new ServiceException(ErrorCode.LOGIN_LOG_NOT_FOUND);
         }
         return loginLogConvert.convert(loginLog);
     }
@@ -120,12 +121,12 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
         try {
             boolean success = removeByIds(ids);
             if (!success) {
-                throw new ServiceException(ErrorCodes.LOG_DELETE_FAILED, "登录日志删除失败");
+                throw new ServiceException(ErrorCode.LOG_DELETE_FAILED);
             }
             return ids.size();
         } catch (Exception e) {
             log.error("批量删除登录日志失败", e);
-            throw new ServiceException(ErrorCodes.LOG_DELETE_FAILED, "登录日志删除失败");
+            throw new ServiceException(ErrorCode.LOG_DELETE_FAILED);
         }
     }
 
@@ -137,7 +138,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
             return loginLogMapper.deleteByTimeRange(startTime, endTime);
         } catch (Exception e) {
             log.error("按时间范围删除登录日志失败", e);
-            throw new ServiceException(ErrorCodes.LOG_DELETE_FAILED, "登录日志删除失败");
+            throw new ServiceException(ErrorCode.LOG_DELETE_FAILED);
         }
     }
 
@@ -149,7 +150,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
             return loginLogMapper.deleteAll();
         } catch (Exception e) {
             log.error("清空登录日志失败", e);
-            throw new ServiceException(ErrorCodes.LOG_CLEAR_FAILED, "登录日志清空失败");
+            throw new ServiceException(ErrorCode.LOG_CLEAR_FAILED);
         }
     }
 
@@ -163,7 +164,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
             return loginLogConvert.convertList(onlineUsers);
         } catch (Exception e) {
             log.error("获取在线用户列表失败", e);
-            throw new ServiceException(ErrorCodes.LOG_QUERY_FAILED, "在线用户查询失败");
+            throw new ServiceException(ErrorCode.LOG_QUERY_FAILED);
         }
     }
 
@@ -174,7 +175,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
             return loginLogConvert.convertList(userLogs);
         } catch (Exception e) {
             log.error("获取用户登录日志失败，userId: {}", userId, e);
-            throw new ServiceException(ErrorCodes.LOG_QUERY_FAILED, "用户登录日志查询失败");
+            throw new ServiceException(ErrorCode.LOG_QUERY_FAILED, "用户登录日志查询失败");
         }
     }
 
@@ -186,7 +187,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
             return loginLogConvert.convertList(list);
         } catch (Exception e) {
             log.error("导出登录日志失败", e);
-            throw new ServiceException(ErrorCodes.LOG_EXPORT_FAILED, "登录日志导出失败");
+            throw new ServiceException(ErrorCode.LOG_EXPORT_FAILED, "登录日志导出失败");
         }
     }
 
@@ -205,7 +206,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
             return result;
         } catch (Exception e) {
             log.error("获取登录日志统计失败", e);
-            throw new ServiceException(ErrorCodes.LOG_STATISTICS_FAILED, "登录日志统计失败");
+            throw new ServiceException(ErrorCode.LOG_STATISTICS_FAILED);
         }
     }
 
@@ -224,7 +225,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
                 .toList();
         } catch (Exception e) {
             log.error("获取登录方式统计失败", e);
-            throw new ServiceException(ErrorCodes.LOG_STATISTICS_FAILED, "登录方式统计失败");
+            throw new ServiceException(ErrorCode.LOG_STATISTICS_FAILED, "登录方式统计失败");
         }
     }
 
@@ -243,7 +244,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
                 .toList();
         } catch (Exception e) {
             log.error("获取登录地点统计失败", e);
-            throw new ServiceException(ErrorCodes.LOG_STATISTICS_FAILED, "登录地点统计失败");
+            throw new ServiceException(ErrorCode.LOG_STATISTICS_FAILED, "登录地点统计失败");
         }
     }
 
@@ -262,7 +263,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
                 .toList();
         } catch (Exception e) {
             log.error("获取浏览器统计失败", e);
-            throw new ServiceException(ErrorCodes.LOG_STATISTICS_FAILED, "浏览器统计失败");
+            throw new ServiceException(ErrorCode.LOG_STATISTICS_FAILED, "浏览器统计失败");
         }
     }
 
@@ -273,7 +274,7 @@ public class SysLoginLogServiceImpl extends ServiceImpl<SysLoginLogMapper, SysLo
             updateLogoutInfo(tokenId, "force");
         } catch (Exception e) {
             log.error("强制登出失败", e);
-            throw new ServiceException(ErrorCodes.LOGOUT_FAILED, "强制登出失败");
+            throw new ServiceException(ErrorCode.LOGOUT_FAILED, "强制登出失败");
         }
     }
 

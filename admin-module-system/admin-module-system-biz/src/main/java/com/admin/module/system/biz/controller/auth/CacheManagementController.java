@@ -1,5 +1,6 @@
 package com.admin.module.system.biz.controller.auth;
 
+import com.admin.common.annotation.OperationLog;
 import com.admin.common.core.domain.R;
 import com.admin.framework.redis.service.UserCacheService;
 import com.admin.framework.security.service.JwtBlacklistService;
@@ -76,6 +77,7 @@ public class CacheManagementController {
     @DeleteMapping("/user/{userId}")
     @Operation(summary = "清除指定用户缓存", description = "清除指定用户的所有缓存信息")
     @PreAuthorize("@ss.hasPermission('system:cache:delete')")
+    @OperationLog(title = "缓存管理", businessType = OperationLog.BusinessType.CLEAN, description = "清除用户缓存")
     public R<Void> clearUserCache(
             @Parameter(description = "用户ID") @PathVariable Long userId) {
         

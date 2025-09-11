@@ -1,5 +1,6 @@
 package com.admin.module.system.biz.controller.dict;
 
+import com.admin.common.annotation.OperationLog;
 import com.admin.common.core.domain.PageResult;
 import com.admin.common.core.domain.R;
 import com.admin.module.system.api.dto.dict.SysDictTypeCreateDTO;
@@ -50,6 +51,7 @@ public class SysDictTypeController {
      */
     @Operation(summary = "创建字典类型")
     @PostMapping
+    @OperationLog(title = "字典管理", businessType = OperationLog.BusinessType.INSERT, description = "创建字典类型")
     public R<Long> createDictType(@Valid @RequestBody SysDictTypeCreateDTO createDTO) {
         Long dictTypeId = dictTypeService.createDictType(createDTO);
         return R.ok(dictTypeId);
@@ -63,6 +65,7 @@ public class SysDictTypeController {
      */
     @Operation(summary = "更新字典类型")
     @PutMapping
+    @OperationLog(title = "字典管理", businessType = OperationLog.BusinessType.UPDATE, description = "更新字典类型")
     public R<Void> updateDictType(@Valid @RequestBody SysDictTypeUpdateDTO updateDTO) {
         dictTypeService.updateDictType(updateDTO);
         return R.ok();
@@ -77,6 +80,7 @@ public class SysDictTypeController {
     @Operation(summary = "删除字典类型")
     @Parameter(name = "id", description = "字典类型编号", required = true, example = "1")
     @DeleteMapping("/{id}")
+    @OperationLog(title = "字典管理", businessType = OperationLog.BusinessType.DELETE, description = "删除字典类型")
     public R<Void> deleteDictType(@PathVariable @NotNull @Positive Long id) {
         dictTypeService.deleteDictType(id);
         return R.ok();
@@ -90,6 +94,7 @@ public class SysDictTypeController {
      */
     @Operation(summary = "批量删除字典类型")
     @DeleteMapping("/batch")
+    @OperationLog(title = "字典管理", businessType = OperationLog.BusinessType.DELETE, description = "批量删除字典类型")
     public R<Integer> deleteDictTypesBatch(@RequestBody @NotEmpty Set<@NotNull @Positive Long> ids) {
         int deleteCount = dictTypeService.deleteDictTypesBatch(ids);
         return R.ok(deleteCount);

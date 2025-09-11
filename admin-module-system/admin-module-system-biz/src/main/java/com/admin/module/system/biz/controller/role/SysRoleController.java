@@ -1,5 +1,6 @@
 package com.admin.module.system.biz.controller.role;
 
+import com.admin.common.annotation.OperationLog;
 import com.admin.common.core.domain.PageResult;
 import com.admin.common.core.domain.R;
 import com.admin.module.system.api.dto.role.*;
@@ -50,6 +51,7 @@ public class SysRoleController {
     @Operation(summary = "创建角色")
     @PostMapping
     @PreAuthorize("@ss.hasPermission('system:role:create')")
+    @OperationLog(title = "角色管理", businessType = OperationLog.BusinessType.INSERT, description = "创建角色")
     public R<Long> createRole(@Valid @RequestBody SysRoleCreateDTO createDTO) {
         Long roleId = roleService.createRole(createDTO);
         return R.ok(roleId);
@@ -64,6 +66,7 @@ public class SysRoleController {
     @Operation(summary = "更新角色")
     @PutMapping
     @PreAuthorize("@ss.hasPermission('system:role:update')")
+    @OperationLog(title = "角色管理", businessType = OperationLog.BusinessType.UPDATE, description = "更新角色")
     public R<Void> updateRole(@Valid @RequestBody SysRoleUpdateDTO updateDTO) {
         roleService.updateRole(updateDTO);
         return R.ok();
@@ -79,6 +82,7 @@ public class SysRoleController {
     @Parameter(name = "id", description = "角色编号", required = true, example = "1")
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:role:delete')")
+    @OperationLog(title = "角色管理", businessType = OperationLog.BusinessType.DELETE, description = "删除角色")
     public R<Void> deleteRole(@PathVariable @NotNull @Positive Long id) {
         roleService.deleteRole(id);
         return R.ok();
@@ -93,6 +97,7 @@ public class SysRoleController {
     @Operation(summary = "批量删除角色")
     @DeleteMapping("/batch")
     @PreAuthorize("@ss.hasPermission('system:role:delete')")
+    @OperationLog(title = "角色管理", businessType = OperationLog.BusinessType.DELETE, description = "批量删除角色")
     public R<Integer> deleteRolesBatch(@RequestBody @NotEmpty Set<@NotNull @Positive Long> ids) {
         int deleteCount = roleService.deleteRolesBatch(ids);
         return R.ok(deleteCount);
@@ -179,6 +184,7 @@ public class SysRoleController {
     @Operation(summary = "分配角色菜单权限")
     @PostMapping("/menu/assign")
     @PreAuthorize("@ss.hasPermission('system:role:assign')")
+    @OperationLog(title = "角色管理", businessType = OperationLog.BusinessType.GRANT, description = "分配角色菜单权限")
     public R<Void> assignRoleMenus(@Valid @RequestBody SysRoleMenuDTO roleMenuDTO) {
         roleService.assignRoleMenus(roleMenuDTO);
         return R.ok();

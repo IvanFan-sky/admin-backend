@@ -1,5 +1,6 @@
 package com.admin.module.system.biz.controller.admin.user;
 
+import com.admin.common.annotation.OperationLog;
 import com.admin.common.core.domain.PageResult;
 import com.admin.common.core.domain.R;
 import com.admin.module.system.api.dto.user.SysUserCreateDTO;
@@ -80,6 +81,7 @@ public class SysUserController {
     )
     @PostMapping
     @PreAuthorize("@ss.hasPermission('system:user:create')")
+    @OperationLog(title = "用户管理", businessType = OperationLog.BusinessType.INSERT, description = "创建用户")
     public R<Long> createUser(@Valid @RequestBody SysUserCreateDTO createDTO) {
         Long userId = userService.createUser(createDTO);
         return R.ok(userId);
@@ -91,6 +93,7 @@ public class SysUserController {
     )
     @PutMapping
     @PreAuthorize("@ss.hasPermission('system:user:update')")
+    @OperationLog(title = "用户管理", businessType = OperationLog.BusinessType.UPDATE, description = "更新用户")
     public R<Boolean> updateUser(@Valid @RequestBody SysUserUpdateDTO updateDTO) {
         userService.updateUser(updateDTO);
         return R.ok(true);
@@ -103,6 +106,7 @@ public class SysUserController {
     @Parameter(name = "id", description = "用户ID", required = true, example = "1024")
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPermission('system:user:delete')")
+    @OperationLog(title = "用户管理", businessType = OperationLog.BusinessType.DELETE, description = "删除用户")
     public R<Boolean> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
         return R.ok(true);
@@ -111,6 +115,7 @@ public class SysUserController {
     @Operation(summary = "批量删除用户")
     @DeleteMapping("/batch")
     @PreAuthorize("@ss.hasPermission('system:user:delete')")
+    @OperationLog(title = "用户管理", businessType = OperationLog.BusinessType.DELETE, description = "批量删除用户")
     public R<Boolean> deleteUsers(@RequestBody @NotEmpty(message = "删除用户不能为空") Long[] ids) {
         userService.deleteUsers(ids);
         return R.ok(true);
@@ -119,6 +124,7 @@ public class SysUserController {
     @Operation(summary = "重置用户密码")
     @PutMapping("/resetPwd")
     @PreAuthorize("@ss.hasPermission('system:user:resetPwd')")
+    @OperationLog(title = "用户管理", businessType = OperationLog.BusinessType.UPDATE, description = "重置用户密码", recordRequestParam = false)
     public R<Boolean> resetUserPwd(@Valid @RequestBody SysUserResetPwdDTO resetPwdDTO) {
         userService.resetUserPwd(resetPwdDTO);
         return R.ok(true);
@@ -127,6 +133,7 @@ public class SysUserController {
     @Operation(summary = "修改用户状态")
     @PutMapping("/changeStatus")
     @PreAuthorize("@ss.hasPermission('system:user:update')")
+    @OperationLog(title = "用户管理", businessType = OperationLog.BusinessType.UPDATE, description = "修改用户状态")
     public R<Boolean> changeStatus(@RequestParam("id") @NotNull(message = "用户ID不能为空") Long id,
                                    @RequestParam("status") @NotNull(message = "状态不能为空") Integer status) {
         userService.updateUserStatus(id, status);

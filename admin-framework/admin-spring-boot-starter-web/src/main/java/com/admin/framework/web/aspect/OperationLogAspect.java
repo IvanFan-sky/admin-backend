@@ -5,13 +5,15 @@ import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentUtil;
 import cn.hutool.json.JSONUtil;
 import com.admin.common.annotation.OperationLog;
-import com.admin.common.constants.ErrorCodes;
 import com.admin.common.constants.SystemConstants;
+import com.admin.common.enums.ErrorCode;
 import com.admin.common.exception.ServiceException;
 import com.admin.common.utils.ServletUtils;
 import com.admin.framework.security.utils.SecurityAuthUtils;
 import com.admin.module.system.api.dto.log.OperationLogDTO;
 import com.admin.module.system.api.service.log.SysOperationLogService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -26,8 +28,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -291,7 +291,7 @@ public class OperationLogAspect {
             operationLogService.saveOperationLog(logDTO);
         } catch (Exception e) {
             log.error("保存操作日志失败: {}", e.getMessage(), e);
-            throw new ServiceException(ErrorCodes.OPERATION_LOG_RECORD_FAILED, "操作日志记录失败");
+            throw new ServiceException(ErrorCode.OPERATION_LOG_RECORD_FAILED, "操作日志记录失败");
         }
     }
 
