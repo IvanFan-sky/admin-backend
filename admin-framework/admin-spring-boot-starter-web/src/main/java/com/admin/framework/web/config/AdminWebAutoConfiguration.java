@@ -1,32 +1,30 @@
 package com.admin.framework.web.config;
 
-import com.admin.framework.web.exception.GlobalExceptionHandler;
+import com.admin.framework.web.properties.OpenApiProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Import;
 
 /**
- * Web层自动配置类
+ * Web框架自动配置类
  * 
- * 提供Web相关的基础功能配置
- * 包括全局异常处理器等核心组件
- *
+ * 自动配置OpenAPI、全局异常处理、跨域等Web相关功能
+ * 
  * @author admin
  * @version 1.0
  * @since 2024-01-15
  */
 @AutoConfiguration
+@ConditionalOnClass(name = "org.springframework.web.servlet.DispatcherServlet")
+@EnableConfigurationProperties(OpenApiProperties.class)
+@Import({
+    OpenApiConfig.class,
+    OpenApiResponseConfig.class
+})
 public class AdminWebAutoConfiguration {
-
-    /**
-     * 配置全局异常处理器
-     * 
-     * 统一处理系统中的各类异常
-     * 提供友好的错误响应格式
-     *
-     * @return 全局异常处理器实例
-     */
-    @Bean
-    public GlobalExceptionHandler globalExceptionHandler() {
-        return new GlobalExceptionHandler();
-    }
+    
+    // 自动配置类，主要用于导入其他配置类
+    // 未来可以在这里添加更多Web相关的自动配置
+    
 }

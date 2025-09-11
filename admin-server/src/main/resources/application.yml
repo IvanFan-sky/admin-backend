@@ -52,3 +52,64 @@ management:
   info:
     git:
       mode: simple
+
+# SpringDoc OpenAPI配置
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    show-extensions: true
+    show-common-extensions: true
+  group-configs:
+    - group: all
+      display-name: 全部接口
+      paths-to-match: /admin-api/**
+
+# Knife4j配置
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+    enable-version: true
+    enable-reload-cache-parameter: true
+    enable-after-script: true
+    enable-filter-multipart-apis: true
+    enable-filter-multipart-api-method-type: POST
+    enable-request-cache: true
+    enable-home-custom: true
+    home-custom-location: classpath:knife4j/home.md
+
+# 自定义OpenAPI配置
+admin:
+  openapi:
+    enabled: true
+    info:
+      title: Admin Management System API
+      description: 基于Spring Boot 3.x的现代化后台管理系统API文档
+      version: 1.0.0
+      contact:
+        name: Admin Team
+        email: admin@example.com
+        url: https://github.com/admin/admin-backend
+      license:
+        name: MIT License
+        url: https://opensource.org/licenses/MIT
+    servers:
+      - url: http://localhost:8080
+        description: 开发环境
+      - url: https://api-test.example.com
+        description: 测试环境
+      - url: https://api.example.com
+        description: 生产环境
+    security:
+      scheme-name: Bearer Authentication
+      type: http
+      scheme: bearer
+      bearer-format: JWT
+      description: 请输入JWT Token，格式：Bearer {token}
