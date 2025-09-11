@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -45,7 +46,7 @@ public class SysUserServiceImpl implements SysUserService {
 
     private final SysUserMapper userMapper;
     private final SysUserRoleMapper userRoleMapper;
-    // private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public PageResult<SysUserVO> getUserPage(SysUserQueryDTO queryDTO) {
@@ -98,11 +99,6 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public List<Long> getUserIdsByRoleId(Long roleId) {
-        return List.of();
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(value = CacheConstants.SYS_USER_CACHE, allEntries = true)
     public Long createUser(SysUserCreateDTO createDTO) {
@@ -111,7 +107,7 @@ public class SysUserServiceImpl implements SysUserService {
         
         // 2. 转换DTO为数据对象
         SysUserDO user = SysUserConvert.INSTANCE.convert(createDTO);
-        user.setPassword(createDTO.getPassword()); // TODO: 密码加密
+        user.setPassword(passwordEncoder.encode(createDTO.getPassword()));
         user.setStatus(createDTO.getStatus() != null ? createDTO.getStatus() : 1);
         
         // 3. 插入用户基本信息
@@ -160,11 +156,6 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
-    public void resetUserPassword(SysUserResetPwdDTO resetPwdDTO) {
-
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     @CacheEvict(value = CacheConstants.SYS_USER_CACHE, allEntries = true)
     public void deleteUsers(Long[] ids) {
@@ -188,7 +179,7 @@ public class SysUserServiceImpl implements SysUserService {
             throw new ServiceException("用户不存在");
         }
         
-        user.setPassword(resetPwdDTO.getPassword()); // TODO: 密码加密
+        user.setPassword(passwordEncoder.encode(resetPwdDTO.getPassword()));
         user.setVersion(resetPwdDTO.getVersion());
         userMapper.updateById(user);
     }
@@ -225,6 +216,16 @@ public class SysUserServiceImpl implements SysUserService {
             return true;
         }
         return userMapper.checkEmailUnique(email, id) == 0;
+    }
+
+    @Override
+    @Cacheable(value = CacheConstants.USER_ROLE_CACHE, key = "'role_user_ids:' + #roleId", unless = "#result == null || #result.isEmpty()")
+    public List<Long> getUserIdsByRoleId(Long roleId) {
+        if (roleId == null) {
+            return new ArrayList<>();
+        }
+        
+        return userRoleMapper.selectUserIdsByRoleId(roleId);
     }
 
     /**

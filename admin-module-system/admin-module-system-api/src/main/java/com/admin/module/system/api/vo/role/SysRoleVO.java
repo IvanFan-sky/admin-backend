@@ -1,6 +1,7 @@
 package com.admin.module.system.api.vo.role;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,43 +18,27 @@ import java.time.LocalDateTime;
  * @since 2024-01-15
  */
 @Data
+@Schema(description = "系统角色展示对象")
 public class SysRoleVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 角色ID
-     */
+    @Schema(description = "角色ID", example = "1")
     private Long id;
 
-    /**
-     * 角色名称
-     * 显示给用户的角色名称，如"管理员"、"普通用户"
-     */
+    @Schema(description = "角色名称", example = "超级管理员")
     private String roleName;
 
-    /**
-     * 角色编码
-     * 系统内部使用的角色标识，如"ADMIN"、"USER"
-     */
+    @Schema(description = "角色编码", example = "SUPER_ADMIN")
     private String roleCode;
 
-    /**
-     * 角色描述
-     * 详细说明该角色的职责和权限范围
-     */
+    @Schema(description = "角色描述", example = "拥有系统所有权限的超级管理员")
     private String roleDesc;
 
-    /**
-     * 显示顺序
-     * 用于角色列表的显示排序，数值越小越靠前
-     */
+    @Schema(description = "显示顺序", example = "1")
     private Integer sortOrder;
 
-    /**
-     * 角色状态
-     * 0-禁用，1-启用
-     */
+    @Schema(description = "角色状态", example = "1", allowableValues = {"0", "1"})
     private Integer status;
 
     /**
@@ -71,38 +56,23 @@ public class SysRoleVO implements Serializable {
         };
     }
 
-    /**
-     * 备注信息
-     */
+    @Schema(description = "备注信息", example = "系统内置角色")
     private String remark;
 
-    /**
-     * 创建者
-     */
+    @Schema(description = "创建者", example = "admin")
     private String createBy;
 
-    /**
-     * 创建时间
-     * 格式化为 yyyy-MM-dd HH:mm:ss
-     */
+    @Schema(description = "创建时间", example = "2024-01-15 10:00:00")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
-    /**
-     * 更新者
-     */
+    @Schema(description = "更新者", example = "admin")
     private String updateBy;
 
-    /**
-     * 更新时间
-     * 格式化为 yyyy-MM-dd HH:mm:ss
-     */
+    @Schema(description = "更新时间", example = "2024-01-15 14:00:00")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 
-    /**
-     * 乐观锁版本号
-     * 用于并发控制
-     */
+    @Schema(description = "乐观锁版本号", example = "1")
     private Integer version;
 }

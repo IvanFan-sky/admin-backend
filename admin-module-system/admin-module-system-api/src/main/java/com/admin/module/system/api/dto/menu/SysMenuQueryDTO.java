@@ -1,6 +1,7 @@
 package com.admin.module.system.api.dto.menu;
 
 import com.admin.common.core.page.PageQuery;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,45 +20,28 @@ import java.io.Serializable;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Schema(description = "系统菜单查询请求对象")
 public class SysMenuQueryDTO extends PageQuery implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 菜单名称
-     * 支持模糊查询
-     */
+    @Schema(description = "菜单名称", example = "用户管理")
     @Size(max = 50, message = "菜单名称长度不能超过50个字符")
     private String menuName;
 
-    /**
-     * 菜单类型
-     * 1-目录，2-菜单，3-按钮
-     */
+    @Schema(description = "菜单类型", example = "2", allowableValues = {"1", "2", "3"})
     private Integer menuType;
 
-    /**
-     * 菜单状态
-     * 0-隐藏，1-显示
-     */
+    @Schema(description = "菜单可见性", example = "1", allowableValues = {"0", "1"})
     private Integer visible;
 
-    /**
-     * 状态
-     * 0-禁用，1-启用
-     */
+    @Schema(description = "菜单状态", example = "1", allowableValues = {"0", "1"})
     private Integer status;
 
-    /**
-     * 权限标识
-     * 支持模糊查询
-     */
+    @Schema(description = "权限标识", example = "system:user:view")
     @Size(max = 100, message = "权限标识长度不能超过100个字符")
     private String permission;
 
-    /**
-     * 父菜单ID
-     * 用于查询指定父菜单下的子菜单
-     */
+    @Schema(description = "父菜单ID", example = "0")
     private Long parentId;
 }

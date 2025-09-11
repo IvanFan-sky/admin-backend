@@ -1,6 +1,7 @@
 package com.admin.module.system.api.dto.dict;
 
 import com.admin.common.core.page.PageQuery;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -18,30 +19,19 @@ import jakarta.validation.constraints.Size;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Schema(description = "系统字典类型查询请求对象")
 public class SysDictTypeQueryDTO extends PageQuery {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 字典名称
-     * 支持模糊查询
-     * 可选，最大100个字符
-     */
+    @Schema(description = "字典名称", example = "用户性别")
     @Size(max = 100, message = "字典名称长度不能超过100个字符")
     private String dictName;
 
-    /**
-     * 字典类型
-     * 支持模糊查询
-     * 可选，最大100个字符
-     */
+    @Schema(description = "字典类型标识", example = "sys_user_sex")
     @Size(max = 100, message = "字典类型长度不能超过100个字符")
     private String dictType;
 
-    /**
-     * 字典状态
-     * 0-禁用，1-启用
-     * 可选，用于筛选特定状态的字典类型
-     */
+    @Schema(description = "字典状态", example = "1", allowableValues = {"0", "1"})
     private Integer status;
 }

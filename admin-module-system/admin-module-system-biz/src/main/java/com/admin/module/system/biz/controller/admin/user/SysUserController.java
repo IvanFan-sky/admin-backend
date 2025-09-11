@@ -40,7 +40,10 @@ public class SysUserController {
 
     private final SysUserService userService;
 
-    @Operation(summary = "获得用户分页")
+    @Operation(
+        summary = "获得用户分页列表", 
+        description = "根据查询条件分页获取用户列表，支持按用户名、昵称、邮箱、手机号、状态等条件筛选"
+    )
     @GetMapping("/page")
     // @PreAuthorize("hasPermission('system:user:query')")
     public R<PageResult<SysUserVO>> getUserPage(@Valid SysUserQueryDTO queryDTO) {
@@ -48,7 +51,10 @@ public class SysUserController {
         return R.ok(pageResult);
     }
 
-    @Operation(summary = "获得用户列表")
+    @Operation(
+        summary = "获得用户列表", 
+        description = "根据查询条件获取用户列表，不分页返回所有匹配的用户数据"
+    )
     @GetMapping("/list")
     // @PreAuthorize("hasPermission('system:user:query')")
     public R<List<SysUserVO>> getUserList(@Valid SysUserQueryDTO queryDTO) {
@@ -56,8 +62,11 @@ public class SysUserController {
         return R.ok(list);
     }
 
-    @Operation(summary = "获得用户")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @Operation(
+        summary = "获得用户详情", 
+        description = "根据用户ID获取用户的详细信息"
+    )
+    @Parameter(name = "id", description = "用户ID", required = true, example = "1024")
     @GetMapping("/{id}")
     // @PreAuthorize("hasPermission('system:user:query')")
     public R<SysUserVO> getUser(@PathVariable("id") Long id) {
@@ -65,7 +74,10 @@ public class SysUserController {
         return R.ok(user);
     }
 
-    @Operation(summary = "新增用户")
+    @Operation(
+        summary = "创建用户", 
+        description = "创建新用户，需要提供用户基本信息和角色分配"
+    )
     @PostMapping
     // @PreAuthorize("hasPermission('system:user:add')")
     public R<Long> createUser(@Valid @RequestBody SysUserCreateDTO createDTO) {
@@ -73,7 +85,10 @@ public class SysUserController {
         return R.ok(userId);
     }
 
-    @Operation(summary = "修改用户")
+    @Operation(
+        summary = "更新用户信息", 
+        description = "更新用户的基本信息，支持修改用户名、昵称、邮箱、手机号等"
+    )
     @PutMapping
     // @PreAuthorize("hasPermission('system:user:edit')")
     public R<Boolean> updateUser(@Valid @RequestBody SysUserUpdateDTO updateDTO) {
@@ -81,8 +96,11 @@ public class SysUserController {
         return R.ok(true);
     }
 
-    @Operation(summary = "删除用户")
-    @Parameter(name = "id", description = "编号", required = true, example = "1024")
+    @Operation(
+        summary = "删除用户", 
+        description = "根据用户ID删除用户，执行逻辑删除"
+    )
+    @Parameter(name = "id", description = "用户ID", required = true, example = "1024")
     @DeleteMapping("/{id}")
     // @PreAuthorize("hasPermission('system:user:remove')")
     public R<Boolean> deleteUser(@PathVariable("id") Long id) {

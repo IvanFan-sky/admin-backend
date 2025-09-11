@@ -1,6 +1,7 @@
 package com.admin.module.system.api.dto.role;
 
 import com.admin.common.core.page.PageQuery;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -18,30 +19,19 @@ import jakarta.validation.constraints.Size;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Schema(description = "系统角色查询请求对象")
 public class SysRoleQueryDTO extends PageQuery {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 角色名称
-     * 支持模糊查询
-     * 可选，最大50个字符
-     */
+    @Schema(description = "角色名称", example = "管理员")
     @Size(max = 50, message = "角色名称长度不能超过50个字符")
     private String roleName;
 
-    /**
-     * 角色编码
-     * 支持模糊查询
-     * 可选，最大50个字符
-     */
+    @Schema(description = "角色编码", example = "admin")
     @Size(max = 50, message = "角色编码长度不能超过50个字符")
     private String roleCode;
 
-    /**
-     * 角色状态
-     * 0-禁用，1-启用
-     * 可选，用于筛选特定状态的角色
-     */
+    @Schema(description = "角色状态", example = "1", allowableValues = {"0", "1"})
     private Integer status;
 }

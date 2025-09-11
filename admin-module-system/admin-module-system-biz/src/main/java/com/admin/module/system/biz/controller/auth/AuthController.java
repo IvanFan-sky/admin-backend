@@ -45,7 +45,10 @@ public class AuthController {
      * 用户登录
      */
     @PostMapping("/login")
-    @Operation(summary = "用户登录", description = "用户通过用户名密码进行登录认证")
+    @Operation(
+        summary = "用户登录", 
+        description = "用户通过用户名和密码进行身份认证，成功后返回访问令牌和用户信息"
+    )
     public R<LoginVO> login(@Valid @RequestBody LoginDTO loginDTO) {
         log.info("用户登录请求，用户名: {}", loginDTO.getUsername());
         
@@ -57,7 +60,10 @@ public class AuthController {
      * 用户登出
      */
     @PostMapping("/logout")
-    @Operation(summary = "用户登出", description = "用户退出登录，清除认证信息并将令牌加入黑名单")
+    @Operation(
+        summary = "用户登出", 
+        description = "用户退出登录，清除认证信息并将令牌加入黑名单，防止令牌被滥用"
+    )
     public R<Void> logout(HttpServletRequest request) {
         // 从请求头获取令牌
         String authHeader = request.getHeader(JwtTokenUtil.TOKEN_HEADER);
@@ -77,7 +83,10 @@ public class AuthController {
      * 刷新访问令牌
      */
     @PostMapping("/refresh-token")
-    @Operation(summary = "刷新令牌", description = "使用刷新令牌获取新的访问令牌")
+    @Operation(
+        summary = "刷新访问令牌", 
+        description = "使用刷新令牌获取新的访问令牌，用于延续用户会话"
+    )
     public R<LoginVO> refreshToken(@Valid @RequestBody RefreshTokenDTO refreshTokenDTO) {
         LoginVO loginVO = authService.refreshToken(refreshTokenDTO);
         return R.ok(loginVO);
@@ -87,7 +96,10 @@ public class AuthController {
      * 获取当前用户信息
      */
     @GetMapping("/user-info")
-    @Operation(summary = "获取用户信息", description = "获取当前登录用户的详细信息")
+    @Operation(
+        summary = "获取当前用户信息", 
+        description = "获取当前登录用户的详细信息，包括基本信息和权限信息"
+    )
     public R<UserInfoVO> getCurrentUserInfo() {
         UserInfoVO userInfo = authService.getCurrentUserInfo();
         return R.ok(userInfo);
@@ -97,7 +109,10 @@ public class AuthController {
      * 验证令牌
      */
     @GetMapping("/validate-token")
-    @Operation(summary = "验证令牌", description = "验证当前令牌是否有效")
+    @Operation(
+        summary = "验证令牌有效性", 
+        description = "检查当前访问令牌是否有效且未过期"
+    )
     public R<Boolean> validateToken() {
         // 如果能到达这里，说明令牌是有效的（通过了JWT过滤器）
         return R.ok(true);
@@ -107,7 +122,10 @@ public class AuthController {
      * 检查登录状态
      */
     @GetMapping("/login-status")
-    @Operation(summary = "检查登录状态", description = "检查用户登录状态和限制信息")
+    @Operation(
+        summary = "检查用户登录状态", 
+        description = "检查指定用户名的登录状态，包括是否被锁定、失败次数等信息"
+    )
     public R<LoginStatusVO> checkLoginStatus(@RequestParam String username) {
         try {
             LoginStatusVO statusVO = new LoginStatusVO();

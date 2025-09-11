@@ -1,5 +1,6 @@
 package com.admin.module.system.api.dto.user;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotNull;
@@ -17,28 +18,19 @@ import java.io.Serializable;
  * @since 2024-01-15
  */
 @Data
+@Schema(description = "系统用户重置密码请求对象")
 public class SysUserResetPwdDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 用户ID
-     * 必填，标识要重置密码的用户
-     */
+    @Schema(description = "用户ID", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "用户ID不能为空")
     private Long id;
 
-    /**
-     * 新密码
-     * 明文密码，后端会进行加密处理
-     * 长度6-20位，支持字母数字特殊字符
-     */
+    @Schema(description = "新密码", example = "newPassword123", requiredMode = Schema.RequiredMode.REQUIRED)
     @Size(min = 6, max = 20, message = "用户密码长度必须在6到20个字符之间")
     private String password;
 
-    /**
-     * 版本号
-     * 用于乐观锁控制，防止并发操作冲突
-     */
+    @Schema(description = "乐观锁版本号", example = "1")
     private Integer version;
 }

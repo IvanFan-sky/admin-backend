@@ -1,6 +1,7 @@
 package com.admin.module.system.api.dto.user;
 
 import com.admin.common.core.page.PageQuery;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,43 +17,26 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@Schema(description = "系统用户查询请求对象")
 public class SysUserQueryDTO extends PageQuery {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 用户账号
-     * 支持模糊查询
-     */
+    @Schema(description = "用户账号", example = "admin")
     private String username;
 
-    /**
-     * 用户昵称  
-     * 支持模糊查询
-     */
+    @Schema(description = "用户昵称", example = "管理员")
     private String nickname;
 
-    /**
-     * 手机号码
-     * 支持模糊查询
-     */
+    @Schema(description = "手机号码", example = "13888888888")
     private String phone;
 
-    /**
-     * 用户状态
-     * 1-正常 0-禁用，支持精确查询
-     */
+    @Schema(description = "用户状态", example = "1", allowableValues = {"0", "1"})
     private Integer status;
 
-    /**
-     * 创建开始时间
-     * 格式：yyyy-MM-dd，用于时间范围查询
-     */
+    @Schema(description = "创建开始时间", example = "2024-01-01")
     private String beginTime;
 
-    /**
-     * 创建结束时间
-     * 格式：yyyy-MM-dd，用于时间范围查询
-     */
+    @Schema(description = "创建结束时间", example = "2024-12-31")
     private String endTime;
 }

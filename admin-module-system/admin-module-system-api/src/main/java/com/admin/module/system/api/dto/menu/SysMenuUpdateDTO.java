@@ -1,5 +1,6 @@
 package com.admin.module.system.api.dto.menu;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import jakarta.validation.constraints.*;
@@ -16,112 +17,70 @@ import java.io.Serializable;
  * @since 2024-01-15
  */
 @Data
+@Schema(description = "系统菜单更新请求对象")
 public class SysMenuUpdateDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 菜单ID
-     */
+    @Schema(description = "菜单ID", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "菜单ID不能为空")
     @Positive(message = "菜单ID必须为正整数")
     private Long id;
 
-    /**
-     * 父菜单ID
-     * 0表示顶级菜单
-     */
+    @Schema(description = "父菜单ID", example = "0", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "父菜单ID不能为空")
     @PositiveOrZero(message = "父菜单ID必须为非负整数")
     private Long parentId;
 
-    /**
-     * 菜单名称
-     * 显示在界面上的菜单标题
-     */
+    @Schema(description = "菜单名称", example = "用户管理", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "菜单名称不能为空")
     @Size(max = 50, message = "菜单名称长度不能超过50个字符")
     private String menuName;
 
-    /**
-     * 菜单类型
-     * 1-目录，2-菜单，3-按钮
-     */
+    @Schema(description = "菜单类型", example = "2", allowableValues = {"1", "2", "3"}, requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "菜单类型不能为空")
     private Integer menuType;
 
-    /**
-     * 路由地址
-     * 访问的路由地址，如：`/user`
-     */
+    @Schema(description = "路由地址", example = "/user")
     @Size(max = 200, message = "路由地址长度不能超过200个字符")
     private String path;
 
-    /**
-     * 组件路径
-     * 组件的具体路径，如：`system/user/index`
-     */
+    @Schema(description = "组件路径", example = "system/user/index")
     @Size(max = 200, message = "组件路径长度不能超过200个字符")
     private String component;
 
-    /**
-     * 权限标识
-     * 权限字符串，如：`system:user:view`
-     */
+    @Schema(description = "权限标识", example = "system:user:view")
     @Size(max = 100, message = "权限标识长度不能超过100个字符")
     private String permission;
 
-    /**
-     * 菜单图标
-     * 图标名称或图标类名
-     */
+    @Schema(description = "菜单图标", example = "user")
     @Size(max = 100, message = "菜单图标长度不能超过100个字符")
     private String icon;
 
-    /**
-     * 显示顺序
-     * 数值越小越靠前显示
-     */
+    @Schema(description = "显示顺序", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "显示顺序不能为空")
     @PositiveOrZero(message = "显示顺序必须为非负整数")
     private Integer sortOrder;
 
-    /**
-     * 菜单状态
-     * 0-隐藏，1-显示
-     */
+    @Schema(description = "菜单可见性", example = "1", allowableValues = {"0", "1"}, requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "菜单状态不能为空")
     private Integer visible;
 
-    /**
-     * 状态
-     * 0-禁用，1-启用
-     */
+    @Schema(description = "菜单状态", example = "1", allowableValues = {"0", "1"}, requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "状态不能为空")
     private Integer status;
 
-    /**
-     * 是否为外链
-     * 0-否，1-是
-     */
+    @Schema(description = "是否为外链", example = "0", allowableValues = {"0", "1"})
     private Integer isFrame;
 
-    /**
-     * 是否缓存
-     * 0-不缓存，1-缓存
-     */
+    @Schema(description = "是否缓存", example = "1", allowableValues = {"0", "1"})
     private Integer isCache;
 
-    /**
-     * 备注信息
-     */
+    @Schema(description = "备注信息", example = "用户管理菜单")
     @Size(max = 500, message = "备注信息长度不能超过500个字符")
     private String remark;
 
-    /**
-     * 乐观锁版本号
-     * 用于并发控制
-     */
+    @Schema(description = "乐观锁版本号", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "版本号不能为空")
     private Integer version;
 }

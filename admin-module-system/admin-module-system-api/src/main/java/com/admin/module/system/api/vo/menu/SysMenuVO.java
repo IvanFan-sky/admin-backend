@@ -1,6 +1,7 @@
 package com.admin.module.system.api.vo.menu;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -19,31 +20,21 @@ import java.util.List;
  * @since 2024-01-15
  */
 @Data
+@Schema(description = "系统菜单展示对象")
 public class SysMenuVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 菜单ID
-     */
+    @Schema(description = "菜单ID", example = "1")
     private Long id;
 
-    /**
-     * 父菜单ID
-     * 0表示顶级菜单
-     */
+    @Schema(description = "父菜单ID", example = "0")
     private Long parentId;
 
-    /**
-     * 菜单名称
-     * 显示在界面上的菜单标题
-     */
+    @Schema(description = "菜单名称", example = "用户管理")
     private String menuName;
 
-    /**
-     * 菜单类型
-     * 1-目录，2-菜单，3-按钮
-     */
+    @Schema(description = "菜单类型", example = "2", allowableValues = {"1", "2", "3"})
     private Integer menuType;
 
     /**
@@ -62,40 +53,22 @@ public class SysMenuVO implements Serializable {
         };
     }
 
-    /**
-     * 路由地址
-     * 访问的路由地址，如：`/user`
-     */
+    @Schema(description = "路由地址", example = "/user")
     private String path;
 
-    /**
-     * 组件路径
-     * 组件的具体路径，如：`system/user/index`
-     */
+    @Schema(description = "组件路径", example = "system/user/index")
     private String component;
 
-    /**
-     * 权限标识
-     * 权限字符串，如：`system:user:view`
-     */
+    @Schema(description = "权限标识", example = "system:user:view")
     private String permission;
 
-    /**
-     * 菜单图标
-     * 图标名称或图标类名
-     */
+    @Schema(description = "菜单图标", example = "user")
     private String icon;
 
-    /**
-     * 显示顺序
-     * 数值越小越靠前显示
-     */
+    @Schema(description = "显示顺序", example = "10")
     private Integer sortOrder;
 
-    /**
-     * 菜单状态
-     * 0-隐藏，1-显示
-     */
+    @Schema(description = "菜单状态", example = "1", allowableValues = {"0", "1"})
     private Integer visible;
 
     /**
@@ -113,10 +86,7 @@ public class SysMenuVO implements Serializable {
         };
     }
 
-    /**
-     * 状态
-     * 0-禁用，1-启用
-     */
+    @Schema(description = "启用状态", example = "1", allowableValues = {"0", "1"})
     private Integer status;
 
     /**
@@ -134,10 +104,7 @@ public class SysMenuVO implements Serializable {
         };
     }
 
-    /**
-     * 是否为外链
-     * 0-否，1-是
-     */
+    @Schema(description = "是否为外链", example = "0", allowableValues = {"0", "1"})
     private Integer isFrame;
 
     /**
@@ -154,10 +121,7 @@ public class SysMenuVO implements Serializable {
         };
     }
 
-    /**
-     * 是否缓存
-     * 0-不缓存，1-缓存
-     */
+    @Schema(description = "是否缓存", example = "0", allowableValues = {"0", "1"})
     private Integer isCache;
 
     /**
@@ -174,45 +138,27 @@ public class SysMenuVO implements Serializable {
         };
     }
 
-    /**
-     * 备注信息
-     */
+    @Schema(description = "备注信息", example = "用户管理菜单")
     private String remark;
 
-    /**
-     * 创建者
-     */
+    @Schema(description = "创建者", example = "admin")
     private String createBy;
 
-    /**
-     * 创建时间
-     * 格式化为 yyyy-MM-dd HH:mm:ss
-     */
+    @Schema(description = "创建时间", example = "2024-01-15 10:00:00")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
-    /**
-     * 更新者
-     */
+    @Schema(description = "更新者", example = "admin")
     private String updateBy;
 
-    /**
-     * 更新时间
-     * 格式化为 yyyy-MM-dd HH:mm:ss
-     */
+    @Schema(description = "更新时间", example = "2024-01-15 14:00:00")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 
-    /**
-     * 乐观锁版本号
-     * 用于并发控制
-     */
+    @Schema(description = "乐观锁版本号", example = "1")
     private Integer version;
 
-    /**
-     * 子菜单列表
-     * 用于构建树形结构
-     */
+    @Schema(description = "子菜单列表")
     private List<SysMenuVO> children = new ArrayList<>();
 
     public List<SysMenuVO> getChildren() {

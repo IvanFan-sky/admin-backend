@@ -101,17 +101,6 @@ public interface SysUserService {
     void deleteUser(Long id);
 
     /**
-     * 重置用户密码
-     * 
-     * 管理员重置指定用户的登录密码
-     * 密码将进行加密存储
-     *
-     * @param resetPwdDTO 重置密码请求参数
-     * @throws com.admin.common.exception.ServiceException 当用户不存在时抛出
-     */
-    void resetUserPassword(SysUserResetPwdDTO resetPwdDTO);
-
-    /**
      * 批量删除用户
      *
      * @param ids 用户ID数组

@@ -16,10 +16,7 @@ import jakarta.validation.constraints.NotBlank;
 @Schema(description = "刷新令牌请求")
 public class RefreshTokenDTO {
 
-    /**
-     * 刷新令牌
-     */
-    @Schema(description = "刷新令牌", required = true)
+    @Schema(description = "刷新令牌", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "刷新令牌不能为空")
     private String refreshToken;
 }

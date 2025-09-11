@@ -1,5 +1,6 @@
 package com.admin.module.system.api.dto.role;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import jakarta.validation.constraints.*;
@@ -16,61 +17,38 @@ import java.io.Serializable;
  * @since 2024-01-15
  */
 @Data
+@Schema(description = "系统角色创建请求对象")
 public class SysRoleCreateDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 角色名称
-     * 显示给用户的角色名称，如"管理员"、"普通用户"
-     * 必填，长度2-50个字符
-     */
+    @Schema(description = "角色名称", example = "普通用户", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "角色名称不能为空")
     @Size(min = 2, max = 50, message = "角色名称长度必须在2-50个字符之间")
     private String roleName;
 
-    /**
-     * 角色编码
-     * 系统内部使用的角色标识，如"ADMIN"、"USER"
-     * 必填，长度2-50个字符，只能包含大写字母、数字和下划线
-     */
+    @Schema(description = "角色编码", example = "USER", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "角色编码不能为空")
     @Size(min = 2, max = 50, message = "角色编码长度必须在2-50个字符之间")
     @Pattern(regexp = "^[A-Z0-9_]+$", message = "角色编码只能包含大写字母、数字和下划线")
     private String roleCode;
 
-    /**
-     * 角色描述
-     * 详细说明该角色的职责和权限范围
-     * 可选，最大200个字符
-     */
+    @Schema(description = "角色描述", example = "系统普通用户，拥有基本操作权限")
     @Size(max = 200, message = "角色描述长度不能超过200个字符")
     private String roleDesc;
 
-    /**
-     * 显示顺序
-     * 用于角色列表的显示排序，数值越小越靠前
-     * 必须为非负整数，默认为0
-     */
+    @Schema(description = "显示顺序", example = "10", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "显示顺序不能为空")
     @Min(value = 0, message = "显示顺序必须为非负整数")
     private Integer sortOrder;
 
-    /**
-     * 角色状态
-     * 0-禁用，1-启用
-     * 必填
-     */
+    @Schema(description = "角色状态", example = "1", allowableValues = {"0", "1"}, requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "角色状态不能为空")
     @Min(value = 0, message = "角色状态值不正确")
     @Max(value = 1, message = "角色状态值不正确")
     private Integer status;
 
-    /**
-     * 备注信息
-     * 额外的说明信息
-     * 可选，最大500个字符
-     */
+    @Schema(description = "备注信息", example = "普通用户角色")
     @Size(max = 500, message = "备注长度不能超过500个字符")
     private String remark;
 }

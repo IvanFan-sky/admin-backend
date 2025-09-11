@@ -1,5 +1,6 @@
 package com.admin.module.system.api.dto.user;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import jakarta.validation.constraints.Email;
@@ -18,78 +19,46 @@ import java.io.Serializable;
  * @since 2024-01-15
  */
 @Data
+@Schema(description = "系统用户创建请求对象")
 public class SysUserCreateDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 用户账号（登录用户名）
-     * 唯一标识，长度3-30位，支持字母数字下划线
-     */
+    @Schema(description = "用户账号（登录用户名）", example = "zhangsan", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "用户账号不能为空")
     @Size(max = 30, message = "用户账号长度不能超过30个字符")
     private String username;
 
-    /**
-     * 用户昵称（显示名称）
-     * 用于界面展示，长度限制30个字符
-     */
+    @Schema(description = "用户昵称（显示名称）", example = "张三")
     @Size(max = 30, message = "用户昵称长度不能超过30个字符")
     private String nickname;
 
-    /**
-     * 用户密码
-     * 明文密码，后端会进行加密处理
-     * 长度6-20位，支持字母数字特殊字符
-     */
+    @Schema(description = "用户密码", example = "123456", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "用户密码不能为空")
     @Size(min = 6, max = 20, message = "用户密码长度必须在6到20个字符之间")
     private String password;
 
-    /**
-     * 邮箱地址
-     * 用于找回密码和消息通知
-     * 需符合标准邮箱格式
-     */
+    @Schema(description = "邮箱地址", example = "zhangsan@example.com")
     @Email(message = "邮箱格式不正确")
     @Size(max = 50, message = "邮箱长度不能超过50个字符")
     private String email;
 
-    /**
-     * 手机号码
-     * 用于短信验证和消息通知
-     * 支持11位中国大陆手机号格式
-     */
+    @Schema(description = "手机号码", example = "13888888888")
     @Size(max = 11, message = "手机号码长度不能超过11个字符")
     private String phone;
 
-    /**
-     * 用户性别
-     * 1-男 2-女 0-未知
-     */
+    @Schema(description = "用户性别", example = "1", allowableValues = {"0", "1", "2"})
     private String sex;
 
-    /**
-     * 用户头像
-     * 存储头像文件的URL路径
-     */
+    @Schema(description = "用户头像URL", example = "https://example.com/avatar/1.jpg")
     private String avatar;
 
-    /**
-     * 用户状态
-     * 1-正常 0-禁用
-     */
+    @Schema(description = "用户状态", example = "1", allowableValues = {"0", "1"})
     private Integer status;
 
-    /**
-     * 备注信息
-     * 管理员添加的用户说明信息
-     */
+    @Schema(description = "备注信息", example = "普通用户")
     private String remark;
 
-    /**
-     * 角色ID数组
-     * 为用户分配的角色列表
-     */
+    @Schema(description = "角色ID数组", example = "[2, 3]")
     private Long[] roleIds;
 }

@@ -19,33 +19,18 @@ import lombok.NoArgsConstructor;
 @Schema(description = "登录状态响应")
 public class LoginStatusVO {
 
-    /**
-     * 是否被锁定
-     */
-    @Schema(description = "是否被锁定")
+    @Schema(description = "账户是否被锁定", example = "false")
     private boolean locked;
     
-    /**
-     * 锁定信息
-     */
-    @Schema(description = "锁定信息")
+    @Schema(description = "账户锁定详细信息")
     private LoginLimitService.AccountLockInfo lockInfo;
     
-    /**
-     * 剩余锁定时间（秒）
-     */
-    @Schema(description = "剩余锁定时间（秒）")
+    @Schema(description = "剩余锁定时间（秒）", example = "1800")
     private long remainingLockTime;
     
-    /**
-     * 登录失败次数
-     */
-    @Schema(description = "登录失败次数")
+    @Schema(description = "登录失败次数", example = "3")
     private int failCount;
     
-    /**
-     * 是否需要验证码
-     */
-    @Schema(description = "是否需要验证码")
+    @Schema(description = "是否需要输入验证码", example = "true")
     private boolean needCaptcha;
 }

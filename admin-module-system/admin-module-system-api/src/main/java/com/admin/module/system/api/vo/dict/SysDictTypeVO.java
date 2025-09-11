@@ -1,6 +1,7 @@
 package com.admin.module.system.api.vo.dict;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -17,57 +18,37 @@ import java.time.LocalDateTime;
  * @since 2024-01-15
  */
 @Data
+@Schema(description = "系统字典类型展示对象")
 public class SysDictTypeVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 字典主键
-     */
+    @Schema(description = "字典主键", example = "1")
     private Long id;
 
-    /**
-     * 字典名称
-     * 字典类型的显示名称
-     */
+    @Schema(description = "字典名称", example = "用户性别")
     private String dictName;
 
-    /**
-     * 字典类型
-     * 字典类型的唯一标识符
-     */
+    @Schema(description = "字典类型标识", example = "sys_user_sex")
     private String dictType;
 
-    /**
-     * 状态
-     * 0-禁用，1-启用
-     */
+    @Schema(description = "状态", example = "1", allowableValues = {"0", "1"})
     private Integer status;
 
-    /**
-     * 备注信息
-     */
+    @Schema(description = "备注信息", example = "用户性别字典")
     private String remark;
 
-    /**
-     * 创建者
-     */
+    @Schema(description = "创建者", example = "admin")
     private String createBy;
 
-    /**
-     * 创建时间
-     */
+    @Schema(description = "创建时间", example = "2024-01-15 10:00:00")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
-    /**
-     * 更新者
-     */
+    @Schema(description = "更新者", example = "admin")
     private String updateBy;
 
-    /**
-     * 更新时间
-     */
+    @Schema(description = "更新时间", example = "2024-01-15 14:00:00")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 }

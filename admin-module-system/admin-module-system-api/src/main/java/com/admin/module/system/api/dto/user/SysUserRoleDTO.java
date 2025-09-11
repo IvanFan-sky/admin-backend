@@ -1,5 +1,6 @@
 package com.admin.module.system.api.dto.user;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -20,29 +21,21 @@ import java.util.Set;
  * @since 2024-01-15
  */
 @Data
+@Schema(description = "系统用户角色分配请求对象")
 public class SysUserRoleDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 用户ID
-     * 要分配角色的用户ID
-     */
+    @Schema(description = "用户ID", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "用户ID不能为空")
     @Positive(message = "用户ID必须为正整数")
     private Long userId;
 
-    /**
-     * 角色ID列表
-     * 分配给用户的角色ID集合
-     */
+    @Schema(description = "角色ID列表", example = "[2, 3, 4]", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotEmpty(message = "角色列表不能为空")
     private Set<Long> roleIds;
 
-    /**
-     * 备注信息
-     * 角色分配的说明
-     */
+    @Schema(description = "备注信息", example = "为用户分配管理员和财务角色")
     @Size(max = 500, message = "备注信息长度不能超过500个字符")
     private String remark;
 }
