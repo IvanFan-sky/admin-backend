@@ -14,8 +14,12 @@ import com.admin.module.system.biz.dal.mapper.SysDictDataMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.admin.framework.redis.constants.CacheConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +45,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = CacheConstants.SYS_DICT_CACHE, allEntries = true)
     public Long createDictData(SysDictDataCreateDTO createDTO) {
         // 校验字典值是否已存在
         if (existsDictValue(createDTO.getDictType(), createDTO.getDictValue())) {
@@ -68,6 +73,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = CacheConstants.SYS_DICT_CACHE, allEntries = true)
     public void updateDictData(SysDictDataUpdateDTO updateDTO) {
         // 校验字典数据是否存在
         SysDictDataDO existingDictData = dictDataMapper.selectById(updateDTO.getId());
@@ -99,6 +105,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = CacheConstants.SYS_DICT_CACHE, allEntries = true)
     public void deleteDictData(Long id) {
         // 校验字典数据是否存在
         SysDictDataDO dictDataDO = dictDataMapper.selectById(id);
@@ -135,6 +142,7 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.SYS_DICT_CACHE, key = "'data:' + #id", unless = "#result == null")
     public SysDictDataVO getDictData(Long id) {
         SysDictDataDO dictDataDO = dictDataMapper.selectById(id);
         if (dictDataDO == null) {
@@ -164,12 +172,14 @@ public class SysDictDataServiceImpl implements SysDictDataService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.SYS_DICT_CACHE, key = "'type:' + #dictType", unless = "#result == null || #result.isEmpty()")
     public List<SysDictDataVO> getDictDataByType(String dictType) {
         List<SysDictDataDO> list = dictDataMapper.selectByDictType(dictType);
         return SysDictDataConvert.INSTANCE.convertList(list);
     }
 
     @Override
+    @Cacheable(value = CacheConstants.SYS_DICT_CACHE, key = "'enabled_type:' + #dictType", unless = "#result == null || #result.isEmpty()")
     public List<SysDictDataVO> getEnabledDictDataByType(String dictType) {
         List<SysDictDataDO> list = dictDataMapper.selectEnabledByDictType(dictType);
         return SysDictDataConvert.INSTANCE.convertList(list);

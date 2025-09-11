@@ -11,8 +11,12 @@ import com.admin.module.system.biz.dal.dataobject.SysRoleMenuDO;
 import com.admin.module.system.biz.dal.mapper.SysMenuMapper;
 import com.admin.module.system.biz.dal.mapper.SysRoleMenuMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.admin.framework.redis.constants.CacheConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -43,6 +47,11 @@ public class SysRoleMenuServiceImpl implements SysRoleMenuService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.SYS_ROLE_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.SYS_MENU_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_PERMISSION_CACHE, allEntries = true)
+    })
     public void assignRoleMenus(SysRoleMenuDTO roleMenuDTO) {
         log.debug("开始分配角色菜单权限，参数: {}", roleMenuDTO);
 
@@ -86,6 +95,7 @@ public class SysRoleMenuServiceImpl implements SysRoleMenuService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.SYS_ROLE_CACHE, key = "'menu_ids:' + #roleId", unless = "#result == null || #result.isEmpty()")
     public List<Long> getRoleMenuIds(Long roleId) {
         if (roleId == null) {
             return new ArrayList<>();
@@ -96,6 +106,11 @@ public class SysRoleMenuServiceImpl implements SysRoleMenuService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.SYS_ROLE_CACHE, key = "'menu_ids:' + #roleId"),
+        @CacheEvict(value = CacheConstants.SYS_MENU_CACHE, key = "'role_ids:' + #menuId"),
+        @CacheEvict(value = CacheConstants.USER_PERMISSION_CACHE, allEntries = true)
+    })
     public void removeRoleMenu(Long roleId, Long menuId) {
         log.debug("开始移除角色菜单权限，角色ID: {}, 菜单ID: {}", roleId, menuId);
 
@@ -119,6 +134,11 @@ public class SysRoleMenuServiceImpl implements SysRoleMenuService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.SYS_ROLE_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.SYS_MENU_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_PERMISSION_CACHE, allEntries = true)
+    })
     public void removeAllRoleMenus(Long roleId) {
         if (roleId == null) {
             return;
@@ -155,6 +175,7 @@ public class SysRoleMenuServiceImpl implements SysRoleMenuService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.SYS_MENU_CACHE, key = "'role_ids:' + #menuId", unless = "#result == null || #result.isEmpty()")
     public List<Long> getRoleIdsByMenuId(Long menuId) {
         if (menuId == null) {
             return new ArrayList<>();

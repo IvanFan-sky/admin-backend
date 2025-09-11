@@ -11,8 +11,12 @@ import com.admin.module.system.biz.dal.dataobject.SysUserRoleDO;
 import com.admin.module.system.biz.dal.mapper.SysRoleMapper;
 import com.admin.module.system.biz.dal.mapper.SysUserRoleMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.admin.framework.redis.constants.CacheConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -44,6 +48,10 @@ public class SysUserRoleServiceImpl implements SysUserRoleService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.USER_ROLE_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_PERMISSION_CACHE, allEntries = true)
+    })
     public void assignUserRoles(SysUserRoleDTO userRoleDTO) {
         log.debug("开始分配用户角色，参数: {}", userRoleDTO);
 
@@ -87,6 +95,7 @@ public class SysUserRoleServiceImpl implements SysUserRoleService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.USER_ROLE_CACHE, key = "'user_role_ids:' + #userId", unless = "#result == null || #result.isEmpty()")
     public List<Long> getUserRoleIds(Long userId) {
         if (userId == null) {
             return new ArrayList<>();
@@ -97,6 +106,11 @@ public class SysUserRoleServiceImpl implements SysUserRoleService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.USER_ROLE_CACHE, key = "'user_role_ids:' + #userId"),
+        @CacheEvict(value = CacheConstants.USER_ROLE_CACHE, key = "'role_user_ids:' + #roleId"),
+        @CacheEvict(value = CacheConstants.USER_PERMISSION_CACHE, allEntries = true)
+    })
     public void removeUserRole(Long userId, Long roleId) {
         log.debug("开始移除用户角色，用户ID: {}, 角色ID: {}", userId, roleId);
 
@@ -156,6 +170,7 @@ public class SysUserRoleServiceImpl implements SysUserRoleService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.USER_ROLE_CACHE, key = "'role_user_ids:' + #roleId", unless = "#result == null || #result.isEmpty()")
     public List<Long> getUserIdsByRoleId(Long roleId) {
         if (roleId == null) {
             return new ArrayList<>();

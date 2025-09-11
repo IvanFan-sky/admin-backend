@@ -14,8 +14,12 @@ import com.admin.module.system.biz.dal.mapper.SysRoleMenuMapper;
 import com.admin.module.system.biz.dal.mapper.SysUserRoleMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.admin.framework.redis.constants.CacheConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -48,6 +52,10 @@ public class SysRoleServiceImpl implements SysRoleService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.SYS_ROLE_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_ROLE_CACHE, allEntries = true)
+    })
     public Long createRole(SysRoleCreateDTO createDTO) {
         log.debug("开始创建角色，参数: {}", createDTO);
 
@@ -69,6 +77,11 @@ public class SysRoleServiceImpl implements SysRoleService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.SYS_ROLE_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_ROLE_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_PERMISSION_CACHE, allEntries = true)
+    })
     public void updateRole(SysRoleUpdateDTO updateDTO) {
         log.debug("开始更新角色，参数: {}", updateDTO);
 
@@ -94,6 +107,11 @@ public class SysRoleServiceImpl implements SysRoleService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.SYS_ROLE_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_ROLE_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_PERMISSION_CACHE, allEntries = true)
+    })
     public void deleteRole(Long id) {
         log.debug("开始删除角色，角色ID: {}", id);
 
@@ -114,6 +132,11 @@ public class SysRoleServiceImpl implements SysRoleService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.SYS_ROLE_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_ROLE_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_PERMISSION_CACHE, allEntries = true)
+    })
     public int deleteRolesBatch(Set<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return 0;
@@ -136,6 +159,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.SYS_ROLE_CACHE, key = "#id", unless = "#result == null")
     public SysRoleVO getRole(Long id) {
         if (id == null) {
             return null;
@@ -146,6 +170,7 @@ public class SysRoleServiceImpl implements SysRoleService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.SYS_ROLE_CACHE, key = "'code:' + #roleCode", unless = "#result == null")
     public SysRoleVO getRoleByCode(String roleCode) {
         if (!StringUtils.hasText(roleCode)) {
             return null;
@@ -235,6 +260,11 @@ public class SysRoleServiceImpl implements SysRoleService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.SYS_ROLE_CACHE, key = "#id"),
+        @CacheEvict(value = CacheConstants.USER_ROLE_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_PERMISSION_CACHE, allEntries = true)
+    })
     public void updateRoleStatus(Long id, Integer status) {
         log.debug("开始更新角色状态，角色ID: {}, 状态: {}", id, status);
 

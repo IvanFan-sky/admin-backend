@@ -15,8 +15,12 @@ import com.admin.module.system.biz.dal.mapper.SysDictTypeMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.admin.framework.redis.constants.CacheConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +47,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = CacheConstants.SYS_DICT_CACHE, allEntries = true)
     public Long createDictType(SysDictTypeCreateDTO createDTO) {
         // 校验字典类型是否已存在
         if (existsDictType(createDTO.getDictType())) {
@@ -134,6 +139,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.SYS_DICT_CACHE, key = "'type:' + #id", unless = "#result == null")
     public SysDictTypeVO getDictType(Long id) {
         SysDictTypeDO dictTypeDO = dictTypeMapper.selectById(id);
         if (dictTypeDO == null) {
@@ -162,6 +168,7 @@ public class SysDictTypeServiceImpl implements SysDictTypeService {
 
 
     @Override
+    @Cacheable(value = CacheConstants.SYS_DICT_CACHE, key = "'enabled_types'", unless = "#result == null || #result.isEmpty()")
     public List<SysDictTypeVO> getEnabledDictTypes() {
         List<SysDictTypeDO> list = dictTypeMapper.selectEnabledDictTypes();
         return SysDictTypeConvert.INSTANCE.convertList(list);

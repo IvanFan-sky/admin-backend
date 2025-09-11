@@ -1,18 +1,17 @@
 package com.admin.module.system.biz.service.auth;
 
 import com.admin.common.exception.ServiceException;
-import com.admin.common.utils.ServletUtils;
+import com.admin.common.utils.AuthorityUtils;
 import com.admin.framework.redis.service.UserCacheService;
 import com.admin.framework.security.core.LoginUser;
 import com.admin.framework.security.service.JwtBlacklistService;
 import com.admin.framework.security.service.LoginLimitService;
-import com.admin.module.system.api.service.auth.PermissionQueryService;
-import com.admin.common.utils.AuthorityUtils;
-import com.admin.framework.security.utils.SecurityAuthUtils;
 import com.admin.framework.security.utils.JwtTokenUtil;
+import com.admin.framework.security.utils.SecurityAuthUtils;
 import com.admin.module.system.api.dto.auth.LoginDTO;
 import com.admin.module.system.api.dto.auth.RefreshTokenDTO;
 import com.admin.module.system.api.service.auth.AuthService;
+import com.admin.module.system.api.service.auth.PermissionQueryService;
 import com.admin.module.system.api.vo.auth.LoginVO;
 import com.admin.module.system.api.vo.auth.UserInfoVO;
 import com.admin.module.system.biz.dal.dataobject.SysUserDO;
@@ -395,7 +394,8 @@ public class AuthServiceImpl implements AuthService {
                     user.getId(),
                     user.getUsername(),
                     user.getLoginIp(),
-                    getUserAgent(), // 获取User-Agent
+                    // 获取User-Agent
+                    getUserAgent(),
                     tokenId
             );
             

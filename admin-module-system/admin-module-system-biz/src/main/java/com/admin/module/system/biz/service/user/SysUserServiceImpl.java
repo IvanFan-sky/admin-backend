@@ -12,11 +12,15 @@ import com.admin.module.system.api.vo.user.SysUserVO;
 import com.admin.module.system.biz.convert.user.SysUserConvert;
 import com.admin.module.system.biz.dal.dataobject.SysUserDO;
 import com.admin.module.system.biz.dal.dataobject.SysUserRoleDO;
+import com.admin.framework.redis.constants.CacheConstants;
 import com.admin.module.system.biz.dal.mapper.SysUserMapper;
 import com.admin.module.system.biz.dal.mapper.SysUserRoleMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -74,6 +78,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.SYS_USER_CACHE, key = "#id", unless = "#result == null")
     public SysUserVO getUser(Long id) {
         SysUserDO user = userMapper.selectById(id);
         if (user == null) {
@@ -83,6 +88,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.SYS_USER_CACHE, key = "'username:' + #username", unless = "#result == null")
     public SysUserVO getUserByUsername(String username) {
         SysUserDO user = userMapper.selectUserByUsername(username);
         if (user == null) {
@@ -93,6 +99,7 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = CacheConstants.SYS_USER_CACHE, allEntries = true)
     public Long createUser(SysUserCreateDTO createDTO) {
         // 1. 数据唯一性校验
         validateUserForCreateOrUpdate(null, createDTO.getUsername(), createDTO.getPhone(), createDTO.getEmail());
@@ -113,6 +120,10 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.SYS_USER_CACHE, key = "#updateDTO.id"),
+        @CacheEvict(value = CacheConstants.SYS_USER_CACHE, allEntries = true)
+    })
     public void updateUser(SysUserUpdateDTO updateDTO) {
         SysUserDO existUser = userMapper.selectById(updateDTO.getId());
         if (existUser == null) {
@@ -130,6 +141,10 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.SYS_USER_CACHE, key = "#id"),
+        @CacheEvict(value = CacheConstants.SYS_USER_CACHE, allEntries = true)
+    })
     public void deleteUser(Long id) {
         if (SysUserDO.isAdmin(id)) {
             throw new ServiceException("不允许删除超级管理员用户");
@@ -141,6 +156,7 @@ public class SysUserServiceImpl implements SysUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = CacheConstants.SYS_USER_CACHE, allEntries = true)
     public void deleteUsers(Long[] ids) {
         for (Long id : ids) {
             if (SysUserDO.isAdmin(id)) {
@@ -155,6 +171,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
+    @CacheEvict(value = CacheConstants.SYS_USER_CACHE, key = "#resetPwdDTO.id")
     public void resetUserPwd(SysUserResetPwdDTO resetPwdDTO) {
         SysUserDO user = userMapper.selectById(resetPwdDTO.getId());
         if (user == null) {
@@ -167,6 +184,7 @@ public class SysUserServiceImpl implements SysUserService {
     }
 
     @Override
+    @CacheEvict(value = CacheConstants.SYS_USER_CACHE, key = "#id")
     public void updateUserStatus(Long id, Integer status) {
         if (SysUserDO.isAdmin(id)) {
             throw new ServiceException("不允许修改超级管理员用户状态");

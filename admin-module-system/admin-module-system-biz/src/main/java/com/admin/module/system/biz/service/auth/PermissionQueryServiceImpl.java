@@ -8,8 +8,10 @@ import com.admin.module.system.biz.dal.mapper.SysMenuMapper;
 import com.admin.module.system.biz.dal.mapper.SysRoleMapper;
 import com.admin.module.system.biz.dal.mapper.SysUserMapper;
 import com.admin.module.system.biz.dal.mapper.SysUserRoleMapper;
+import com.admin.framework.redis.constants.CacheConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -35,6 +37,7 @@ public class PermissionQueryServiceImpl implements PermissionQueryService {
     private final SysMenuMapper menuMapper;
 
     @Override
+    @Cacheable(value = CacheConstants.USER_ROLE_CACHE, key = "#userId", unless = "#result == null || #result.isEmpty()")
     public List<String> getUserRoles(Long userId) {
         try {
             // 查询用户关联的角色ID列表
@@ -61,6 +64,7 @@ public class PermissionQueryServiceImpl implements PermissionQueryService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.USER_PERMISSION_CACHE, key = "#userId", unless = "#result == null || #result.isEmpty()")
     public List<String> getUserPermissions(Long userId) {
         try {
             // 直接通过用户ID查询菜单权限（已考虑角色关联）

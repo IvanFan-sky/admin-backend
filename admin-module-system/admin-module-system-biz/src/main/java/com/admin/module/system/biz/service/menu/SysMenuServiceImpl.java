@@ -14,8 +14,12 @@ import com.admin.module.system.biz.dal.mapper.SysMenuMapper;
 import com.admin.module.system.biz.dal.mapper.SysRoleMenuMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.admin.framework.redis.constants.CacheConstants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -45,6 +49,10 @@ public class SysMenuServiceImpl implements SysMenuService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.SYS_MENU_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_PERMISSION_CACHE, allEntries = true)
+    })
     public Long createMenu(SysMenuCreateDTO createDTO) {
         log.debug("开始创建菜单，参数: {}", createDTO);
 
@@ -76,6 +84,10 @@ public class SysMenuServiceImpl implements SysMenuService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.SYS_MENU_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_PERMISSION_CACHE, allEntries = true)
+    })
     public void updateMenu(SysMenuUpdateDTO updateDTO) {
         log.debug("开始更新菜单，参数: {}", updateDTO);
 
@@ -119,6 +131,11 @@ public class SysMenuServiceImpl implements SysMenuService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = CacheConstants.SYS_MENU_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.SYS_ROLE_CACHE, allEntries = true),
+        @CacheEvict(value = CacheConstants.USER_PERMISSION_CACHE, allEntries = true)
+    })
     public void deleteMenu(Long id) {
         log.debug("开始删除菜单，菜单ID: {}", id);
 
@@ -161,6 +178,7 @@ public class SysMenuServiceImpl implements SysMenuService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.SYS_MENU_CACHE, key = "#id", unless = "#result == null")
     public SysMenuVO getMenu(Long id) {
         if (id == null) {
             return null;
@@ -221,6 +239,7 @@ public class SysMenuServiceImpl implements SysMenuService {
     }
 
     @Override
+    @Cacheable(value = CacheConstants.SYS_MENU_CACHE, key = "'role:' + #roleId", unless = "#result == null || #result.isEmpty()")
     public List<SysMenuVO> getMenusByRoleId(Long roleId) {
         if (roleId == null) {
             return new ArrayList<>();
