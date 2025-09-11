@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,6 +49,7 @@ public class SysRoleController {
      */
     @Operation(summary = "创建角色")
     @PostMapping
+    @PreAuthorize("@ss.hasPermission('system:role:create')")
     public R<Long> createRole(@Valid @RequestBody SysRoleCreateDTO createDTO) {
         Long roleId = roleService.createRole(createDTO);
         return R.ok(roleId);
@@ -61,6 +63,7 @@ public class SysRoleController {
      */
     @Operation(summary = "更新角色")
     @PutMapping
+    @PreAuthorize("@ss.hasPermission('system:role:update')")
     public R<Void> updateRole(@Valid @RequestBody SysRoleUpdateDTO updateDTO) {
         roleService.updateRole(updateDTO);
         return R.ok();
@@ -75,6 +78,7 @@ public class SysRoleController {
     @Operation(summary = "删除角色")
     @Parameter(name = "id", description = "角色编号", required = true, example = "1")
     @DeleteMapping("/{id}")
+    @PreAuthorize("@ss.hasPermission('system:role:delete')")
     public R<Void> deleteRole(@PathVariable @NotNull @Positive Long id) {
         roleService.deleteRole(id);
         return R.ok();
@@ -88,6 +92,7 @@ public class SysRoleController {
      */
     @Operation(summary = "批量删除角色")
     @DeleteMapping("/batch")
+    @PreAuthorize("@ss.hasPermission('system:role:delete')")
     public R<Integer> deleteRolesBatch(@RequestBody @NotEmpty Set<@NotNull @Positive Long> ids) {
         int deleteCount = roleService.deleteRolesBatch(ids);
         return R.ok(deleteCount);
@@ -102,6 +107,7 @@ public class SysRoleController {
     @Operation(summary = "获取角色详情")
     @Parameter(name = "id", description = "角色编号", required = true, example = "1")
     @GetMapping("/{id}")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public R<SysRoleVO> getRole(@PathVariable @NotNull @Positive Long id) {
         SysRoleVO roleVO = roleService.getRole(id);
         return R.ok(roleVO);
@@ -116,6 +122,7 @@ public class SysRoleController {
     @Operation(summary = "根据角色编码获取角色详情")
     @Parameter(name = "roleCode", description = "角色编码", required = true, example = "ADMIN")
     @GetMapping("/code/{roleCode}")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public R<SysRoleVO> getRoleByCode(@PathVariable String roleCode) {
         SysRoleVO roleVO = roleService.getRoleByCode(roleCode);
         return R.ok(roleVO);
@@ -129,6 +136,7 @@ public class SysRoleController {
      */
     @Operation(summary = "获取角色分页列表")
     @GetMapping("/page")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public R<PageResult<SysRoleVO>> getRolePage(@Valid SysRoleQueryDTO queryDTO) {
         PageResult<SysRoleVO> pageResult = roleService.getRolePage(queryDTO);
         return R.ok(pageResult);
@@ -141,6 +149,7 @@ public class SysRoleController {
      */
     @Operation(summary = "获取启用状态的角色列表")
     @GetMapping("/enabled")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public R<List<SysRoleVO>> getEnabledRoleList() {
         List<SysRoleVO> roleList = roleService.getEnabledRoleList();
         return R.ok(roleList);
@@ -155,6 +164,7 @@ public class SysRoleController {
     @Operation(summary = "根据用户ID获取角色列表")
     @Parameter(name = "userId", description = "用户编号", required = true, example = "1")
     @GetMapping("/user/{userId}")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public R<List<SysRoleVO>> getRolesByUserId(@PathVariable @NotNull @Positive Long userId) {
         List<SysRoleVO> roleList = roleService.getRolesByUserId(userId);
         return R.ok(roleList);
@@ -168,6 +178,7 @@ public class SysRoleController {
      */
     @Operation(summary = "分配角色菜单权限")
     @PostMapping("/menu/assign")
+    @PreAuthorize("@ss.hasPermission('system:role:assign')")
     public R<Void> assignRoleMenus(@Valid @RequestBody SysRoleMenuDTO roleMenuDTO) {
         roleService.assignRoleMenus(roleMenuDTO);
         return R.ok();
@@ -182,6 +193,7 @@ public class SysRoleController {
     @Operation(summary = "获取角色的菜单权限ID列表")
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @GetMapping("/{roleId}/menus")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public R<List<Long>> getRoleMenuIds(@PathVariable @NotNull @Positive Long roleId) {
         List<Long> menuIds = roleService.getRoleMenuIds(roleId);
         return R.ok(menuIds);
@@ -198,6 +210,7 @@ public class SysRoleController {
     @Parameter(name = "id", description = "角色编号", required = true, example = "1")
     @Parameter(name = "status", description = "角色状态", required = true, example = "1")
     @PutMapping("/{id}/status/{status}")
+    @PreAuthorize("@ss.hasPermission('system:role:update')")
     public R<Void> updateRoleStatus(@PathVariable @NotNull @Positive Long id, 
                                     @PathVariable @NotNull Integer status) {
         roleService.updateRoleStatus(id, status);

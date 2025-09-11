@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +51,7 @@ public class SysMenuController {
      */
     @Operation(summary = "创建菜单")
     @PostMapping
+    @PreAuthorize("@ss.hasPermission('system:menu:create')")
     public R<Long> createMenu(@Valid @RequestBody SysMenuCreateDTO createDTO) {
         Long menuId = menuService.createMenu(createDTO);
         return R.ok(menuId);
@@ -63,6 +65,7 @@ public class SysMenuController {
      */
     @Operation(summary = "更新菜单")
     @PutMapping
+    @PreAuthorize("@ss.hasPermission('system:menu:update')")
     public R<Void> updateMenu(@Valid @RequestBody SysMenuUpdateDTO updateDTO) {
         menuService.updateMenu(updateDTO);
         return R.ok();
@@ -77,6 +80,7 @@ public class SysMenuController {
     @Operation(summary = "删除菜单")
     @Parameter(name = "id", description = "菜单编号", required = true, example = "1")
     @DeleteMapping("/{id}")
+    @PreAuthorize("@ss.hasPermission('system:menu:delete')")
     public R<Void> deleteMenu(@PathVariable @NotNull @Positive Long id) {
         menuService.deleteMenu(id);
         return R.ok();
@@ -90,6 +94,7 @@ public class SysMenuController {
      */
     @Operation(summary = "批量删除菜单")
     @DeleteMapping("/batch")
+    @PreAuthorize("@ss.hasPermission('system:menu:delete')")
     public R<Integer> deleteMenusBatch(@RequestBody @NotEmpty Set<@NotNull @Positive Long> ids) {
         int deleteCount = menuService.deleteMenusBatch(ids);
         return R.ok(deleteCount);
@@ -104,6 +109,7 @@ public class SysMenuController {
     @Operation(summary = "获取菜单详情")
     @Parameter(name = "id", description = "菜单编号", required = true, example = "1")
     @GetMapping("/{id}")
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public R<SysMenuVO> getMenu(@PathVariable @NotNull @Positive Long id) {
         SysMenuVO menuVO = menuService.getMenu(id);
         return R.ok(menuVO);
@@ -117,6 +123,7 @@ public class SysMenuController {
      */
     @Operation(summary = "获取菜单分页列表")
     @GetMapping("/page")
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public R<PageResult<SysMenuVO>> getMenuPage(@Valid SysMenuQueryDTO queryDTO) {
         PageResult<SysMenuVO> pageResult = menuService.getMenuPage(queryDTO);
         return R.ok(pageResult);
@@ -130,6 +137,7 @@ public class SysMenuController {
      */
     @Operation(summary = "获取菜单树形列表")
     @GetMapping("/tree")
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public R<List<SysMenuVO>> getMenuTree(@Valid SysMenuQueryDTO queryDTO) {
         List<SysMenuVO> menuTree = menuService.getMenuTree(queryDTO);
         return R.ok(menuTree);
@@ -142,6 +150,7 @@ public class SysMenuController {
      */
     @Operation(summary = "获取启用状态的菜单树形列表")
     @GetMapping("/tree/enabled")
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public R<List<SysMenuVO>> getEnabledMenuTree() {
         List<SysMenuVO> menuTree = menuService.getEnabledMenuTree();
         return R.ok(menuTree);
@@ -156,6 +165,7 @@ public class SysMenuController {
     @Operation(summary = "根据用户ID获取菜单树形列表")
     @Parameter(name = "userId", description = "用户编号", required = true, example = "1")
     @GetMapping("/tree/user/{userId}")
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public R<List<SysMenuVO>> getMenuTreeByUserId(@PathVariable @NotNull @Positive Long userId) {
         List<SysMenuVO> menuTree = menuService.getMenuTreeByUserId(userId);
         return R.ok(menuTree);
@@ -170,6 +180,7 @@ public class SysMenuController {
     @Operation(summary = "根据角色ID获取菜单列表")
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @GetMapping("/role/{roleId}")
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public R<List<SysMenuVO>> getMenusByRoleId(@PathVariable @NotNull @Positive Long roleId) {
         List<SysMenuVO> menuList = menuService.getMenusByRoleId(roleId);
         return R.ok(menuList);
@@ -184,6 +195,7 @@ public class SysMenuController {
     @Operation(summary = "获取父菜单下拉选项列表")
     @Parameter(name = "excludeId", description = "排除的菜单编号", example = "1")
     @GetMapping("/parent/options")
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public R<List<SysMenuVO>> getParentMenuOptions(@RequestParam(required = false) Long excludeId) {
         List<SysMenuVO> menuOptions = menuService.getParentMenuOptions(excludeId);
         return R.ok(menuOptions);
@@ -200,6 +212,7 @@ public class SysMenuController {
     @Parameter(name = "id", description = "菜单编号", required = true, example = "1")
     @Parameter(name = "status", description = "菜单状态", required = true, example = "1")
     @PutMapping("/{id}/status/{status}")
+    @PreAuthorize("@ss.hasPermission('system:menu:update')")
     public R<Void> updateMenuStatus(@PathVariable @NotNull @Positive Long id, 
                                     @PathVariable @NotNull Integer status) {
         menuService.updateMenuStatus(id, status);
@@ -213,6 +226,7 @@ public class SysMenuController {
      */
     @Operation(summary = "刷新菜单缓存")
     @PostMapping("/cache/refresh")
+    @PreAuthorize("@ss.hasPermission('system:menu:refresh')")
     public R<Void> refreshMenuCache() {
         menuService.refreshMenuCache();
         return R.ok();

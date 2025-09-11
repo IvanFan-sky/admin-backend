@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +48,7 @@ public class SysRoleMenuController {
      */
     @Operation(summary = "分配角色菜单权限")
     @PostMapping("/assign")
+    @PreAuthorize("@ss.hasPermission('system:role:assign')")
     public R<Void> assignRoleMenus(@Valid @RequestBody SysRoleMenuDTO roleMenuDTO) {
         roleMenuService.assignRoleMenus(roleMenuDTO);
         return R.ok();
@@ -61,6 +63,7 @@ public class SysRoleMenuController {
     @Operation(summary = "获取角色的菜单权限列表")
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @GetMapping("/role/{roleId}/menus")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public R<List<SysMenuVO>> getRoleMenus(@PathVariable @NotNull @Positive Long roleId) {
         List<SysMenuVO> menuList = roleMenuService.getRoleMenus(roleId);
         return R.ok(menuList);
@@ -75,6 +78,7 @@ public class SysRoleMenuController {
     @Operation(summary = "获取角色的菜单权限ID列表")
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @GetMapping("/role/{roleId}/menu-ids")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public R<List<Long>> getRoleMenuIds(@PathVariable @NotNull @Positive Long roleId) {
         List<Long> menuIds = roleMenuService.getRoleMenuIds(roleId);
         return R.ok(menuIds);
@@ -89,6 +93,7 @@ public class SysRoleMenuController {
     @Operation(summary = "获取角色菜单权限树形结构")
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @GetMapping("/role/{roleId}/menu-tree")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public R<List<SysMenuVO>> getRoleMenuTree(@PathVariable @NotNull @Positive Long roleId) {
         List<SysMenuVO> menuTree = roleMenuService.getRoleMenuTree(roleId);
         return R.ok(menuTree);
@@ -105,6 +110,7 @@ public class SysRoleMenuController {
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @Parameter(name = "menuId", description = "菜单编号", required = true, example = "1")
     @DeleteMapping("/role/{roleId}/menu/{menuId}")
+    @PreAuthorize("@ss.hasPermission('system:role:assign')")
     public R<Void> removeRoleMenu(@PathVariable @NotNull @Positive Long roleId,
                                   @PathVariable @NotNull @Positive Long menuId) {
         roleMenuService.removeRoleMenu(roleId, menuId);
@@ -120,6 +126,7 @@ public class SysRoleMenuController {
     @Operation(summary = "移除角色的所有菜单权限")
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @DeleteMapping("/role/{roleId}/menus")
+    @PreAuthorize("@ss.hasPermission('system:role:assign')")
     public R<Void> removeAllRoleMenus(@PathVariable @NotNull @Positive Long roleId) {
         roleMenuService.removeAllRoleMenus(roleId);
         return R.ok();
@@ -133,6 +140,7 @@ public class SysRoleMenuController {
      */
     @Operation(summary = "批量移除角色菜单权限关联")
     @DeleteMapping("/roles/menus/batch")
+    @PreAuthorize("@ss.hasPermission('system:role:assign')")
     public R<Integer> removeRoleMenusBatch(@RequestBody @NotEmpty Set<@NotNull @Positive Long> roleIds) {
         int removeCount = roleMenuService.removeRoleMenusBatch(roleIds);
         return R.ok(removeCount);
@@ -147,6 +155,7 @@ public class SysRoleMenuController {
     @Operation(summary = "获取拥有指定菜单权限的角色ID列表")
     @Parameter(name = "menuId", description = "菜单编号", required = true, example = "1")
     @GetMapping("/menu/{menuId}/role-ids")
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public R<List<Long>> getRoleIdsByMenuId(@PathVariable @NotNull @Positive Long menuId) {
         List<Long> roleIds = roleMenuService.getRoleIdsByMenuId(menuId);
         return R.ok(roleIds);
@@ -163,6 +172,7 @@ public class SysRoleMenuController {
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @Parameter(name = "menuId", description = "菜单编号", required = true, example = "1")
     @GetMapping("/role/{roleId}/menu/{menuId}/exists")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public R<Boolean> hasRoleMenu(@PathVariable @NotNull @Positive Long roleId,
                                   @PathVariable @NotNull @Positive Long menuId) {
         boolean hasMenu = roleMenuService.hasRoleMenu(roleId, menuId);
@@ -179,6 +189,7 @@ public class SysRoleMenuController {
     @Operation(summary = "检查角色是否拥有指定菜单权限中的任意一个")
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @PostMapping("/role/{roleId}/menus/has-any")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public R<Boolean> hasAnyRoleMenu(@PathVariable @NotNull @Positive Long roleId,
                                      @RequestBody @NotEmpty Set<@NotNull @Positive Long> menuIds) {
         boolean hasAnyMenu = roleMenuService.hasAnyRoleMenu(roleId, menuIds);
@@ -195,6 +206,7 @@ public class SysRoleMenuController {
     @Operation(summary = "检查角色是否拥有指定的所有菜单权限")
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @PostMapping("/role/{roleId}/menus/has-all")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public R<Boolean> hasAllRoleMenus(@PathVariable @NotNull @Positive Long roleId,
                                       @RequestBody @NotEmpty Set<@NotNull @Positive Long> menuIds) {
         boolean hasAllMenus = roleMenuService.hasAllRoleMenus(roleId, menuIds);
@@ -210,6 +222,7 @@ public class SysRoleMenuController {
     @Operation(summary = "检查菜单是否被任何角色使用")
     @Parameter(name = "menuId", description = "菜单编号", required = true, example = "1")
     @GetMapping("/menu/{menuId}/used")
+    @PreAuthorize("@ss.hasPermission('system:menu:query')")
     public R<Boolean> isMenuUsedByAnyRole(@PathVariable @NotNull @Positive Long menuId) {
         boolean isUsed = roleMenuService.isMenuUsedByAnyRole(menuId);
         return R.ok(isUsed);
@@ -223,6 +236,7 @@ public class SysRoleMenuController {
      */
     @Operation(summary = "根据菜单ID列表批量移除相关的角色菜单权限")
     @DeleteMapping("/menus/roles/batch")
+    @PreAuthorize("@ss.hasPermission('system:role:assign')")
     public R<Integer> removeRoleMenusByMenuIds(@RequestBody @NotEmpty Set<@NotNull @Positive Long> menuIds) {
         int removeCount = roleMenuService.removeRoleMenusByMenuIds(menuIds);
         return R.ok(removeCount);

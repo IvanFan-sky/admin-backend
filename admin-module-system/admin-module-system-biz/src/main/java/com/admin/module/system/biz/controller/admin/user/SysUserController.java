@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,7 +45,7 @@ public class SysUserController {
         description = "根据查询条件分页获取用户列表，支持按用户名、昵称、邮箱、手机号、状态等条件筛选"
     )
     @GetMapping("/page")
-    // @PreAuthorize("hasPermission('system:user:query')")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
     public R<PageResult<SysUserVO>> getUserPage(@Valid SysUserQueryDTO queryDTO) {
         PageResult<SysUserVO> pageResult = userService.getUserPage(queryDTO);
         return R.ok(pageResult);
@@ -56,7 +56,7 @@ public class SysUserController {
         description = "根据查询条件获取用户列表，不分页返回所有匹配的用户数据"
     )
     @GetMapping("/list")
-    // @PreAuthorize("hasPermission('system:user:query')")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
     public R<List<SysUserVO>> getUserList(@Valid SysUserQueryDTO queryDTO) {
         List<SysUserVO> list = userService.getUserList(queryDTO);
         return R.ok(list);
@@ -68,7 +68,7 @@ public class SysUserController {
     )
     @Parameter(name = "id", description = "用户ID", required = true, example = "1024")
     @GetMapping("/{id}")
-    // @PreAuthorize("hasPermission('system:user:query')")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
     public R<SysUserVO> getUser(@PathVariable("id") Long id) {
         SysUserVO user = userService.getUser(id);
         return R.ok(user);
@@ -79,7 +79,7 @@ public class SysUserController {
         description = "创建新用户，需要提供用户基本信息和角色分配"
     )
     @PostMapping
-    // @PreAuthorize("hasPermission('system:user:add')")
+    @PreAuthorize("@ss.hasPermission('system:user:create')")
     public R<Long> createUser(@Valid @RequestBody SysUserCreateDTO createDTO) {
         Long userId = userService.createUser(createDTO);
         return R.ok(userId);
@@ -90,7 +90,7 @@ public class SysUserController {
         description = "更新用户的基本信息，支持修改用户名、昵称、邮箱、手机号等"
     )
     @PutMapping
-    // @PreAuthorize("hasPermission('system:user:edit')")
+    @PreAuthorize("@ss.hasPermission('system:user:update')")
     public R<Boolean> updateUser(@Valid @RequestBody SysUserUpdateDTO updateDTO) {
         userService.updateUser(updateDTO);
         return R.ok(true);
@@ -102,7 +102,7 @@ public class SysUserController {
     )
     @Parameter(name = "id", description = "用户ID", required = true, example = "1024")
     @DeleteMapping("/{id}")
-    // @PreAuthorize("hasPermission('system:user:remove')")
+    @PreAuthorize("@ss.hasPermission('system:user:delete')")
     public R<Boolean> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
         return R.ok(true);
@@ -110,7 +110,7 @@ public class SysUserController {
 
     @Operation(summary = "批量删除用户")
     @DeleteMapping("/batch")
-    // @PreAuthorize("hasPermission('system:user:remove')")
+    @PreAuthorize("@ss.hasPermission('system:user:delete')")
     public R<Boolean> deleteUsers(@RequestBody @NotEmpty(message = "删除用户不能为空") Long[] ids) {
         userService.deleteUsers(ids);
         return R.ok(true);
@@ -118,7 +118,7 @@ public class SysUserController {
 
     @Operation(summary = "重置用户密码")
     @PutMapping("/resetPwd")
-    // @PreAuthorize("hasPermission('system:user:resetPwd')")
+    @PreAuthorize("@ss.hasPermission('system:user:resetPwd')")
     public R<Boolean> resetUserPwd(@Valid @RequestBody SysUserResetPwdDTO resetPwdDTO) {
         userService.resetUserPwd(resetPwdDTO);
         return R.ok(true);
@@ -126,7 +126,7 @@ public class SysUserController {
 
     @Operation(summary = "修改用户状态")
     @PutMapping("/changeStatus")
-    // @PreAuthorize("hasPermission('system:user:edit')")
+    @PreAuthorize("@ss.hasPermission('system:user:update')")
     public R<Boolean> changeStatus(@RequestParam("id") @NotNull(message = "用户ID不能为空") Long id,
                                    @RequestParam("status") @NotNull(message = "状态不能为空") Integer status) {
         userService.updateUserStatus(id, status);
@@ -135,7 +135,7 @@ public class SysUserController {
 
     @Operation(summary = "校验用户名是否唯一")
     @GetMapping("/checkUsernameUnique")
-    // @PreAuthorize("hasPermission('system:user:query')")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
     public R<Boolean> checkUsernameUnique(@RequestParam("username") String username,
                                           @RequestParam(value = "id", required = false) Long id) {
         boolean unique = userService.checkUsernameUnique(username, id);
@@ -145,7 +145,7 @@ public class SysUserController {
 
     @Operation(summary = "校验手机号是否唯一")
     @GetMapping("/checkPhoneUnique")
-    // @PreAuthorize("hasPermission('system:user:query')")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
     public R<Boolean> checkPhoneUnique(@RequestParam("phone") String phone,
                                        @RequestParam(value = "id", required = false) Long id) {
         boolean unique = userService.checkPhoneUnique(phone, id);
@@ -154,7 +154,7 @@ public class SysUserController {
 
     @Operation(summary = "校验邮箱是否唯一")
     @GetMapping("/checkEmailUnique")
-    // @PreAuthorize("hasPermission('system:user:query')")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
     public R<Boolean> checkEmailUnique(@RequestParam("email") String email,
                                        @RequestParam(value = "id", required = false) Long id) {
         boolean unique = userService.checkEmailUnique(email, id);

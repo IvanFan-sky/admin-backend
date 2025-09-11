@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +48,7 @@ public class SysUserRoleController {
      */
     @Operation(summary = "分配用户角色")
     @PostMapping("/assign")
+    @PreAuthorize("@ss.hasPermission('system:user:assign')")
     public R<Void> assignUserRoles(@Valid @RequestBody SysUserRoleDTO userRoleDTO) {
         userRoleService.assignUserRoles(userRoleDTO);
         return R.ok();
@@ -61,6 +63,7 @@ public class SysUserRoleController {
     @Operation(summary = "获取用户的角色列表")
     @Parameter(name = "userId", description = "用户编号", required = true, example = "1")
     @GetMapping("/user/{userId}/roles")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
     public R<List<SysRoleVO>> getUserRoles(@PathVariable @NotNull @Positive Long userId) {
         List<SysRoleVO> roleList = userRoleService.getUserRoles(userId);
         return R.ok(roleList);
@@ -75,6 +78,7 @@ public class SysUserRoleController {
     @Operation(summary = "获取用户的角色ID列表")
     @Parameter(name = "userId", description = "用户编号", required = true, example = "1")
     @GetMapping("/user/{userId}/role-ids")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
     public R<List<Long>> getUserRoleIds(@PathVariable @NotNull @Positive Long userId) {
         List<Long> roleIds = userRoleService.getUserRoleIds(userId);
         return R.ok(roleIds);
@@ -91,6 +95,7 @@ public class SysUserRoleController {
     @Parameter(name = "userId", description = "用户编号", required = true, example = "1")
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @DeleteMapping("/user/{userId}/role/{roleId}")
+    @PreAuthorize("@ss.hasPermission('system:user:assign')")
     public R<Void> removeUserRole(@PathVariable @NotNull @Positive Long userId,
                                   @PathVariable @NotNull @Positive Long roleId) {
         userRoleService.removeUserRole(userId, roleId);
@@ -106,6 +111,7 @@ public class SysUserRoleController {
     @Operation(summary = "移除用户的所有角色")
     @Parameter(name = "userId", description = "用户编号", required = true, example = "1")
     @DeleteMapping("/user/{userId}/roles")
+    @PreAuthorize("@ss.hasPermission('system:user:assign')")
     public R<Void> removeAllUserRoles(@PathVariable @NotNull @Positive Long userId) {
         userRoleService.removeAllUserRoles(userId);
         return R.ok();
@@ -119,6 +125,7 @@ public class SysUserRoleController {
      */
     @Operation(summary = "批量移除用户角色关联")
     @DeleteMapping("/users/roles/batch")
+    @PreAuthorize("@ss.hasPermission('system:user:assign')")
     public R<Integer> removeUserRolesBatch(@RequestBody @NotEmpty Set<@NotNull @Positive Long> userIds) {
         int removeCount = userRoleService.removeUserRolesBatch(userIds);
         return R.ok(removeCount);
@@ -133,6 +140,7 @@ public class SysUserRoleController {
     @Operation(summary = "获取拥有指定角色的用户ID列表")
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @GetMapping("/role/{roleId}/user-ids")
+    @PreAuthorize("@ss.hasPermission('system:role:query')")
     public R<List<Long>> getUserIdsByRoleId(@PathVariable @NotNull @Positive Long roleId) {
         List<Long> userIds = userRoleService.getUserIdsByRoleId(roleId);
         return R.ok(userIds);
@@ -149,6 +157,7 @@ public class SysUserRoleController {
     @Parameter(name = "userId", description = "用户编号", required = true, example = "1")
     @Parameter(name = "roleId", description = "角色编号", required = true, example = "1")
     @GetMapping("/user/{userId}/role/{roleId}/exists")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
     public R<Boolean> hasUserRole(@PathVariable @NotNull @Positive Long userId,
                                   @PathVariable @NotNull @Positive Long roleId) {
         boolean hasRole = userRoleService.hasUserRole(userId, roleId);
@@ -165,6 +174,7 @@ public class SysUserRoleController {
     @Operation(summary = "检查用户是否拥有指定角色中的任意一个")
     @Parameter(name = "userId", description = "用户编号", required = true, example = "1")
     @PostMapping("/user/{userId}/roles/has-any")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
     public R<Boolean> hasAnyUserRole(@PathVariable @NotNull @Positive Long userId,
                                      @RequestBody @NotEmpty Set<@NotNull @Positive Long> roleIds) {
         boolean hasAnyRole = userRoleService.hasAnyUserRole(userId, roleIds);
@@ -181,6 +191,7 @@ public class SysUserRoleController {
     @Operation(summary = "检查用户是否拥有指定的所有角色")
     @Parameter(name = "userId", description = "用户编号", required = true, example = "1")
     @PostMapping("/user/{userId}/roles/has-all")
+    @PreAuthorize("@ss.hasPermission('system:user:query')")
     public R<Boolean> hasAllUserRoles(@PathVariable @NotNull @Positive Long userId,
                                       @RequestBody @NotEmpty Set<@NotNull @Positive Long> roleIds) {
         boolean hasAllRoles = userRoleService.hasAllUserRoles(userId, roleIds);

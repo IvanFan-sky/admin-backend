@@ -60,7 +60,7 @@ public interface SysUserService {
      * @param roleId 角色ID
      * @return 拥有该角色的用户ID列表
      */
-    List<Long> getUserIdsByRoleId(Long roleId);
+//    List<Long> getUserIdsByRoleId(Long roleId);
 
     /**
      * 创建用户

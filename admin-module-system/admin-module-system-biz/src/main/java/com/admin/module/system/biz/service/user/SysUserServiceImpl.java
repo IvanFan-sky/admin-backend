@@ -3,6 +3,7 @@ package com.admin.module.system.biz.service.user;
 import com.admin.common.core.domain.PageResult;
 import com.admin.common.exception.ServiceException;
 import com.admin.common.utils.PageUtils;
+import com.admin.framework.redis.constants.CacheConstants;
 import com.admin.module.system.api.dto.user.SysUserCreateDTO;
 import com.admin.module.system.api.dto.user.SysUserQueryDTO;
 import com.admin.module.system.api.dto.user.SysUserResetPwdDTO;
@@ -12,7 +13,6 @@ import com.admin.module.system.api.vo.user.SysUserVO;
 import com.admin.module.system.biz.convert.user.SysUserConvert;
 import com.admin.module.system.biz.dal.dataobject.SysUserDO;
 import com.admin.module.system.biz.dal.dataobject.SysUserRoleDO;
-import com.admin.framework.redis.constants.CacheConstants;
 import com.admin.module.system.biz.dal.mapper.SysUserMapper;
 import com.admin.module.system.biz.dal.mapper.SysUserRoleMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -46,7 +46,7 @@ public class SysUserServiceImpl implements SysUserService {
 
     private final SysUserMapper userMapper;
     private final SysUserRoleMapper userRoleMapper;
-    private final PasswordEncoder passwordEncoder;
+     private final PasswordEncoder passwordEncoder;
 
     @Override
     public PageResult<SysUserVO> getUserPage(SysUserQueryDTO queryDTO) {
@@ -107,7 +107,7 @@ public class SysUserServiceImpl implements SysUserService {
         
         // 2. 转换DTO为数据对象
         SysUserDO user = SysUserConvert.INSTANCE.convert(createDTO);
-        user.setPassword(passwordEncoder.encode(createDTO.getPassword()));
+        user.setPassword(createDTO.getPassword()); // TODO: 密码加密
         user.setStatus(createDTO.getStatus() != null ? createDTO.getStatus() : 1);
         
         // 3. 插入用户基本信息
@@ -179,7 +179,7 @@ public class SysUserServiceImpl implements SysUserService {
             throw new ServiceException("用户不存在");
         }
         
-        user.setPassword(passwordEncoder.encode(resetPwdDTO.getPassword()));
+        user.setPassword(resetPwdDTO.getPassword()); // TODO: 密码加密
         user.setVersion(resetPwdDTO.getVersion());
         userMapper.updateById(user);
     }
@@ -216,16 +216,6 @@ public class SysUserServiceImpl implements SysUserService {
             return true;
         }
         return userMapper.checkEmailUnique(email, id) == 0;
-    }
-
-    @Override
-    @Cacheable(value = CacheConstants.USER_ROLE_CACHE, key = "'role_user_ids:' + #roleId", unless = "#result == null || #result.isEmpty()")
-    public List<Long> getUserIdsByRoleId(Long roleId) {
-        if (roleId == null) {
-            return new ArrayList<>();
-        }
-        
-        return userRoleMapper.selectUserIdsByRoleId(roleId);
     }
 
     /**
