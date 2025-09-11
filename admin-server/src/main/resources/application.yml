@@ -3,6 +3,11 @@ spring:
     name: admin-backend
   profiles:
     active: dev
+  main:
+    allow-bean-definition-overriding: true
+  autoconfigure:
+    exclude:
+      - org.redisson.spring.starter.RedissonAutoConfigurationV2
   
   # Jackson配置
   jackson:

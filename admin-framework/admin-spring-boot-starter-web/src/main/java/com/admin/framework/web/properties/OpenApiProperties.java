@@ -16,7 +16,6 @@ import java.util.List;
  * @since 2024-01-15
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "admin.openapi")
 public class OpenApiProperties {
 
