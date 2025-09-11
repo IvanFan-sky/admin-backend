@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.admin.module.system.biz.dal.mapper.SysOperationLogMapper">
+
+    <!-- 根据时间范围删除操作日志 -->
+    <delete id="deleteByTimeRange">
+        DELETE FROM sys_operation_log 
+        WHERE operation_time BETWEEN #{startTime} AND #{endTime}
+    </delete>
+
+    <!-- 清空操作日志 -->
+    <delete id="deleteAll">
+        DELETE FROM sys_operation_log
+    </delete>
+
+    <!-- 清理过期操作日志 -->
+    <delete id="deleteExpiredLogs">
+        DELETE FROM sys_operation_log 
+        WHERE operation_time &lt; #{beforeTime}
+    </delete>
+
+    <!-- 获取操作日志统计信息 -->
+    <select id="getStatistics" resultType="com.admin.module.system.api.vo.log.StatisticsResult">
+        SELECT 
+            COUNT(*) as totalCount,
+            SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as successCount,
+            SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END) as failCount,
+            AVG(cost_time) as avgCostTime,
+            MAX(cost_time) as maxCostTime,
+            MIN(cost_time) as minCostTime
+        FROM sys_operation_log 
+        WHERE deleted = 0
+        <if test="startTime != null">
+            AND operation_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND operation_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <!-- 按业务类型统计操作日志 -->
+    <select id="getBusinessTypeStatistics" resultType="com.admin.module.system.api.vo.log.BusinessTypeStatisticsVO">
+        SELECT 
+            business_type as businessType,
+            COUNT(*) as count
+        FROM sys_operation_log 
+        WHERE deleted = 0
+        <if test="startTime != null">
+            AND operation_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND operation_time &lt;= #{endTime}
+        </if>
+        GROUP BY business_type
+        ORDER BY count DESC
+    </select>
+
+    <!-- 按操作人统计操作日志 -->
+    <select id="getOperatorStatistics" resultType="com.admin.module.system.api.vo.log.OperatorStatisticsVO">
+        SELECT 
+            operator_id as operatorId,
+            operator_name as operatorName,
+            COUNT(*) as count
+        FROM sys_operation_log 
+        WHERE deleted = 0
+        <if test="startTime != null">
+            AND operation_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND operation_time &lt;= #{endTime}
+        </if>
+        GROUP BY operator_id, operator_name
+        ORDER BY count DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 获取用户操作日志 -->
+    <select id="selectUserLogs" resultType="com.admin.module.system.biz.dal.dataobject.SysOperationLogDO">
+        SELECT * FROM sys_operation_log 
+        WHERE deleted = 0
+        AND operator_id = #{userId}
+        <if test="startTime != null">
+            AND operation_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND operation_time &lt;= #{endTime}
+        </if>
+        ORDER BY operation_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+</mapper>

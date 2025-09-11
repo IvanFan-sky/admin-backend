@@ -67,8 +67,17 @@ public class PageResult<T> implements Serializable {
         this.pages = (total + size - 1) / size;
     }
 
+    public PageResult(List<T> records, Long total) {
+        this.records = records;
+        this.total = total;
+    }
+
     public static <T> PageResult<T> of(List<T> records, Long total, Long size, Long current) {
         return new PageResult<>(records, total, size, current);
+    }
+
+    public static <T> PageResult<T> of(List<T> records, Long total) {
+        return new PageResult<>(records, total);
     }
 
     public static <T> PageResult<T> empty() {

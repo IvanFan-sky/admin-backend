@@ -55,6 +55,24 @@
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
         
+        <!-- Spring AOP -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        
+        <!-- System API模块 -->
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-module-system-api</artifactId>
+        </dependency>
+        
+        <!-- Security框架 -->
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-security</artifactId>
+        </dependency>
+        
     </dependencies>
 
 </project>

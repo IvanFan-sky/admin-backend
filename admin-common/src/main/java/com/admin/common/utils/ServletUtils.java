@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.admin.common.utils.IpUtils;
+
 /**
  * Servlet工具类
  * 
@@ -46,33 +48,7 @@ public class ServletUtils {
      * 获取客户端IP地址
      */
     public static String getClientIpAddress() {
-        HttpServletRequest request = getRequest();
-        if (request == null) {
-            return "Unknown";
-        }
-
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-
-        // 多个IP的情况，取第一个
-        if (ip != null && ip.indexOf(',') > 0) {
-            ip = ip.substring(0, ip.indexOf(',')).trim();
-        }
-
+        String ip = IpUtils.getIpAddr();
         return ip != null ? ip : "Unknown";
     }
 

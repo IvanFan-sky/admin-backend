@@ -4,7 +4,7 @@ package com.admin.common.constants;
  * 业务错误码定义
  * 
  * 定义系统各模块的详细业务错误码，便于问题定位和国际化
- * HTTP状态码采用标准200、400等，业务错误码格式：模块代码(2位) + 具体错误(4位)
+ * HTTP状态码采用标准200、400等，业务错误码采用整型数值
  * 
  * @author admin
  * @version 1.0
@@ -19,141 +19,141 @@ public interface ErrorCodes {
     /**
      * 用户名或密码错误
      */
-    String INVALID_CREDENTIALS = "A00001";
+    Integer INVALID_CREDENTIALS = 100001;
     
     /**
      * 令牌无效
      */
-    String INVALID_TOKEN = "A00002";
+    Integer INVALID_TOKEN = 100002;
     
     /**
      * 令牌过期
      */
-    String TOKEN_EXPIRED = "A00003";
+    Integer TOKEN_EXPIRED = 100003;
     
     /**
      * 账户被锁定
      */
-    String ACCOUNT_LOCKED = "A00004";
+    Integer ACCOUNT_LOCKED = 100004;
     
     /**
      * 账户被禁用
      */
-    String ACCOUNT_DISABLED = "A00005";
+    Integer ACCOUNT_DISABLED = 100005;
     
     /**
      * 登录失败次数过多
      */
-    String LOGIN_FAIL_COUNT_EXCEEDED = "A00006";
+    Integer LOGIN_FAIL_COUNT_EXCEEDED = 100006;
     
     /**
      * 验证码错误
      */
-    String INVALID_CAPTCHA = "A00007";
+    Integer INVALID_CAPTCHA = 100007;
     
     /**
      * 验证码过期
      */
-    String CAPTCHA_EXPIRED = "A00008";
+    Integer CAPTCHA_EXPIRED = 100008;
     
     /**
      * 刷新令牌无效
      */
-    String INVALID_REFRESH_TOKEN = "A00009";
+    Integer INVALID_REFRESH_TOKEN = 100009;
     
     /**
      * 用户未登录
      */
-    String USER_NOT_LOGIN = "A00010";
+    Integer USER_NOT_LOGIN = 100010;
     
     /**
      * 会话过期
      */
-    String SESSION_EXPIRED = "A00011";
+    Integer SESSION_EXPIRED = 100011;
     
     /**
      * 权限不足
      */
-    String ACCESS_DENIED = "A00012";
+    Integer ACCESS_DENIED = 100012;
 
     // =============================================
-    // 用户管理业务错误码 (U0xxxx)
+    // 用户管理业务错误码 (200xxx)
     // =============================================
     
     /**
      * 用户不存在
      */
-    String USER_NOT_FOUND = "U00001";
+    Integer USER_NOT_FOUND = 200001;
     
     /**
      * 用户名已存在
      */
-    String USERNAME_ALREADY_EXISTS = "U00002";
+    Integer USERNAME_ALREADY_EXISTS = 200002;
     
     /**
      * 邮箱已存在
      */
-    String EMAIL_ALREADY_EXISTS = "U00003";
+    Integer EMAIL_ALREADY_EXISTS = 200003;
     
     /**
      * 手机号已存在
      */
-    String PHONE_ALREADY_EXISTS = "U00004";
+    Integer PHONE_ALREADY_EXISTS = 200004;
     
     /**
      * 用户名格式错误
      */
-    String INVALID_USERNAME_FORMAT = "U00005";
+    Integer INVALID_USERNAME_FORMAT = 200005;
     
     /**
      * 密码格式错误
      */
-    String INVALID_PASSWORD_FORMAT = "U00006";
+    Integer INVALID_PASSWORD_FORMAT = 200006;
     
     /**
      * 邮箱格式错误
      */
-    String INVALID_EMAIL_FORMAT = "U00007";
+    Integer INVALID_EMAIL_FORMAT = 200007;
     
     /**
      * 手机号格式错误
      */
-    String INVALID_PHONE_FORMAT = "U00008";
+    Integer INVALID_PHONE_FORMAT = 200008;
     
     /**
      * 原密码错误
      */
-    String WRONG_OLD_PASSWORD = "U00009";
+    Integer WRONG_OLD_PASSWORD = 200009;
     
     /**
      * 新密码与原密码相同
      */
-    String NEW_PASSWORD_SAME_AS_OLD = "U00010";
+    Integer NEW_PASSWORD_SAME_AS_OLD = 200010;
     
     /**
      * 用户状态异常
      */
-    String INVALID_USER_STATUS = "U00011";
+    Integer INVALID_USER_STATUS = 200011;
     
     /**
      * 不能删除管理员用户
      */
-    String CANNOT_DELETE_ADMIN_USER = "U00012";
+    Integer CANNOT_DELETE_ADMIN_USER = 200012;
     
     /**
      * 不能禁用管理员用户
      */
-    String CANNOT_DISABLE_ADMIN_USER = "U00013";
+    Integer CANNOT_DISABLE_ADMIN_USER = 200013;
     
     /**
      * 用户密码未设置
      */
-    String USER_PASSWORD_NOT_SET = "U00014";
+    Integer USER_PASSWORD_NOT_SET = 200014;
     
     /**
      * 用户头像上传失败
      */
-    String USER_AVATAR_UPLOAD_FAILED = "U00015";
+    Integer USER_AVATAR_UPLOAD_FAILED = 200015;
 
     // =============================================
     // 角色管理业务错误码 (R0xxxx)
@@ -487,4 +487,68 @@ public interface ErrorCodes {
      * 文件存储服务异常
      */
     String FILE_STORAGE_SERVICE_ERROR = "T00008";
+
+    // =============================================
+    // 日志管理业务错误码 (700xxx)
+    // =============================================
+    
+    /**
+     * 操作日志记录失败
+     */
+    Integer OPERATION_LOG_RECORD_FAILED = 700001;
+    
+    /**
+     * 登录日志记录失败
+     */
+    Integer LOGIN_LOG_RECORD_FAILED = 700002;
+    
+    /**
+     * 日志查询失败
+     */
+    Integer LOG_QUERY_FAILED = 700003;
+    
+    /**
+     * 日志删除失败
+     */
+    Integer LOG_DELETE_FAILED = 700004;
+    
+    /**
+     * 日志导出失败
+     */
+    Integer LOG_EXPORT_FAILED = 700005;
+    
+    /**
+     * 日志清空失败
+     */
+    Integer LOG_CLEAR_FAILED = 700006;
+    
+    /**
+     * 日志统计失败
+     */
+    Integer LOG_STATISTICS_FAILED = 700007;
+    
+    /**
+     * 操作日志不存在
+     */
+    Integer OPERATION_LOG_NOT_FOUND = 700008;
+    
+    /**
+     * 登录日志不存在
+     */
+    Integer LOGIN_LOG_NOT_FOUND = 700009;
+    
+    /**
+     * 日志类型不支持
+     */
+    Integer LOG_TYPE_NOT_SUPPORTED = 700010;
+    
+    /**
+     * 日志保存失败
+     */
+    Integer LOG_SAVE_FAILED = 700011;
+    
+    /**
+     * 登出失败
+     */
+    Integer LOGOUT_FAILED = 700012;
 }

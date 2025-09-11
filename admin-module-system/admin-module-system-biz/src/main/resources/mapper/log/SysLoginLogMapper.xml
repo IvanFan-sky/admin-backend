@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.admin.module.system.biz.dal.mapper.SysLoginLogMapper">
+
+    <!-- 根据时间范围删除登录日志 -->
+    <delete id="deleteByTimeRange">
+        DELETE FROM sys_login_log 
+        WHERE login_time BETWEEN #{startTime} AND #{endTime}
+    </delete>
+
+    <!-- 清空登录日志 -->
+    <delete id="deleteAll">
+        DELETE FROM sys_login_log
+    </delete>
+
+    <!-- 清理过期登录日志 -->
+    <delete id="deleteExpiredLogs">
+        DELETE FROM sys_login_log 
+        WHERE login_time &lt; #{beforeTime}
+    </delete>
+
+    <!-- 根据令牌ID查询登录日志 -->
+    <select id="selectByTokenId" resultType="com.admin.module.system.biz.dal.dataobject.SysLoginLogDO">
+        SELECT * FROM sys_login_log 
+        WHERE token_id = #{tokenId} AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- 更新登出信息 -->
+    <update id="updateLogoutInfo">
+        UPDATE sys_login_log 
+        SET logout_time = #{logoutTime},
+            logout_type = #{logoutType},
+            online_duration = #{onlineDuration},
+            update_time = NOW()
+        WHERE token_id = #{tokenId}
+    </update>
+
+    <!-- 获取在线用户列表 -->
+    <select id="selectOnlineUsers" resultType="com.admin.module.system.biz.dal.dataobject.SysLoginLogDO">
+        SELECT * FROM sys_login_log 
+        WHERE logout_time IS NULL 
+        AND login_result = 1
+        AND deleted = 0
+        ORDER BY login_time DESC
+    </select>
+
+    <!-- 获取用户登录日志 -->
+    <select id="selectUserLogs" resultType="com.admin.module.system.biz.dal.dataobject.SysLoginLogDO">
+        SELECT * FROM sys_login_log 
+        WHERE user_id = #{userId}
+        AND deleted = 0
+        <if test="startTime != null">
+            AND login_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND login_time &lt;= #{endTime}
+        </if>
+        ORDER BY login_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 获取登录统计信息 -->
+    <select id="getStatistics" resultType="com.admin.module.system.api.vo.log.StatisticsResult">
+        SELECT 
+            COUNT(*) as totalCount,
+            SUM(CASE WHEN login_result = 1 THEN 1 ELSE 0 END) as successCount,
+            SUM(CASE WHEN login_result = 0 THEN 1 ELSE 0 END) as failCount,
+            COUNT(CASE WHEN logout_time IS NULL AND login_result = 1 THEN 1 END) as onlineCount,
+            AVG(CASE WHEN online_duration IS NOT NULL THEN online_duration END) as avgOnlineDuration
+        FROM sys_login_log 
+        WHERE deleted = 0
+        <if test="startTime != null">
+            AND login_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND login_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <!-- 按登录方式统计 -->
+    <select id="getLoginTypeStatistics" resultType="com.admin.module.system.api.vo.log.LoginTypeStatisticsVO">
+        SELECT 
+            login_type as loginType,
+            COUNT(*) as count
+        FROM sys_login_log 
+        WHERE deleted = 0
+        <if test="startTime != null">
+            AND login_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND login_time &lt;= #{endTime}
+        </if>
+        GROUP BY login_type
+        ORDER BY count DESC
+    </select>
+
+    <!-- 按登录地点统计 -->
+    <select id="getLocationStatistics" resultType="com.admin.module.system.api.vo.log.LoginLocationStatisticsVO">
+        SELECT 
+            login_location as location,
+            COUNT(*) as count
+        FROM sys_login_log 
+        WHERE deleted = 0
+        AND login_location IS NOT NULL 
+        AND login_location != ''
+        <if test="startTime != null">
+            AND login_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND login_time &lt;= #{endTime}
+        </if>
+        GROUP BY login_location
+        ORDER BY count DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 按浏览器统计 -->
+    <select id="getBrowserStatistics" resultType="com.admin.module.system.api.vo.log.BrowserStatisticsVO">
+        SELECT 
+            browser,
+            COUNT(*) as count
+        FROM sys_login_log 
+        WHERE deleted = 0
+        AND browser IS NOT NULL 
+        AND browser != ''
+        <if test="startTime != null">
+            AND login_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            AND login_time &lt;= #{endTime}
+        </if>
+        GROUP BY browser
+        ORDER BY count DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+</mapper>

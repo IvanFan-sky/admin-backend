@@ -369,4 +369,113 @@ public interface SystemConstants {
      * 数据范围 - 仅本人数据权限
      */
     String DATA_SCOPE_SELF = "5";
+
+    // =============================================
+    // 日志管理相关常量
+    // =============================================
+    
+    /**
+     * 操作日志状态 - 正常
+     */
+    Integer LOG_STATUS_SUCCESS = 1;
+    
+    /**
+     * 操作日志状态 - 异常
+     */
+    Integer LOG_STATUS_FAILED = 0;
+    
+    /**
+     * 登录类型 - 用户名密码登录
+     */
+    String LOGIN_TYPE_PASSWORD = "password";
+    
+    /**
+     * 登录类型 - 手机号登录
+     */
+    String LOGIN_TYPE_PHONE = "phone";
+    
+    /**
+     * 登录类型 - 第三方登录
+     */
+    String LOGIN_TYPE_THIRD_PARTY = "third_party";
+    
+    /**
+     * 登录状态 - 成功
+     */
+    Integer LOGIN_STATUS_SUCCESS = 1;
+    
+    /**
+     * 登录状态 - 失败
+     */
+    Integer LOGIN_STATUS_FAILED = 0;
+    
+    /**
+     * 操作类型 - 登录
+     */
+    String OPERATION_LOGIN = "LOGIN";
+    
+    /**
+     * 操作类型 - 登出
+     */
+    String OPERATION_LOGOUT = "LOGOUT";
+    
+    /**
+     * 操作类型 - 其他
+     */
+    String OPERATION_OTHER = "OTHER";
+    
+    /**
+     * 日志保留天数
+     */
+    int LOG_RETENTION_DAYS = 30;
+    
+    /**
+     * 批量删除日志的批次大小
+     */
+    int LOG_BATCH_DELETE_SIZE = 1000;
+    
+    /**
+     * 操作日志标题最大长度
+     */
+    int LOG_TITLE_MAX_LENGTH = 200;
+    
+    /**
+     * 操作日志内容最大长度
+     */
+    int LOG_CONTENT_MAX_LENGTH = 2000;
+    
+    /**
+     * IP地址最大长度
+     */
+    int IP_ADDRESS_MAX_LENGTH = 50;
+    
+    /**
+     * User-Agent最大长度
+     */
+    int USER_AGENT_MAX_LENGTH = 1000;
+    
+    /**
+     * 操作模块最大长度
+     */
+    int OPERATION_MODULE_MAX_LENGTH = 50;
+    
+    /**
+     * 操作方法最大长度
+     */
+    int OPERATION_METHOD_MAX_LENGTH = 200;
+    
+    /**
+     * 请求参数最大长度
+     */
+    int REQUEST_PARAM_MAX_LENGTH = 2000;
+    
+    /**
+     * 响应结果最大长度
+     */
+    int RESPONSE_RESULT_MAX_LENGTH = 2000;
+    
+    /**
+     * 错误信息最大长度
+     */
+    int ERROR_MESSAGE_MAX_LENGTH = 2000;
 }

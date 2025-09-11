@@ -89,7 +89,7 @@ public interface SysMenuConvert {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "ancestors", ignore = true)
     @Mapping(target = "children", ignore = true)
-    SysMenuDO convertToDO(SysMenuUpdateDTO updateDTO);
+    SysMenuDO convertUpdateToDO(SysMenuUpdateDTO updateDTO);
 
     /**
      * 使用更新DTO的数据更新现有DO对象

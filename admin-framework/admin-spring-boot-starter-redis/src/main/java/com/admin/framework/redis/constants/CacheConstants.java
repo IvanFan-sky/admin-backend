@@ -38,4 +38,19 @@ public interface CacheConstants {
      * 字典缓存
      */
     String SYS_DICT_CACHE = "sys_dict";
+    
+    /**
+     * 操作日志缓存
+     */
+    String OPERATION_LOG_CACHE = "operation_log";
+    
+    /**
+     * 登录日志缓存
+     */
+    String LOGIN_LOG_CACHE = "login_log";
+    
+    /**
+     * 日志统计缓存
+     */
+    String LOG_STATISTICS_CACHE = "log_statistics";
 }
