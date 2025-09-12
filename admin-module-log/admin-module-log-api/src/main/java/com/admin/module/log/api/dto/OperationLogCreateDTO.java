@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
 @Data
 public class OperationLogCreateDTO {
 
+    @Schema(description = "日志ID")
+    private Long id;
+
     @Schema(description = "模块标题", example = "用户管理")
     @Size(max = 50, message = "模块标题长度不能超过50个字符")
     private String title;

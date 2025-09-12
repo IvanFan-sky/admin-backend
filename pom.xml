@@ -24,6 +24,7 @@
         <module>admin-dependencies</module>
         <module>admin-framework</module>
         <module>admin-module-system</module>
+        <module>admin-module-log</module>
         <module>admin-module-infra</module>
         <module>admin-common</module>
         <module>admin-server</module>

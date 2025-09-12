@@ -98,6 +98,25 @@ admin:
     secret: adminSecretKeyForJWTTokenGenerationMustBeLongEnoughForHS512
     expiration: 1800000  # 访问令牌过期时间：30分钟（毫秒）
     refresh-expiration: 2592000000  # 刷新令牌过期时间：30天（毫秒）
+  
+  # 日志切面配置
+  log:
+    aspect:
+      enabled: true
+      async-enabled: true
+      max-param-length: 2000
+      max-result-length: 4000
+      max-error-length: 1000
+      exclude-patterns:
+        - "*/health/**"
+        - "*/metrics/**"
+        - "*/actuator/**"
+      async:
+        core-pool-size: 2
+        max-pool-size: 8
+        queue-capacity: 500
+        thread-name-prefix: "LogAspect-"
+        keep-alive-seconds: 60
 
 # 日志配置
 logging:

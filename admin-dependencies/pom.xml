@@ -157,6 +157,11 @@
                 <artifactId>admin-module-infra-api</artifactId>
                 <version>1.0.0</version>
             </dependency>
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-module-log-api</artifactId>
+                <version>1.0.0</version>
+            </dependency>
             
             <!-- 业务模块BIZ -->
             <dependency>
@@ -167,6 +172,11 @@
             <dependency>
                 <groupId>com.admin</groupId>
                 <artifactId>admin-module-infra-biz</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-module-log-biz</artifactId>
                 <version>1.0.0</version>
             </dependency>
             

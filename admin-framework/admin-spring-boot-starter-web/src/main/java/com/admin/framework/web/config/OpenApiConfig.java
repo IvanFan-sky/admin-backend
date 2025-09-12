@@ -199,7 +199,7 @@ public class OpenApiConfig {
     public GroupedOpenApi logApi() {
         return GroupedOpenApi.builder()
                 .group("07-日志管理")
-                .pathsToMatch("/system/login-log/**","/system/operation-log/**")
+                .pathsToMatch("/system/log/**","/system/log-management/**","/system/log-statistics/**")
                 .build();
     }
 

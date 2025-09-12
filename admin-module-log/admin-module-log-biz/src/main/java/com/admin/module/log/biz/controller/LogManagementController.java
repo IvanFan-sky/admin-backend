@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Tag(name = "日志管理")
 @RestController
-@RequestMapping("/admin-api/log/management")
+@RequestMapping("/system/log-management")
 @RequiredArgsConstructor
 @Validated
 public class LogManagementController {
@@ -54,14 +54,14 @@ public class LogManagementController {
             @Parameter(description = "清理多少天前的日志") @RequestParam(defaultValue = "30") Integer days) {
         
         if (days <= 0 || days > 365) {
-            return R.fail("清理天数必须在1-365之间");
+            return R.error("清理天数必须在1-365之间");
         }
         
         try {
             int cleanedCount = logCleanupService.manualCleanupFileLogs(days);
             return R.ok("清理完成，共清理了 " + cleanedCount + " 个日志文件");
         } catch (Exception e) {
-            return R.fail("清理失败：" + e.getMessage());
+            return R.error("清理失败：" + e.getMessage());
         }
     }
 

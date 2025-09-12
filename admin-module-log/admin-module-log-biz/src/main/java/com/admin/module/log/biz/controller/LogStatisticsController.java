@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @Tag(name = "日志统计")
 @RestController
-@RequestMapping("/admin-api/log/statistics")
+@RequestMapping("/system/log-statistics")
 @RequiredArgsConstructor
 @Validated
 public class LogStatisticsController {

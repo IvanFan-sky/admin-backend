@@ -27,6 +27,10 @@
             <groupId>com.admin</groupId>
             <artifactId>admin-module-infra-biz</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-module-log-biz</artifactId>
+        </dependency>
         
         <!-- Spring Boot Actuator -->
         <dependency>

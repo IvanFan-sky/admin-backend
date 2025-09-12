@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -27,19 +26,20 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Slf4j
 @Configuration
 @EnableAsync
-public class AsyncLogConfig implements AsyncConfigurer {
+public class AsyncLogConfig {
 
     /**
      * 异步日志任务执行器
      */
     @Bean("asyncLogExecutor")
-    public Executor asyncLogExecutor() {
+    public Executor asyncLogExecutor(LogAspectProperties properties) {
+        LogAspectProperties.AsyncConfig asyncConfig = properties.getAsync();
         ThreadPoolTaskExecutor executor = new TraceableThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(5);
-        executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("AsyncLog-");
-        executor.setKeepAliveSeconds(60);
+        executor.setCorePoolSize(asyncConfig.getCorePoolSize());
+        executor.setMaxPoolSize(asyncConfig.getMaxPoolSize());
+        executor.setQueueCapacity(asyncConfig.getQueueCapacity());
+        executor.setThreadNamePrefix(asyncConfig.getThreadNamePrefix());
+        executor.setKeepAliveSeconds(asyncConfig.getKeepAliveSeconds());
         
         // 拒绝策略：调用者运行
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
@@ -52,12 +52,23 @@ public class AsyncLogConfig implements AsyncConfigurer {
         return executor;
     }
 
-    @Override
-    public Executor getAsyncExecutor() {
-        return asyncLogExecutor();
+    /**
+     * 获取默认的异步执行器
+     * 
+     * @return 异步执行器
+     */
+    @Bean("defaultAsyncExecutor")
+    public Executor getDefaultAsyncExecutor() {
+        LogAspectProperties defaultProperties = new LogAspectProperties();
+        return asyncLogExecutor(defaultProperties);
     }
 
-    @Override
+    /**
+     * 获取异步异常处理器
+     * 
+     * @return 异步异常处理器
+     */
+    @Bean
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return new AsyncLogExceptionHandler();
     }

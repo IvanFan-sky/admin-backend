@@ -61,10 +61,10 @@
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
         
-        <!-- System API模块 -->
+        <!-- Log API模块 -->
         <dependency>
             <groupId>com.admin</groupId>
-            <artifactId>admin-module-system-api</artifactId>
+            <artifactId>admin-module-log-api</artifactId>
         </dependency>
         
         <!-- Security框架 -->

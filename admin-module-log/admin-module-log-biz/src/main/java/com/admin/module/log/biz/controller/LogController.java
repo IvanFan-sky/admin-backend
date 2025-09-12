@@ -33,7 +33,7 @@ import java.time.format.DateTimeFormatter;
  */
 @Tag(name = "日志管理")
 @RestController
-@RequestMapping("/admin-api/log")
+@RequestMapping("/system/log")
 @RequiredArgsConstructor
 @Validated
 public class LogController {
