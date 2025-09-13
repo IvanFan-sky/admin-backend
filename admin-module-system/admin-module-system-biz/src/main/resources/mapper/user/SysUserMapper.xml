@@ -9,7 +9,7 @@
         <result property="password" column="password"/>
         <result property="email" column="email"/>
         <result property="phone" column="phone"/>
-        <result property="sex" column="sex"/>
+        <result property="gender" column="gender"/>
         <result property="avatar" column="avatar"/>
         <result property="status" column="status"/>
         <result property="deleted" column="deleted"/>
@@ -24,7 +24,7 @@
     </resultMap>
 
     <sql id="selectUserVo">
-        select id, username, nickname, password, email, phone, sex, avatar, status, del_flag, login_ip, login_date, 
+        select id, username, nickname, password, email, phone, gender, avatar, status, del_flag, login_ip, login_date, 
                create_by, create_time, update_by, update_time, remark, version
         from sys_user
     </sql>

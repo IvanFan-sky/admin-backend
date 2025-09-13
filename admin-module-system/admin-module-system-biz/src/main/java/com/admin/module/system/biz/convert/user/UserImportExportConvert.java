@@ -1,8 +1,8 @@
 package com.admin.module.system.biz.convert.user;
 
-import com.admin.module.system.api.dto.UserImportDTO;
+import com.admin.module.system.api.dto.imports.UserImportDTO;
 import com.admin.module.system.api.dto.user.SysUserCreateDTO;
-import com.admin.module.system.api.vo.UserExportVO;
+import com.admin.module.system.api.vo.imports.UserExportVO;
 import com.admin.module.system.biz.dal.dataobject.SysUserDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -26,7 +26,7 @@ public interface UserImportExportConvert {
      * 导入DTO转换为创建DTO
      */
     @Mapping(target = "password", constant = "123456") // 默认密码
-    @Mapping(target = "sex", expression = "java(String.valueOf(importDTO.getGenderValue()))")
+    @Mapping(target = "gender", expression = "java(importDTO.getGenderValue())")
     @Mapping(target = "phone", source = "mobile")
     @Mapping(target = "status", expression = "java(importDTO.getStatusValue())")
     @Mapping(target = "roleIds", ignore = true) // 需要根据角色名称查询ID
@@ -37,8 +37,7 @@ public interface UserImportExportConvert {
      * 用户DO转换为导出VO
      */
     @Mapping(target = "genderText", ignore = true) // 在service中设置
-    @Mapping(target = "statusText", ignore = true) // 在service中设置
-    @Mapping(target = "deptName", ignore = true) // 部门信息需要在service中设置
+    @Mapping(target = "statusText", ignore = true) // 在service中设置// 部门信息需要在service中设置
     @Mapping(target = "roleNames", ignore = true) // 需要在service中设置
     UserExportVO toExportVO(SysUserDO userDO);
 

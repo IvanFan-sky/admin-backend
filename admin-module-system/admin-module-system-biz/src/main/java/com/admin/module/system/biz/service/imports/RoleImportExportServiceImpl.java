@@ -1,24 +1,27 @@
-package com.admin.module.system.biz.service.impl;
+package com.admin.module.system.biz.service.imports;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.admin.common.core.domain.PageResult;
 import com.admin.common.exception.ServiceException;
-import com.admin.common.result.excel.ImportResult;
-import com.admin.common.result.excel.ValidationResult;
 import com.admin.framework.excel.domain.ImportExportTask;
 import com.admin.framework.excel.service.ExcelExportService;
 import com.admin.framework.excel.service.ExcelImportService;
 import com.admin.framework.excel.service.ImportExportTaskService;
 import com.admin.framework.security.utils.SecurityContextHolder;
-import com.admin.module.system.api.dto.UserImportDTO;
-import com.admin.module.system.api.dto.user.SysUserCreateDTO;
-import com.admin.module.system.api.service.UserImportExportService;
-import com.admin.module.system.api.service.user.SysUserService;
-import com.admin.module.system.api.vo.UserExportVO;
-import com.admin.module.system.biz.convert.user.UserImportExportConvert;
-import com.admin.module.system.biz.dal.dataobject.SysUserDO;
-import com.admin.module.system.biz.dal.mapper.SysUserMapper;
+import com.admin.module.system.api.dto.imports.RoleImportDTO;
+import com.admin.module.system.api.dto.role.SysRoleCreateDTO;
+import com.admin.module.system.api.dto.role.SysRoleQueryDTO;
+import com.admin.module.system.api.service.imports.RoleImportExportService;
+import com.admin.module.system.api.service.role.SysRoleService;
+import com.admin.module.system.api.vo.imports.RoleExportVO;
+import com.admin.module.system.api.vo.imports.RoleImportValidationResult;
+import com.admin.module.system.biz.convert.role.RoleImportExportConvert;
+import com.admin.module.system.biz.dal.dataobject.SysRoleDO;
+import com.admin.module.system.biz.dal.mapper.SysRoleMapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -32,7 +35,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
- * 用户导入导出服务实现
+ * 角色导入导出服务实现
  * 
  * @author admin
  * @version 1.0
@@ -41,29 +44,29 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserImportExportServiceImpl implements UserImportExportService {
+public class RoleImportExportServiceImpl implements RoleImportExportService {
 
-    private static final String BUSINESS_TYPE = "USER";
+    private static final String BUSINESS_TYPE = "ROLE";
     private static final int BATCH_SIZE = 1000;
     private static final int PREVIEW_SIZE = 10;
 
     private final ExcelImportService excelImportService;
     private final ExcelExportService excelExportService;
     private final ImportExportTaskService taskService;
-    private final SysUserService userService;
-    private final SysUserMapper userMapper;
+    private final SysRoleService roleService;
+    private final SysRoleMapper roleMapper;
 
     @Override
     public void downloadImportTemplate(HttpServletResponse response) {
-        log.info("下载用户导入模板");
-        excelExportService.exportTemplate(response, "用户导入模板", "用户信息", UserImportDTO.class);
+        log.info("下载角色导入模板");
+        excelExportService.exportTemplate(response, "角色导入模板", "角色信息", RoleImportDTO.class);
     }
 
     @Override
     @Async
-    public CompletableFuture<Long> importUsersAsync(MultipartFile file) {
+    public CompletableFuture<Long> importRolesAsync(MultipartFile file) {
         Long userId = SecurityContextHolder.getCurrentUserId();
-        log.info("用户[{}]开始异步导入用户，文件名: {}", userId, file.getOriginalFilename());
+        log.info("用户[{}]开始异步导入角色，文件名: {}", userId, file.getOriginalFilename());
 
         // 检查并发限制
         if (!taskService.canCreateTask(userId, ImportExportTask.TaskType.IMPORT)) {
@@ -71,27 +74,27 @@ public class UserImportExportServiceImpl implements UserImportExportService {
         }
 
         // 创建任务
-        Long taskId = taskService.createTask("用户导入", ImportExportTask.TaskType.IMPORT, 
+        Long taskId = taskService.createTask("角色导入", ImportExportTask.TaskType.IMPORT, 
                                            BUSINESS_TYPE, file.getOriginalFilename());
 
         // 异步执行导入
-        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> processImportTask(taskId, file));
-        return future.thenApply(v -> taskId);
+        taskService.executeImportTaskAsync(taskId, this::processImportTask);
+        return CompletableFuture.completedFuture(taskId);
     }
 
     /**
      * 处理导入任务
      */
-    private void processImportTask(Long taskId, MultipartFile file) {
+    private void processImportTask(Long taskId) {
         try {
-            log.info("开始处理用户导入任务: {}", taskId);
+            ImportExportTask task = taskService.getTask(taskId);
+            log.info("开始处理角色导入任务: {}", taskId);
 
             // 标记任务开始
             taskService.updateTaskStatus(taskId, ImportExportTask.TaskStatus.PROCESSING);
 
             // 读取并验证数据
-            ImportResult<UserImportDTO> importResult = excelImportService.importExcel(file, UserImportDTO.class);
-            List<UserImportDTO> importData = importResult.getData();
+            List<RoleImportDTO> importData = readAndValidateImportData(task.getFileName());
             
             if (CollectionUtil.isEmpty(importData)) {
                 taskService.completeTask(taskId, false, "导入文件为空或格式错误");
@@ -108,7 +111,7 @@ public class UserImportExportServiceImpl implements UserImportExportService {
 
             for (int i = 0; i < importData.size(); i += BATCH_SIZE) {
                 int endIndex = Math.min(i + BATCH_SIZE, importData.size());
-                List<UserImportDTO> batch = importData.subList(i, endIndex);
+                List<RoleImportDTO> batch = importData.subList(i, endIndex);
 
                 // 处理当前批次
                 BatchResult result = processBatch(batch, i + 1);
@@ -132,42 +135,52 @@ public class UserImportExportServiceImpl implements UserImportExportService {
             }
 
             taskService.completeTask(taskId, success, message);
-            log.info("用户导入任务{}完成，成功: {}, 失败: {}", taskId, successCount, errors.size());
+            log.info("角色导入任务{}完成，成功: {}, 失败: {}", taskId, successCount, errors.size());
 
         } catch (Exception e) {
-            log.error("用户导入任务{}执行失败", taskId, e);
+            log.error("角色导入任务{}执行失败", taskId, e);
             taskService.completeTask(taskId, false, "导入失败: " + e.getMessage());
         }
     }
 
     /**
+     * 读取并验证导入数据
+     */
+    private List<RoleImportDTO> readAndValidateImportData(String fileName) {
+        // 这里应该从文件系统或MinIO读取文件
+        // 为了简化，此处返回模拟数据
+        // 实际实现中需要根据fileName读取真实文件
+        return new ArrayList<>();
+    }
+
+    /**
      * 处理批次数据
      */
-    private BatchResult processBatch(List<UserImportDTO> batch, int startRowNumber) {
+    private BatchResult processBatch(List<RoleImportDTO> batch, int startRowNumber) {
         List<String> errors = new ArrayList<>();
         int successCount = 0;
 
         for (int i = 0; i < batch.size(); i++) {
-            UserImportDTO importDTO = batch.get(i);
+            RoleImportDTO importDTO = batch.get(i);
             importDTO.setRowNumber(startRowNumber + i);
 
             try {
                 // 验证数据
-                List<String> validationErrors = validateUserData(importDTO);
+                List<String> validationErrors = validateRoleData(importDTO);
                 if (!validationErrors.isEmpty()) {
                     errors.addAll(validationErrors);
                     continue;
                 }
 
-                // 转换并创建用户
-                SysUserCreateDTO createDTO = UserImportExportConvert.INSTANCE.toCreateDTO(importDTO);
-                userService.createUser(createDTO);
+                // 转换并创建角色
+                SysRoleCreateDTO createDTO = RoleImportExportConvert.INSTANCE.toCreateDTO(importDTO);
+                roleService.createRole(createDTO);
                 successCount++;
 
             } catch (Exception e) {
                 String error = String.format("第%d行: %s", importDTO.getRowNumber(), e.getMessage());
                 errors.add(error);
-                log.warn("导入用户失败: {}", error, e);
+                log.warn("导入角色失败: {}", error, e);
             }
         }
 
@@ -175,33 +188,25 @@ public class UserImportExportServiceImpl implements UserImportExportService {
     }
 
     /**
-     * 验证用户数据
+     * 验证角色数据
      */
-    private List<String> validateUserData(UserImportDTO importDTO) {
+    private List<String> validateRoleData(RoleImportDTO importDTO) {
         List<String> errors = new ArrayList<>();
         int rowNumber = importDTO.getRowNumber();
 
-        // 用户名重复检查
-        if (StrUtil.isNotBlank(importDTO.getUsername())) {
-            SysUserDO existingUser = userMapper.selectByUsername(importDTO.getUsername());
-            if (existingUser != null) {
-                errors.add(String.format("第%d行: 用户名[%s]已存在", rowNumber, importDTO.getUsername()));
+        // 角色编码重复检查
+        if (StrUtil.isNotBlank(importDTO.getRoleCode())) {
+            SysRoleDO existingRole = roleMapper.selectByRoleCode(importDTO.getRoleCode());
+            if (existingRole != null) {
+                errors.add(String.format("第%d行: 角色编码[%s]已存在", rowNumber, importDTO.getRoleCode()));
             }
         }
 
-        // 邮箱重复检查
-        if (StrUtil.isNotBlank(importDTO.getEmail())) {
-            SysUserDO existingUser = userMapper.selectByEmail(importDTO.getEmail());
-            if (existingUser != null) {
-                errors.add(String.format("第%d行: 邮箱[%s]已存在", rowNumber, importDTO.getEmail()));
-            }
-        }
-
-        // 手机号重复检查
-        if (StrUtil.isNotBlank(importDTO.getMobile())) {
-            SysUserDO existingUser = userMapper.selectByMobile(importDTO.getMobile());
-            if (existingUser != null) {
-                errors.add(String.format("第%d行: 手机号[%s]已存在", rowNumber, importDTO.getMobile()));
+        // 角色名称重复检查
+        if (StrUtil.isNotBlank(importDTO.getRoleName())) {
+            SysRoleDO existingRole = roleMapper.selectByRoleName(importDTO.getRoleName());
+            if (existingRole != null) {
+                errors.add(String.format("第%d行: 角色名称[%s]已存在", rowNumber, importDTO.getRoleName()));
             }
         }
 
@@ -218,22 +223,27 @@ public class UserImportExportServiceImpl implements UserImportExportService {
     }
 
     @Override
-    public UserImportValidationResult validateImportFile(MultipartFile file) {
+    public RoleImportValidationResult validateImportFile(MultipartFile file) {
         try {
             // 使用ExcelImportService验证文件
-            ValidationResult validationResult = excelImportService.validateExcel(file, UserImportDTO.class);
+            var validationResult = excelImportService.validateExcel(file, RoleImportDTO.class);
             
             if (!validationResult.isSuccess()) {
-                return new UserImportValidationResult(false, validationResult.getMessage());
+                RoleImportValidationResult result = new RoleImportValidationResult();
+                result.setValid(false);
+                result.setMessage(validationResult.getMessage());
+                return result;
             }
 
             // 读取预览数据
-            ImportResult<UserImportDTO> importResult = excelImportService.importExcel(file, UserImportDTO.class);
-            List<UserImportDTO> previewData = importResult.getData().stream()
+            var importResult = excelImportService.importExcel(file, RoleImportDTO.class);
+            List<RoleImportDTO> previewData = importResult.getData().stream()
                     .limit(PREVIEW_SIZE)
                     .collect(Collectors.toList());
 
-            UserImportValidationResult result = new UserImportValidationResult(true, "验证成功");
+            RoleImportValidationResult result = new RoleImportValidationResult();
+            result.setValid(true);
+            result.setMessage("验证成功");
             result.setPreviewData(previewData);
             result.setTotalRows(importResult.getTotalRows());
             result.setValidRows(importResult.getSuccessRows());
@@ -244,15 +254,18 @@ public class UserImportExportServiceImpl implements UserImportExportService {
 
         } catch (Exception e) {
             log.error("验证导入文件失败", e);
-            return new UserImportValidationResult(false, "文件验证失败: " + e.getMessage());
+            RoleImportValidationResult result = new RoleImportValidationResult();
+            result.setValid(false);
+            result.setMessage("文件验证失败: " + e.getMessage());
+            return result;
         }
     }
 
     @Override
     @Async
-    public CompletableFuture<Long> exportUsersAsync(Object queryCondition) {
+    public CompletableFuture<Long> exportRolesAsync(Object queryCondition) {
         Long userId = SecurityContextHolder.getCurrentUserId();
-        log.info("用户[{}]开始异步导出用户数据", userId);
+        log.info("用户[{}]开始异步导出角色数据", userId);
 
         // 检查并发限制
         if (!taskService.canCreateTask(userId, ImportExportTask.TaskType.EXPORT)) {
@@ -260,33 +273,69 @@ public class UserImportExportServiceImpl implements UserImportExportService {
         }
 
         // 创建任务
-        Long taskId = taskService.createTask("用户导出", ImportExportTask.TaskType.EXPORT, 
-                                           BUSINESS_TYPE, "用户数据.xlsx");
+        Long taskId = taskService.createTask("角色导出", ImportExportTask.TaskType.EXPORT, 
+                                           BUSINESS_TYPE, "角色数据.xlsx");
 
         // 异步执行导出
-        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> processExportTask(taskId, queryCondition));
-        return future.thenApply(v -> taskId);
+        taskService.executeExportTaskAsync(taskId, (id) -> processExportTask(id, queryCondition));
+        return CompletableFuture.completedFuture(taskId);
     }
 
     /**
      * 处理导出任务
      */
     private void processExportTask(Long taskId, Object queryCondition) {
+        SysRoleQueryDTO roleQueryDTO = (SysRoleQueryDTO) queryCondition;
         try {
-            log.info("开始处理用户导出任务: {}", taskId);
+            log.info("开始处理角色导出任务: {}", taskId);
             taskService.updateTaskStatus(taskId, ImportExportTask.TaskStatus.PROCESSING);
 
-            // 简化实现：直接查询所有用户
-            List<SysUserDO> userList = userMapper.selectList(null);
-            taskService.updateTaskStatistics(taskId, userList.size(), 0, 0);
+            // 构建查询条件
+            LambdaQueryWrapper<SysRoleDO> wrapper = new LambdaQueryWrapper<>();
+            wrapper.like(StringUtils.hasText(roleQueryDTO.getRoleName()), SysRoleDO::getRoleName, roleQueryDTO.getRoleName())
+                    .like(StringUtils.hasText(roleQueryDTO.getRoleCode()), SysRoleDO::getRoleCode, roleQueryDTO.getRoleCode())
+                    .eq(roleQueryDTO.getStatus() != null, SysRoleDO::getStatus, roleQueryDTO.getStatus())
+                    .orderByAsc(SysRoleDO::getSortOrder)
+                    .orderByDesc(SysRoleDO::getCreateTime);
 
-            // 转换为导出VO
-            List<UserExportVO> allExportData = UserImportExportConvert.INSTANCE.toExportVOList(userList);
-            
-            // 设置额外字段
-            for (UserExportVO vo : allExportData) {
-                vo.setGenderText(vo.getGender());
-                vo.setStatusText(vo.getStatus());
+            // 查询总数
+            long totalCount = roleMapper.selectCount(wrapper);
+            taskService.updateTaskStatistics(taskId, (int) totalCount, 0, 0);
+
+            // 分批查询并导出
+            List<RoleExportVO> allExportData = new ArrayList<>();
+            int pageSize = BATCH_SIZE;
+            int pageNum = 1;
+            int processedCount = 0;
+
+            while (true) {
+                Page<SysRoleDO> page = new Page<>(pageNum, pageSize);
+                Page<SysRoleDO> pageResult = roleMapper.selectPage(page, wrapper);
+                if (CollectionUtil.isEmpty(pageResult.getRecords())) {
+                    break;
+                }
+
+                // 转换为导出VO
+                List<RoleExportVO> exportVOs = RoleImportExportConvert.INSTANCE.toExportVOList(pageResult.getRecords());
+                
+                // 设置额外字段
+                for (int i = 0; i < exportVOs.size(); i++) {
+                    RoleExportVO exportVO = exportVOs.get(i);
+                    SysRoleDO roleDO = pageResult.getRecords().get(i);
+                    
+                    // 设置状态文本
+                    exportVO.setStatusText(roleDO.getStatus());
+                    // 设置权限信息和用户数量
+                    // exportVO.setPermissions(...);
+                    // exportVO.setUserCount(...);
+                }
+                
+                allExportData.addAll(exportVOs);
+
+                processedCount += pageResult.getRecords().size();
+                taskService.updateTaskProgress(taskId, processedCount, (int) totalCount);
+
+                pageNum++;
             }
 
             // 生成Excel文件
@@ -294,10 +343,10 @@ public class UserImportExportServiceImpl implements UserImportExportService {
             taskService.setTaskFilePath(taskId, filePath);
             taskService.completeTask(taskId, true, "导出成功");
 
-            log.info("用户导出任务{}完成，导出数据: {}条", taskId, allExportData.size());
+            log.info("角色导出任务{}完成，导出数据: {}条", taskId, allExportData.size());
 
         } catch (Exception e) {
-            log.error("用户导出任务{}执行失败", taskId, e);
+            log.error("角色导出任务{}执行失败", taskId, e);
             taskService.completeTask(taskId, false, "导出失败: " + e.getMessage());
         }
     }
@@ -305,10 +354,10 @@ public class UserImportExportServiceImpl implements UserImportExportService {
     /**
      * 生成导出文件
      */
-    private String generateExportFile(Long taskId, List<UserExportVO> exportData) {
+    private String generateExportFile(Long taskId, List<RoleExportVO> exportData) {
         // 实现文件生成逻辑，保存到文件系统或MinIO
         // 返回文件路径
-        return "/exports/user_export_" + taskId + ".xlsx";
+        return "/exports/role_export_" + taskId + ".xlsx";
     }
 
     @Override

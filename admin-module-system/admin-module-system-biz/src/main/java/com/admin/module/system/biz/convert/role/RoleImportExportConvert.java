@@ -1,8 +1,8 @@
 package com.admin.module.system.biz.convert.role;
 
-import com.admin.module.system.api.dto.RoleCreateDTO;
-import com.admin.module.system.api.dto.RoleImportDTO;
-import com.admin.module.system.api.vo.RoleExportVO;
+import com.admin.module.system.api.dto.imports.RoleImportDTO;
+import com.admin.module.system.api.dto.role.SysRoleCreateDTO;
+import com.admin.module.system.api.vo.imports.RoleExportVO;
 import com.admin.module.system.biz.dal.dataobject.SysRoleDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -26,8 +26,7 @@ public interface RoleImportExportConvert {
      * 导入DTO转换为创建DTO
      */
     @Mapping(target = "status", expression = "java(importDTO.getStatusValue())")
-    @Mapping(target = "menuIds", ignore = true) // 需要根据权限字符串解析
-    RoleCreateDTO toCreateDTO(RoleImportDTO importDTO);
+    SysRoleCreateDTO toCreateDTO(RoleImportDTO importDTO);
 
     /**
      * 角色DO转换为导出VO
@@ -45,5 +44,5 @@ public interface RoleImportExportConvert {
     /**
      * 导入DTO列表转换为创建DTO列表
      */
-    List<RoleCreateDTO> toCreateDTOList(List<RoleImportDTO> importDTOList);
+    List<SysRoleCreateDTO> toCreateDTOList(List<RoleImportDTO> importDTOList);
 }

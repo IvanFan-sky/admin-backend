@@ -182,32 +182,6 @@ CREATE TABLE `sys_config` (
   UNIQUE KEY `uk_sys_config_key` (`config_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='参数配置表';
 
--- =============================================
--- 文件管理模块
--- =============================================
-
--- 文件信息表
-CREATE TABLE `sys_file` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '文件ID',
-  `file_name` varchar(255) NOT NULL COMMENT '文件名称',
-  `original_name` varchar(255) NOT NULL COMMENT '原始文件名',
-  `file_path` varchar(500) NOT NULL COMMENT '文件路径',
-  `file_url` varchar(500) NOT NULL COMMENT '文件URL',
-  `file_size` bigint NOT NULL COMMENT '文件大小（字节）',
-  `file_type` varchar(50) NOT NULL COMMENT '文件类型',
-  `file_suffix` varchar(20) NOT NULL COMMENT '文件后缀',
-  `storage_type` tinyint DEFAULT '1' COMMENT '存储类型：1-本地，2-MinIO，3-OSS',
-  `bucket_name` varchar(100) DEFAULT NULL COMMENT '存储桶名称',
-  `md5` varchar(32) DEFAULT NULL COMMENT '文件MD5',
-  `upload_by` varchar(50) DEFAULT NULL COMMENT '上传者',
-  `upload_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
-  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `deleted` tinyint DEFAULT '0' COMMENT '删除标识：0-未删除，1-已删除',
-  PRIMARY KEY (`id`),
-  KEY `idx_sys_file_md5` (`md5`),
-  KEY `idx_sys_file_upload_by` (`upload_by`),
-  KEY `idx_sys_file_upload_time` (`upload_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文件信息表';
 
 -- =============================================
 -- 通知管理模块

@@ -42,8 +42,8 @@ public class SysUserDO extends BaseEntity {
     @TableField("phone")
     private String phone;
 
-    @TableField("sex")
-    private String sex;
+    @TableField("gender")
+    private Integer gender;
 
     @TableField("avatar")
     private String avatar;

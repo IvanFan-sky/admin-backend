@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 日志管理控制器
@@ -113,27 +114,27 @@ public class LogController {
     @Operation(summary = "导出操作日志")
     @OperationLog(title = "操作日志", description = "导出操作日志", businessType = OperationLog.BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermission('system:operlog:export')")
-    public ResponseEntity<byte[]> exportOperationLogs(@Valid OperationLogQueryDTO queryDTO) {
-        byte[] data = logExportService.exportOperationLogs(queryDTO);
-        String fileName = "operation_log_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv";
-        
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
-                .contentType(MediaType.parseMediaType("application/csv"))
-                .body(data);
+    public R<Long> exportOperationLogs(@Valid OperationLogQueryDTO queryDTO) {
+        try {
+            CompletableFuture<Long> future = logExportService.exportOperationLogsAsync(queryDTO);
+            Long taskId = future.get();
+            return R.ok(taskId);
+        } catch (Exception e) {
+            return R.error("创建导出任务失败: " + e.getMessage());
+        }
     }
 
     @GetMapping("/login/export")
     @Operation(summary = "导出登录日志")
     @OperationLog(title = "登录日志", description = "导出登录日志", businessType = OperationLog.BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermission('system:loginlog:export')")
-    public ResponseEntity<byte[]> exportLoginLogs(@Valid LoginLogQueryDTO queryDTO) {
-        byte[] data = logExportService.exportLoginLogs(queryDTO);
-        String fileName = "login_log_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")) + ".csv";
-        
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + fileName)
-                .contentType(MediaType.parseMediaType("application/csv"))
-                .body(data);
+    public R<Long> exportLoginLogs(@Valid LoginLogQueryDTO queryDTO) {
+        try {
+            CompletableFuture<Long> future = logExportService.exportLoginLogsAsync(queryDTO);
+            Long taskId = future.get();
+            return R.ok(taskId);
+        } catch (Exception e) {
+            return R.error("创建导出任务失败: " + e.getMessage());
+        }
     }
 }

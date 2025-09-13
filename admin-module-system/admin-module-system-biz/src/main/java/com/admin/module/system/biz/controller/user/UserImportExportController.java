@@ -1,11 +1,11 @@
 package com.admin.module.system.biz.controller.user;
 
 import com.admin.common.core.domain.PageResult;
-import com.admin.common.result.CommonResult;
+import com.admin.common.core.domain.R;
 import com.admin.framework.excel.domain.ImportExportTask;
-import com.admin.module.system.api.dto.UserPageDTO;
-import com.admin.module.system.api.service.UserImportExportService;
-import com.admin.module.system.api.service.UserImportExportService.UserImportValidationResult;
+import com.admin.module.system.api.service.imports.UserImportExportService;
+import com.admin.module.system.api.dto.user.SysUserQueryDTO;
+import com.admin.module.system.api.vo.imports.UserImportValidationResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,98 +48,98 @@ public class UserImportExportController {
     @PostMapping("/validate-import")
     @Operation(summary = "验证导入文件")
     @PreAuthorize("@ss.hasPermission('system:user:import')")
-    public CommonResult<UserImportValidationResult> validateImportFile(
+    public R<UserImportValidationResult> validateImportFile(
             @Parameter(description = "导入文件") @RequestParam("file") MultipartFile file) {
         
         // 文件基本验证
         if (file.isEmpty()) {
-            return CommonResult.error("导入文件不能为空");
+            return R.error("导入文件不能为空");
         }
         
         if (file.getSize() > 10 * 1024 * 1024) { // 10MB限制
-            return CommonResult.error("文件大小不能超过10MB");
+            return R.error("文件大小不能超过10MB");
         }
         
         String filename = file.getOriginalFilename();
         if (filename == null || (!filename.endsWith(".xlsx") && !filename.endsWith(".xls"))) {
-            return CommonResult.error("只支持Excel文件格式(.xlsx/.xls)");
+            return R.error("只支持Excel文件格式(.xlsx/.xls)");
         }
 
         UserImportValidationResult result = userImportExportService.validateImportFile(file);
-        return CommonResult.success(result);
+        return R.ok(result);
     }
 
     @PostMapping("/import")
     @Operation(summary = "异步导入用户")
     @PreAuthorize("@ss.hasPermission('system:user:import')")
-    public CommonResult<Long> importUsers(
+    public R<Long> importUsers(
             @Parameter(description = "导入文件") @RequestParam("file") MultipartFile file) {
         
         // 文件基本验证
         if (file.isEmpty()) {
-            return CommonResult.error("导入文件不能为空");
+            return R.error("导入文件不能为空");
         }
         
         if (file.getSize() > 10 * 1024 * 1024) { // 10MB限制
-            return CommonResult.error("文件大小不能超过10MB");
+            return R.error("文件大小不能超过10MB");
         }
         
         String filename = file.getOriginalFilename();
         if (filename == null || (!filename.endsWith(".xlsx") && !filename.endsWith(".xls"))) {
-            return CommonResult.error("只支持Excel文件格式(.xlsx/.xls)");
+            return R.error("只支持Excel文件格式(.xlsx/.xls)");
         }
 
         try {
             CompletableFuture<Long> future = userImportExportService.importUsersAsync(file);
             Long taskId = future.get(); // 获取任务ID
             
-            return CommonResult.success(taskId, "导入任务已创建，请通过任务ID查询进度");
+            return R.ok("导入任务已创建，请通过任务ID查询进度", taskId);
         } catch (Exception e) {
             log.error("创建用户导入任务失败", e);
-            return CommonResult.error("创建导入任务失败: " + e.getMessage());
+            return R.error("创建导入任务失败: " + e.getMessage());
         }
     }
 
     @PostMapping("/export")
     @Operation(summary = "异步导出用户")
     @PreAuthorize("@ss.hasPermission('system:user:export')")
-    public CommonResult<Long> exportUsers(
-            @Parameter(description = "查询条件") @Valid @RequestBody UserPageDTO queryCondition) {
+    public R<Long> exportUsers(
+            @Parameter(description = "查询条件") @Valid @RequestBody SysUserQueryDTO queryCondition) {
         
         try {
             CompletableFuture<Long> future = userImportExportService.exportUsersAsync(queryCondition);
             Long taskId = future.get(); // 获取任务ID
             
-            return CommonResult.success(taskId, "导出任务已创建，请通过任务ID查询进度");
+            return R.ok("导出任务已创建，请通过任务ID查询进度", taskId);
         } catch (Exception e) {
             log.error("创建用户导出任务失败", e);
-            return CommonResult.error("创建导出任务失败: " + e.getMessage());
+            return R.error("创建导出任务失败: " + e.getMessage());
         }
     }
 
     @GetMapping("/task/{taskId}")
     @Operation(summary = "查询任务详情")
     @PreAuthorize("@ss.hasPermission('system:user:import') or @ss.hasPermission('system:user:export')")
-    public CommonResult<ImportExportTask> getTaskDetail(
+    public R<ImportExportTask> getTaskDetail(
             @Parameter(description = "任务ID") @PathVariable @NotNull Long taskId) {
         
         ImportExportTask task = userImportExportService.getTaskDetail(taskId);
         if (task == null) {
-            return CommonResult.error("任务不存在");
+            return R.error("任务不存在");
         }
         
-        return CommonResult.success(task);
+        return R.ok(task);
     }
 
     @GetMapping("/tasks")
     @Operation(summary = "查询用户的导入导出任务列表")
     @PreAuthorize("@ss.hasPermission('system:user:import') or @ss.hasPermission('system:user:export')")
-    public CommonResult<PageResult<ImportExportTask>> getUserTasks(
+    public R<PageResult<ImportExportTask>> getUserTasks(
             @Parameter(description = "页码") @RequestParam(defaultValue = "1") int pageNum,
             @Parameter(description = "页大小") @RequestParam(defaultValue = "10") int pageSize) {
         
         PageResult<ImportExportTask> result = userImportExportService.getUserTasks(pageNum, pageSize);
-        return CommonResult.success(result);
+        return R.ok(result);
     }
 
     @GetMapping("/task/{taskId}/download-error-report")
@@ -165,23 +165,23 @@ public class UserImportExportController {
     @DeleteMapping("/task/{taskId}/cancel")
     @Operation(summary = "取消任务")
     @PreAuthorize("@ss.hasPermission('system:user:import') or @ss.hasPermission('system:user:export')")
-    public CommonResult<Boolean> cancelTask(
+    public R<Boolean> cancelTask(
             @Parameter(description = "任务ID") @PathVariable @NotNull Long taskId) {
         
         boolean success = userImportExportService.cancelTask(taskId);
-        return success ? CommonResult.success(true, "任务已取消") 
-                       : CommonResult.error("任务取消失败");
+        return success ? R.ok("任务已取消", true) 
+                       : R.error("任务取消失败");
     }
 
     @GetMapping("/progress/{taskId}")
     @Operation(summary = "获取任务进度（轮询接口）")
     @PreAuthorize("@ss.hasPermission('system:user:import') or @ss.hasPermission('system:user:export')")
-    public CommonResult<TaskProgress> getTaskProgress(
+    public R<TaskProgress> getTaskProgress(
             @Parameter(description = "任务ID") @PathVariable @NotNull Long taskId) {
         
         ImportExportTask task = userImportExportService.getTaskDetail(taskId);
         if (task == null) {
-            return CommonResult.error("任务不存在");
+            return R.error("任务不存在");
         }
 
         TaskProgress progress = new TaskProgress();
@@ -195,7 +195,7 @@ public class UserImportExportController {
         progress.setCompleted(task.getStatus() == ImportExportTask.TaskStatus.SUCCESS || 
                              task.getStatus() == ImportExportTask.TaskStatus.FAILED);
         
-        return CommonResult.success(progress);
+        return R.ok(progress);
     }
 
     /**

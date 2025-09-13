@@ -1,8 +1,9 @@
-package com.admin.module.system.api.service;
+package com.admin.module.system.api.service.imports;
 
 import com.admin.common.core.domain.PageResult;
 import com.admin.framework.excel.domain.ImportExportTask;
-import com.admin.module.system.api.dto.UserImportDTO;
+import com.admin.module.system.api.dto.imports.UserImportDTO;
+import com.admin.module.system.api.vo.imports.UserImportValidationResult;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -89,44 +90,5 @@ public interface UserImportExportService {
      */
     boolean cancelTask(Long taskId);
 
-    /**
-     * 用户导入验证结果
-     */
-    class UserImportValidationResult {
-        private boolean valid;
-        private String message;
-        private java.util.List<UserImportDTO> previewData;
-        private java.util.List<String> errors;
-        private int totalRows;
-        private int validRows;
-        private int errorRows;
 
-        // 构造方法和getter/setter
-        public UserImportValidationResult(boolean valid, String message) {
-            this.valid = valid;
-            this.message = message;
-        }
-
-        // Getters and Setters
-        public boolean isValid() { return valid; }
-        public void setValid(boolean valid) { this.valid = valid; }
-        
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
-        
-        public java.util.List<UserImportDTO> getPreviewData() { return previewData; }
-        public void setPreviewData(java.util.List<UserImportDTO> previewData) { this.previewData = previewData; }
-        
-        public java.util.List<String> getErrors() { return errors; }
-        public void setErrors(java.util.List<String> errors) { this.errors = errors; }
-        
-        public int getTotalRows() { return totalRows; }
-        public void setTotalRows(int totalRows) { this.totalRows = totalRows; }
-        
-        public int getValidRows() { return validRows; }
-        public void setValidRows(int validRows) { this.validRows = validRows; }
-        
-        public int getErrorRows() { return errorRows; }
-        public void setErrorRows(int errorRows) { this.errorRows = errorRows; }
-    }
 }

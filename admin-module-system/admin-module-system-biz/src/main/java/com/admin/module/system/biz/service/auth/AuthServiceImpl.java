@@ -291,7 +291,7 @@ public class AuthServiceImpl implements AuthService {
         userInfo.setAvatar(user.getAvatar());
         userInfo.setEmail(user.getEmail());
         userInfo.setPhone(user.getPhone());
-        userInfo.setSex(user.getSex());
+        userInfo.setGender(user.getGender());
         userInfo.setStatus(user.getStatus());
         
         // 使用工具类解析权限信息

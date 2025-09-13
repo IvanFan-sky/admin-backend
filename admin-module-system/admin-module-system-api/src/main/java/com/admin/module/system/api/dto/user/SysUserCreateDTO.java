@@ -48,7 +48,7 @@ public class SysUserCreateDTO implements Serializable {
     private String phone;
 
     @Schema(description = "用户性别", example = "1", allowableValues = {"0", "1", "2"})
-    private String sex;
+    private Integer gender;
 
     @Schema(description = "用户头像URL", example = "https://example.com/avatar/1.jpg")
     private String avatar;

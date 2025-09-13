@@ -56,7 +56,7 @@ public class UserInfoVO {
      * 用户性别
      */
     @Schema(description = "用户性别", example = "1")
-    private String sex;
+    private Integer gender;
 
     /**
      * 用户状态
