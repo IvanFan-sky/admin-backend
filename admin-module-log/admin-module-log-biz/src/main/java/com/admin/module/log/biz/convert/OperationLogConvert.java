@@ -2,6 +2,7 @@ package com.admin.module.log.biz.convert;
 
 import com.admin.module.log.api.dto.OperationLogCreateDTO;
 import com.admin.module.log.api.vo.OperationLogVO;
+import com.admin.module.log.api.vo.OperationLogExportVO;
 import com.admin.module.log.biz.dal.dataobject.OperationLogDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -34,4 +35,14 @@ public interface OperationLogConvert {
      * DO列表转VO列表
      */
     List<OperationLogVO> convertList(List<OperationLogDO> list);
+
+    /**
+     * 转换为导出VO列表
+     */
+    List<OperationLogExportVO> toExportVOList(List<OperationLogDO> doList);
+
+    /**
+     * 转换为导出VO
+     */
+    OperationLogExportVO toExportVO(OperationLogDO operationLogDO);
 }

@@ -72,4 +72,28 @@ public interface SysUserMapper extends BaseMapper<SysUserDO> {
      * @return 重复数量，0表示唯一
      */
     int checkEmailUnique(@Param("email") String email, @Param("id") Long id);
+
+    /**
+     * 根据用户名查询用户（用于导入验证）
+     *
+     * @param username 用户名
+     * @return 用户信息
+     */
+    SysUserDO selectByUsername(@Param("username") String username);
+
+    /**
+     * 根据邮箱查询用户（用于导入验证）
+     *
+     * @param email 邮箱
+     * @return 用户信息
+     */
+    SysUserDO selectByEmail(@Param("email") String email);
+
+    /**
+     * 根据手机号查询用户（用于导入验证）
+     *
+     * @param mobile 手机号
+     * @return 用户信息
+     */
+    SysUserDO selectByMobile(@Param("mobile") String mobile);
 }

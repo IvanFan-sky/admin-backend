@@ -26,6 +26,12 @@
             <artifactId>admin-common</artifactId>
         </dependency>
         
+        <!-- Excel框架 -->
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-excel</artifactId>
+        </dependency>
+        
         <!-- Spring Boot Starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

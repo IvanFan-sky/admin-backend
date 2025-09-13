@@ -50,6 +50,27 @@
             <artifactId>admin-common</artifactId>
         </dependency>
         
+        <!-- MinIO框架 -->
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-minio</artifactId>
+            <optional>true</optional>
+        </dependency>
+        
+        <!-- 安全框架 -->
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-security</artifactId>
+            <optional>true</optional>
+        </dependency>
+        
+        <!-- Redis -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <optional>true</optional>
+        </dependency>
+        
         <!-- Hutool -->
         <dependency>
             <groupId>cn.hutool</groupId>

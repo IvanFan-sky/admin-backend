@@ -16,7 +16,7 @@ public interface BatchProcessor<T> {
      * 处理批次数据
      * 
      * @param batch 批次数据
-     * @return 处理结果，true表示处理成功，false表示处理失败
+     * @return 处理结果
      */
-    boolean processBatch(List<T> batch);
+    BatchResult<T> process(List<T> batch);
 }

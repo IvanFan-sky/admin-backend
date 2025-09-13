@@ -2,6 +2,7 @@ package com.admin.module.log.biz.convert;
 
 import com.admin.module.log.api.dto.LoginLogCreateDTO;
 import com.admin.module.log.api.vo.LoginLogVO;
+import com.admin.module.log.api.vo.LoginLogExportVO;
 import com.admin.module.log.biz.dal.dataobject.LoginLogDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -34,4 +35,14 @@ public interface LoginLogConvert {
      * DO列表转VO列表
      */
     List<LoginLogVO> convertList(List<LoginLogDO> list);
+
+    /**
+     * 转换为导出VO列表
+     */
+    List<LoginLogExportVO> toExportVOList(List<LoginLogDO> doList);
+
+    /**
+     * 转换为导出VO
+     */
+    LoginLogExportVO toExportVO(LoginLogDO loginLogDO);
 }

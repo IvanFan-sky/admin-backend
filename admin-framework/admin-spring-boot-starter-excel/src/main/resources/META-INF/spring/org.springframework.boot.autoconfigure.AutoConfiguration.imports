@@ -1,1 +1,2 @@
 com.admin.framework.excel.config.AdminExcelAutoConfiguration
+com.admin.framework.excel.config.ImportExportAutoConfiguration

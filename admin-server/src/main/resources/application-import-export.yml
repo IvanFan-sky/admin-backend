@@ -1,0 +1,64 @@
+# 导入导出功能配置
+admin:
+  import-export:
+    # 是否启用导入导出功能
+    enabled: true
+    
+    # 文件配置
+    file:
+      # 最大文件大小（50MB）
+      max-file-size: 52428800
+      # 允许的文件类型
+      allowed-types: ["xlsx", "xls", "csv"]
+      # 文件保留天数
+      retention-days: 30
+      # 是否启用文件压缩
+      compression-enabled: false
+    
+    # 任务配置
+    task:
+      # 核心线程池大小
+      core-pool-size: 4
+      # 最大线程池大小
+      max-pool-size: 8
+      # 队列容量
+      queue-capacity: 200
+      # 每个用户最大并发任务数
+      max-concurrent-tasks-per-user: 3
+      # 系统最大并发任务数
+      max-system-concurrent-tasks: 15
+      # 批处理大小
+      batch-size: 2000
+      # 任务超时时间（分钟）
+      timeout-minutes: 120
+    
+    # 缓存配置
+    cache:
+      # 是否启用缓存
+      enabled: true
+      # 缓存过期时间（分钟）
+      expire-minutes: 60
+      # 缓存Key前缀
+      key-prefix: "admin:import_export:"
+
+# Spring配置
+spring:
+  servlet:
+    multipart:
+      # 单个文件最大大小
+      max-file-size: 50MB
+      # 请求最大大小
+      max-request-size: 50MB
+      # 是否延迟解析
+      resolve-lazily: true
+
+# 线程池配置优化
+management:
+  metrics:
+    export:
+      simple:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,threadpool"

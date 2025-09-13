@@ -3,6 +3,7 @@ spring:
     name: admin-backend
   profiles:
     active: dev
+    include: import-export
   main:
     allow-bean-definition-overriding: true
   autoconfigure:

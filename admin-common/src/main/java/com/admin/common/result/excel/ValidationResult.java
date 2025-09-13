@@ -72,4 +72,18 @@ public class ValidationResult {
     public static ValidationResult failure(List<String> errors) {
         return new ValidationResult(false, "验证失败", errors);
     }
+
+    /**
+     * 构造验证失败结果
+     * 
+     * @param message 失败消息
+     * @return 验证结果
+     */
+    public static ValidationResult failure(String message) {
+        return new ValidationResult(false, message, null);
+    }
+
+    public boolean isSuccess() {
+        return valid;
+    }
 }
