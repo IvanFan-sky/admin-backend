@@ -1,0 +1,49 @@
+# 文件服务缓存配置
+admin:
+  cache:
+    file:
+      # 文件信息缓存过期时间（小时）
+      ttl-hours: 2
+      # 热点文件缓存过期时间（小时）
+      hot-ttl-hours: 6
+      # 空值缓存过期时间（分钟），防止缓存穿透
+      null-value-ttl-minutes: 5
+      # 是否启用缓存
+      enabled: true
+      # 缓存Key前缀
+      key-prefix: "admin:file:"
+      # 最大缓存大小
+      max-size: 10000
+      
+  file:
+    # 默认存储桶
+    default-bucket: "default"
+    # 最大文件大小（字节），默认10MB
+    max-file-size: 10485760
+    # 是否启用文件去重
+    enable-deduplication: true
+    # 允许的文件类型（逗号分隔）
+    allowed-types: "image/jpeg,image/png,image/gif,application/pdf,text/plain"
+    # 文件存储路径模式
+    path-pattern: "yyyy/MM/dd"
+    # 是否启用文件审计日志
+    enable-audit: true
+    
+spring:
+  redis:
+    # Redis连接配置
+    timeout: 5000ms
+    lettuce:
+      pool:
+        # 连接池最大连接数
+        max-active: 10
+        # 连接池最大空闲连接数
+        max-idle: 8
+        # 连接池最小空闲连接数
+        min-idle: 2
+        # 连接池最大阻塞等待时间
+        max-wait: -1ms
+    # Redis key序列化方式
+    key-serializer: org.springframework.data.redis.serializer.StringRedisSerializer
+    # Redis value序列化方式
+    value-serializer: org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer

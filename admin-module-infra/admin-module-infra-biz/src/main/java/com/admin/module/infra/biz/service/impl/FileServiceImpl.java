@@ -1,11 +1,13 @@
 package com.admin.module.infra.biz.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import com.admin.common.core.domain.PageResult;
 import com.admin.common.exception.ServiceException;
 import com.admin.common.result.minio.UploadResult;
+import com.admin.framework.security.utils.SecurityContextHolder;
 import com.admin.framework.minio.service.MinioService;
 import com.admin.module.infra.api.dto.FilePageDTO;
 import com.admin.module.infra.api.dto.FileUploadDTO;
@@ -17,6 +19,7 @@ import com.admin.module.infra.biz.convert.FileConvert;
 import com.admin.module.infra.biz.dal.dataobject.FileInfoDO;
 import com.admin.module.infra.biz.dal.mapper.FileInfoMapper;
 import com.admin.module.infra.biz.service.ContentTypeDetectionService;
+import com.admin.module.infra.biz.service.FileCacheService;
 import com.admin.module.infra.biz.service.StreamingDownloadService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -50,6 +53,7 @@ public class FileServiceImpl implements FileService {
     private final MinioService minioService;
     private final ContentTypeDetectionService contentTypeDetectionService;
     private final StreamingDownloadService streamingDownloadService;
+    private final FileCacheService fileCacheService;
 
     @Value("${admin.file.default-bucket:default}")
     private String defaultBucket;
@@ -100,10 +104,14 @@ public class FileServiceImpl implements FileService {
             FileInfoDO fileInfo = buildFileInfo(file, fileName, filePath, fileHash, validationResult.getContentType());
             fileInfoMapper.insert(fileInfo);
             
+            // 转换为VO并缓存
+            FileInfoVO fileInfoVO = FileConvert.INSTANCE.convert(fileInfo);
+            fileCacheService.cacheFileInfoAsync(fileInfo.getId(), fileInfoVO);
+            
             log.info("文件上传成功: fileId={}, fileName={}, size={}", 
                     fileInfo.getId(), fileName, file.getSize());
             
-            return createUploadVO(FileConvert.INSTANCE.convert(fileInfo), false);
+            return createUploadVO(fileInfoVO, false);
             
         } catch (Exception e) {
             log.error("文件上传失败: fileName={}", file.getOriginalFilename(), e);
@@ -129,11 +137,17 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FileInfoVO getFileInfo(Long fileId) {
-        FileInfoDO fileInfo = fileInfoMapper.selectById(fileId);
+        if (fileId == null) {
+            throw new ServiceException("文件ID不能为空");
+        }
+        
+        // 使用缓存获取文件信息
+        FileInfoVO fileInfo = fileCacheService.getFileInfo(fileId);
         if (fileInfo == null) {
             throw new ServiceException("文件不存在");
         }
-        return FileConvert.INSTANCE.convert(fileInfo);
+        
+        return fileInfo;
     }
 
     @Override
@@ -142,8 +156,8 @@ public class FileServiceImpl implements FileService {
             return null;
         }
         
-        FileInfoDO fileInfo = fileInfoMapper.selectByFileHash(fileHash, FileUploadStatusEnum.COMPLETED.getCode());
-        return fileInfo != null ? FileConvert.INSTANCE.convert(fileInfo) : null;
+        // 使用缓存获取文件信息
+        return fileCacheService.getFileByHash(fileHash, FileUploadStatusEnum.COMPLETED.getCode());
     }
 
     @Override
@@ -177,20 +191,25 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public Boolean deleteFile(Long fileId) {
+        if (fileId == null) {
+            throw new ServiceException("文件ID不能为空");
+        }
+        
         FileInfoDO fileInfo = fileInfoMapper.selectById(fileId);
-        if (fileInfo == null) {
+        if (fileInfo == null || fileInfo.getDeleted() == 1) {
             throw new ServiceException("文件不存在");
         }
         
         try {
-            // 删除MinIO中的文件
+            // 1. 删除MinIO中的文件
             minioService.deleteFile(fileInfo.getBucketName(), fileInfo.getFilePath());
             
-            // 更新数据库状态
-            FileInfoDO updateFile = new FileInfoDO();
-            updateFile.setId(fileId);
-            updateFile.setUploadStatus(FileUploadStatusEnum.DELETED.getCode());
-            fileInfoMapper.updateById(updateFile);
+            // 2. 逻辑删除数据库记录
+            String currentUser = SecurityContextHolder.getCurrentUsernameOrDefault("system");
+            fileInfoMapper.batchLogicalDelete(List.of(fileId), currentUser, LocalDateTime.now());
+            
+            // 3. 清除缓存
+            fileCacheService.evictFileCache(fileId);
             
             log.info("文件删除成功: fileId={}, fileName={}", fileId, fileInfo.getFileName());
             return true;
@@ -204,22 +223,47 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public Integer batchDeleteFiles(List<Long> fileIds) {
-        if (fileIds == null || fileIds.isEmpty()) {
+        if (CollectionUtil.isEmpty(fileIds)) {
             return 0;
         }
         
-        int successCount = 0;
-        for (Long fileId : fileIds) {
-            try {
-                if (deleteFile(fileId)) {
-                    successCount++;
-                }
-            } catch (Exception e) {
-                log.error("批量删除文件失败: fileId={}", fileId, e);
-            }
-        }
+        log.info("开始批量删除文件: 数量={}", fileIds.size());
         
-        return successCount;
+        try {
+            // 1. 批量查询有效文件信息
+            List<FileInfoDO> validFiles = fileInfoMapper.selectValidFilesByIds(fileIds);
+            if (CollectionUtil.isEmpty(validFiles)) {
+                log.warn("批量删除文件: 没有找到有效文件");
+                return 0;
+            }
+            
+            // 2. 提取文件路径和ID列表
+            List<String> filePaths = validFiles.stream()
+                    .map(FileInfoDO::getFilePath)
+                    .toList();
+            List<Long> validFileIds = validFiles.stream()
+                    .map(FileInfoDO::getId)
+                    .toList();
+            
+            // 3. 批量删除MinIO中的文件
+            List<String> deleteResults = minioService.deleteFiles(defaultBucket, filePaths);
+            log.info("MinIO批量删除结果: 请求数量={}, 删除结果数量={}", filePaths.size(), deleteResults.size());
+            
+            // 4. 批量更新数据库状态为已删除
+            String currentUser = SecurityContextHolder.getCurrentUsernameOrDefault("system");
+            int updatedCount = fileInfoMapper.batchLogicalDelete(validFileIds, currentUser, LocalDateTime.now());
+            
+            // 5. 批量清除缓存
+            fileCacheService.batchEvictFileCache(validFileIds);
+            
+            log.info("批量删除文件成功: 请求数量={}, 实际删除={}", fileIds.size(), updatedCount);
+            
+            return updatedCount;
+            
+        } catch (Exception e) {
+            log.error("批量删除文件失败: fileIds={}", fileIds, e);
+            throw new ServiceException("批量删除文件失败: " + e.getMessage());
+        }
     }
 
     @Override
@@ -302,13 +346,15 @@ public class FileServiceImpl implements FileService {
         
         // 设置上传用户信息
         try {
-            // TODO: 集成用户上下文获取用户信息
-            // fileInfo.setUploadUserId(SecurityUtils.getUserId());
-            // fileInfo.setUploadUserName(SecurityUtils.getUsername());
-            fileInfo.setUploadUserId(1L);
-            fileInfo.setUploadUserName("admin");
+            Long userId = SecurityContextHolder.getCurrentUserId();
+            String username = SecurityContextHolder.getCurrentUsername();
+            
+            fileInfo.setUploadUserId(userId != null ? userId : 0L);
+            fileInfo.setUploadUserName(StrUtil.isNotBlank(username) ? username : "anonymous");
         } catch (Exception e) {
             log.warn("获取当前用户信息失败", e);
+            fileInfo.setUploadUserId(0L);
+            fileInfo.setUploadUserName("anonymous");
         }
         
         return fileInfo;

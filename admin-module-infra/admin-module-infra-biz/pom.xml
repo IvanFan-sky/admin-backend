@@ -47,6 +47,11 @@
             <artifactId>admin-spring-boot-starter-minio</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-security</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
 
         <!-- https://mvnrepository.com/artifact/org.apache.tika/tika-core -->

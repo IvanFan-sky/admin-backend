@@ -101,4 +101,73 @@ public class LoginUser implements UserDetails {
     public boolean isEnabled() {
         return enabled;
     }
+
+    /**
+     * 检查是否有指定权限
+     */
+    public boolean hasPermission(String permission) {
+        if (authorities == null || permission == null) {
+            return false;
+        }
+        return authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(authority -> authority.equals(permission));
+    }
+
+    /**
+     * 检查是否有指定角色
+     */
+    public boolean hasRole(String role) {
+        if (authorities == null || role == null) {
+            return false;
+        }
+        String roleWithPrefix = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+        return authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(authority -> authority.equals(roleWithPrefix));
+    }
+
+    /**
+     * 检查是否有任意一个指定权限
+     */
+    public boolean hasAnyPermission(String... permissions) {
+        if (permissions == null || permissions.length == 0) {
+            return false;
+        }
+        for (String permission : permissions) {
+            if (hasPermission(permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 检查是否有任意一个指定角色
+     */
+    public boolean hasAnyRole(String... roles) {
+        if (roles == null || roles.length == 0) {
+            return false;
+        }
+        for (String role : roles) {
+            if (hasRole(role)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 获取显示名称（默认返回用户名）
+     */
+    public String getDisplayName() {
+        return username;
+    }
+
+    /**
+     * 检查Token是否过期（JWT认证中由外部管理）
+     */
+    public boolean isTokenExpired() {
+        return false; // JWT认证中Token过期由JwtTokenUtil管理
+    }
 }

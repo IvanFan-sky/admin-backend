@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.admin.module.infra.biz.dal.mapper.FileInfoMapper">
+
+    <!-- 通用结果映射 -->
+    <resultMap id="FileInfoResult" type="com.admin.module.infra.biz.dal.dataobject.FileInfoDO">
+        <id column="id" property="id" />
+        <result column="file_name" property="fileName" />
+        <result column="original_file_name" property="originalFileName" />
+        <result column="file_path" property="filePath" />
+        <result column="file_size" property="fileSize" />
+        <result column="content_type" property="contentType" />
+        <result column="file_extension" property="fileExtension" />
+        <result column="file_hash" property="fileHash" />
+        <result column="storage_type" property="storageType" />
+        <result column="bucket_name" property="bucketName" />
+        <result column="upload_status" property="uploadStatus" />
+        <result column="is_chunked" property="isChunked" />
+        <result column="total_chunks" property="totalChunks" />
+        <result column="upload_id" property="uploadId" />
+        <result column="access_url" property="accessUrl" />
+        <result column="business_type" property="businessType" />
+        <result column="business_id" property="businessId" />
+        <result column="upload_user_id" property="uploadUserId" />
+        <result column="upload_user_name" property="uploadUserName" />
+        <result column="download_count" property="downloadCount" />
+        <result column="last_download_time" property="lastDownloadTime" />
+        <result column="tags" property="tags" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+    </resultMap>
+
+    <!-- 存储统计结果映射 -->
+    <resultMap id="StorageStatisticsResult" type="com.admin.module.infra.biz.dal.mapper.FileInfoMapper$FileStorageStatistics">
+        <result column="total_files" property="totalFiles" />
+        <result column="total_size" property="totalSize" />
+        <result column="image_files" property="imageFiles" />
+        <result column="document_files" property="documentFiles" />
+        <result column="video_files" property="videoFiles" />
+        <result column="other_files" property="otherFiles" />
+    </resultMap>
+
+    <!-- 根据文件哈希查找文件 -->
+    <select id="selectByFileHash" resultMap="FileInfoResult">
+        SELECT *
+        FROM infra_file_info
+        WHERE file_hash = #{fileHash}
+          AND upload_status = #{uploadStatus}
+          AND deleted = 0
+        LIMIT 1
+    </select>
+
+    <!-- 根据业务类型和业务ID查找文件 -->
+    <select id="selectByBusiness" resultMap="FileInfoResult">
+        SELECT *
+        FROM infra_file_info
+        WHERE business_type = #{businessType}
+          AND business_id = #{businessId}
+          AND deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 更新下载统计 -->
+    <update id="updateDownloadCount">
+        UPDATE infra_file_info
+        SET download_count = download_count + 1,
+            last_download_time = NOW(),
+            update_time = NOW()
+        WHERE id = #{fileId}
+          AND deleted = 0
+    </update>
+
+    <!-- 批量更新上传状态 -->
+    <update id="batchUpdateUploadStatus">
+        UPDATE infra_file_info
+        SET upload_status = #{uploadStatus},
+            update_time = NOW()
+        WHERE deleted = 0
+          AND id IN
+        <foreach collection="fileIds" item="fileId" open="(" separator="," close=")">
+            #{fileId}
+        </foreach>
+    </update>
+
+    <!-- 批量查询有效文件信息 -->
+    <select id="selectValidFilesByIds" resultMap="FileInfoResult">
+        SELECT *
+        FROM infra_file_info
+        WHERE deleted = 0
+          AND upload_status != 3
+          AND id IN
+        <foreach collection="fileIds" item="fileId" open="(" separator="," close=")">
+            #{fileId}
+        </foreach>
+        ORDER BY id
+    </select>
+
+    <!-- 根据文件路径批量查询文件 -->
+    <select id="selectByFilePaths" resultMap="FileInfoResult">
+        SELECT *
+        FROM infra_file_info
+        WHERE deleted = 0
+          AND file_path IN
+        <foreach collection="filePaths" item="filePath" open="(" separator="," close=")">
+            #{filePath}
+        </foreach>
+    </select>
+
+    <!-- 批量逻辑删除文件 -->
+    <update id="batchLogicalDelete">
+        UPDATE infra_file_info
+        SET upload_status = 3,
+            deleted = 1,
+            update_time = #{updateTime}
+            <if test="updateBy != null and updateBy != ''">
+            , update_by = #{updateBy}
+            </if>
+        WHERE deleted = 0
+          AND id IN
+        <foreach collection="fileIds" item="fileId" open="(" separator="," close=")">
+            #{fileId}
+        </foreach>
+    </update>
+
+    <!-- 查询过期文件 -->
+    <select id="selectExpiredFiles" resultMap="FileInfoResult">
+        SELECT *
+        FROM infra_file_info
+        WHERE deleted = 0
+          AND upload_status = 1
+          AND create_time &lt; #{expireTime}
+        ORDER BY create_time ASC
+        <if test="limit != null and limit > 0">
+        LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 统计文件存储信息 -->
+    <select id="selectStorageStatistics" resultMap="StorageStatisticsResult">
+        SELECT 
+            COUNT(*) as total_files,
+            IFNULL(SUM(file_size), 0) as total_size,
+            COUNT(CASE WHEN content_type LIKE 'image/%' THEN 1 END) as image_files,
+            COUNT(CASE WHEN content_type LIKE 'application/%' OR content_type LIKE 'text/%' THEN 1 END) as document_files,
+            COUNT(CASE WHEN content_type LIKE 'video/%' OR content_type LIKE 'audio/%' THEN 1 END) as video_files,
+            COUNT(CASE WHEN content_type NOT LIKE 'image/%' 
+                         AND content_type NOT LIKE 'application/%' 
+                         AND content_type NOT LIKE 'text/%'
+                         AND content_type NOT LIKE 'video/%' 
+                         AND content_type NOT LIKE 'audio/%' THEN 1 END) as other_files
+        FROM infra_file_info
+        WHERE deleted = 0
+          AND upload_status = 1
+    </select>
+
+    <!-- 根据业务类型和时间范围统计文件数量 -->
+    <select id="countByBusinessTypeAndTimeRange" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM infra_file_info
+        WHERE deleted = 0
+          AND upload_status = 1
+          <if test="businessType != null and businessType != ''">
+          AND business_type = #{businessType}
+          </if>
+          <if test="startTime != null">
+          AND create_time &gt;= #{startTime}
+          </if>
+          <if test="endTime != null">
+          AND create_time &lt;= #{endTime}
+          </if>
+    </select>
+
+</mapper>

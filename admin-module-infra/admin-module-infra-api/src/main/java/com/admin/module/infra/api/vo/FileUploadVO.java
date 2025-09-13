@@ -12,7 +12,8 @@ import lombok.Data;
  */
 @Data
 @Schema(description = "文件上传结果响应")
-public class FileUploadVO {
+public class
+FileUploadVO {
 
     /**
      * 文件ID
