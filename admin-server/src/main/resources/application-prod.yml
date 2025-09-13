@@ -53,6 +53,81 @@ knife4j:
     description: Admin管理系统后端接口文档
     version: 1.0.0
 
+# JWT认证配置
+admin:
+  jwt:
+    secret: ${ADMIN_JWT_SECRET:adminSecretKeyForJWTTokenGenerationMustBeLongEnoughForHS512}
+    expiration: ${ADMIN_JWT_EXPIRATION:1800000}  # 访问令牌过期时间：30分钟（毫秒）
+    refresh-expiration: ${ADMIN_JWT_REFRESH_EXPIRATION:2592000000}  # 刷新令牌过期时间：30天（毫秒）
+  
+  # MinIO对象存储配置
+  minio:
+    enabled: ${ADMIN_MINIO_ENABLED:true}
+    endpoint: ${ADMIN_MINIO_ENDPOINT:http://minio:9000}
+    access-key: ${ADMIN_MINIO_ACCESS_KEY:admin}
+    secret-key: ${ADMIN_MINIO_SECRET_KEY:admin123}
+    default-bucket: ${ADMIN_MINIO_DEFAULT_BUCKET:admin-prod}
+    connect-timeout: ${ADMIN_MINIO_CONNECT_TIMEOUT:10000}
+    write-timeout: ${ADMIN_MINIO_WRITE_TIMEOUT:60000}
+    read-timeout: ${ADMIN_MINIO_READ_TIMEOUT:10000}
+    upload:
+      max-file-size: ${ADMIN_MINIO_MAX_FILE_SIZE:100}  # 最大文件大小（MB）
+      allowed-types:
+        - jpg
+        - jpeg
+        - png
+        - gif
+        - bmp
+        - webp
+        - pdf
+        - doc
+        - docx
+        - xls
+        - xlsx
+        - ppt
+        - pptx
+        - txt
+        - mp4
+        - avi
+        - mkv
+        - mov
+        - wmv
+        - mp3
+        - wav
+        - flac
+        - aac
+        - zip
+        - rar
+        - 7z
+        - tar
+        - gz
+      file-name-strategy: ${ADMIN_MINIO_FILE_NAME_STRATEGY:UUID}
+      keep-original-name: ${ADMIN_MINIO_KEEP_ORIGINAL_NAME:false}
+      path-prefix: ${ADMIN_MINIO_PATH_PREFIX:uploads/}
+    download:
+      presigned-url-expiry: ${ADMIN_MINIO_PRESIGNED_URL_EXPIRY:3600}
+      enable-range-download: ${ADMIN_MINIO_ENABLE_RANGE_DOWNLOAD:true}
+      cache-control: ${ADMIN_MINIO_CACHE_CONTROL:max-age=3600}
+  
+  # 日志切面配置
+  log:
+    aspect:
+      enabled: ${ADMIN_LOG_ASPECT_ENABLED:true}
+      async-enabled: ${ADMIN_LOG_ASPECT_ASYNC_ENABLED:true}
+      max-param-length: ${ADMIN_LOG_ASPECT_MAX_PARAM_LENGTH:2000}
+      max-result-length: ${ADMIN_LOG_ASPECT_MAX_RESULT_LENGTH:4000}
+      max-error-length: ${ADMIN_LOG_ASPECT_MAX_ERROR_LENGTH:1000}
+      exclude-patterns:
+        - "*/health/**"
+        - "*/metrics/**"
+        - "*/actuator/**"
+      async:
+        core-pool-size: ${ADMIN_LOG_ASPECT_CORE_POOL_SIZE:2}
+        max-pool-size: ${ADMIN_LOG_ASPECT_MAX_POOL_SIZE:8}
+        queue-capacity: ${ADMIN_LOG_ASPECT_QUEUE_CAPACITY:500}
+        thread-name-prefix: "LogAspect-"
+        keep-alive-seconds: ${ADMIN_LOG_ASPECT_KEEP_ALIVE_SECONDS:60}
+
 # 日志配置
 logging:
   level:

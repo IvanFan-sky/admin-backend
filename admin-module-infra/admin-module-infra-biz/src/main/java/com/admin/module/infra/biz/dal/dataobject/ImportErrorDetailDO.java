@@ -1,73 +1,73 @@
 package com.admin.module.infra.biz.dal.dataobject;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.admin.common.core.domain.BaseEntity;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import lombok.EqualsAndHashCode;
 
 /**
  * 导入错误详情数据对象
  * 
- * 对应数据库表 sys_import_error_detail
- * 用于记录导入过程中具体的错误信息
- *
  * @author admin
  * @version 1.0
  * @since 2024-01-15
  */
 @Data
-@TableName("sys_import_error_detail")
-public class ImportErrorDetailDO implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+@EqualsAndHashCode(callSuper = true)
+@TableName("infra_import_error_detail")
+public class ImportErrorDetailDO extends BaseEntity {
 
     /**
-     * ID
+     * 错误详情ID
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 任务ID
+     * 关联任务ID
      */
-    @TableField("task_id")
     private Long taskId;
 
     /**
-     * 行号
+     * 错误行号
      */
-    @TableField("row_number")
     private Integer rowNumber;
 
     /**
-     * 字段名称
+     * 错误列名
      */
-    @TableField("field_name")
-    private String fieldName;
+    private String columnName;
 
     /**
-     * 字段值
+     * 错误列值
      */
-    @TableField("field_value")
-    private String fieldValue;
+    private String columnValue;
 
     /**
      * 错误类型
-     * FORMAT_ERROR-格式错误，DUPLICATE_ERROR-重复错误，VALIDATION_ERROR-校验错误
+     * VALIDATION-校验错误 DUPLICATE-重复数据 CONSTRAINT-约束错误 BUSINESS-业务错误
      */
-    @TableField("error_type")
     private String errorType;
+
+    /**
+     * 错误代码
+     */
+    private String errorCode;
 
     /**
      * 错误信息
      */
-    @TableField("error_message")
     private String errorMessage;
 
     /**
-     * 创建时间
+     * 原始数据（JSON格式）
      */
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+    private String originalData;
+
+    /**
+     * 建议修复方案
+     */
+    private String suggestion;
 }

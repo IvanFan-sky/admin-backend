@@ -37,19 +37,25 @@
             <groupId>com.admin</groupId>
             <artifactId>admin-spring-boot-starter-redis</artifactId>
         </dependency>
-        
-        <!-- MinIO -->
         <dependency>
-            <groupId>io.minio</groupId>
-            <artifactId>minio</artifactId>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-excel</artifactId>
+            <version>${project.version}</version>
         </dependency>
-        
-        <!-- EasyExcel -->
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>easyexcel</artifactId>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-minio</artifactId>
+            <version>${project.version}</version>
         </dependency>
-        
+
+
+        <!-- https://mvnrepository.com/artifact/org.apache.tika/tika-core -->
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>3.1.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

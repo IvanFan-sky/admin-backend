@@ -1,25 +1,24 @@
 package com.admin.module.infra.biz.dal.dataobject;
 
-import com.admin.common.core.domain.BaseDO;
+import com.admin.common.core.domain.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.time.LocalDateTime;
-
 /**
- * 文件信息 DO
- *
+ * 文件信息数据对象
+ * 
  * @author admin
  * @version 1.0
  * @since 2024-01-15
  */
-@TableName("sys_file_info")
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class FileInfoDO extends BaseDO {
+@TableName("infra_file_info")
+public class FileInfoDO extends BaseEntity {
 
     /**
      * 文件ID
@@ -28,19 +27,19 @@ public class FileInfoDO extends BaseDO {
     private Long id;
 
     /**
-     * 文件原始名称
+     * 文件名
      */
     private String fileName;
 
     /**
-     * 文件存储键（包含路径）
+     * 文件原始名称
      */
-    private String fileKey;
+    private String originalFileName;
 
     /**
-     * 文件访问URL
+     * 文件路径
      */
-    private String fileUrl;
+    private String filePath;
 
     /**
      * 文件大小（字节）
@@ -48,7 +47,7 @@ public class FileInfoDO extends BaseDO {
     private Long fileSize;
 
     /**
-     * 文件MIME类型
+     * 文件类型（MIME类型）
      */
     private String contentType;
 
@@ -58,44 +57,65 @@ public class FileInfoDO extends BaseDO {
     private String fileExtension;
 
     /**
-     * 文件SHA256哈希值（用于去重）
+     * 文件MD5哈希值
      */
     private String fileHash;
 
     /**
-     * 存储类型：MINIO, OSS
+     * 存储类型（MINIO, OSS, LOCAL等）
      */
     private String storageType;
 
     /**
      * 存储桶名称
      */
-    private String storageBucket;
+    private String bucketName;
 
     /**
-     * 存储路径
-     */
-    private String storagePath;
-
-    /**
-     * 上传状态：1-上传中，2-上传完成，3-上传失败
+     * 上传状态
+     * 0-上传中 1-上传完成 2-上传失败 3-已删除
      */
     private Integer uploadStatus;
 
     /**
-     * 业务类型：avatar, document, import_template
+     * 是否为分片上传
+     */
+    private Boolean isChunked;
+
+    /**
+     * 总分片数
+     */
+    private Integer totalChunks;
+
+    /**
+     * 上传会话ID（分片上传使用）
+     */
+    private String uploadId;
+
+    /**
+     * 访问URL
+     */
+    private String accessUrl;
+
+    /**
+     * 业务类型
      */
     private String businessType;
 
     /**
-     * 业务关联ID
+     * 业务ID
      */
     private String businessId;
 
     /**
-     * 是否公开：0-私有，1-公开
+     * 上传用户ID
      */
-    private Integer isPublic;
+    private Long uploadUserId;
+
+    /**
+     * 上传用户名
+     */
+    private String uploadUserName;
 
     /**
      * 下载次数
@@ -103,12 +123,17 @@ public class FileInfoDO extends BaseDO {
     private Integer downloadCount;
 
     /**
-     * 过期时间
+     * 最后下载时间
      */
-    private LocalDateTime expireTime;
+    private java.time.LocalDateTime lastDownloadTime;
 
     /**
-     * 备注
+     * 文件标签
      */
-    private String remark;
+    private String tags;
+
+    @TableLogic
+    private Integer deleted;
+
+
 }

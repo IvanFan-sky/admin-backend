@@ -2,123 +2,149 @@ package com.admin.framework.minio.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 /**
  * MinIO配置属性
+ * <p>
+ * 所有属性值从配置文件中动态加载，不设置硬编码默认值
  * 
  * @author admin
  * @version 1.0
  * @since 2024-01-15
  */
 @Data
+@Validated
 @ConfigurationProperties(prefix = "admin.minio")
 public class AdminMinioProperties {
 
     /**
      * 是否启用MinIO功能
      */
-    private Boolean enabled = true;
+    @NotNull(message = "MinIO启用状态不能为空")
+    private Boolean enabled;
 
     /**
      * MinIO服务端点
      */
-    private String endpoint = "http://localhost:9000";
+    @NotBlank(message = "MinIO服务端点不能为空")
+    private String endpoint;
 
     /**
      * 访问密钥
      */
-    private String accessKey = "minioadmin";
+    @NotBlank(message = "MinIO访问密钥不能为空")
+    private String accessKey;
 
     /**
      * 密钥
      */
-    private String secretKey = "minioadmin";
+    @NotBlank(message = "MinIO密钥不能为空")
+    private String secretKey;
 
     /**
      * 默认存储桶名称
      */
-    private String defaultBucket = "admin";
+    @NotBlank(message = "默认存储桶名称不能为空")
+    private String defaultBucket;
 
     /**
      * 连接超时时间（毫秒）
      */
-    private Long connectTimeout = 10000L;
+    @NotNull(message = "连接超时时间不能为空")
+    @Positive(message = "连接超时时间必须大于0")
+    private Long connectTimeout;
 
     /**
      * 写超时时间（毫秒）
      */
-    private Long writeTimeout = 60000L;
+    @NotNull(message = "写超时时间不能为空")
+    @Positive(message = "写超时时间必须大于0")
+    private Long writeTimeout;
 
     /**
      * 读超时时间（毫秒）
      */
-    private Long readTimeout = 10000L;
+    @NotNull(message = "读超时时间不能为空")
+    @Positive(message = "读超时时间必须大于0")
+    private Long readTimeout;
 
     /**
      * 上传配置
      */
-    private Upload upload = new Upload();
+    @NotNull(message = "上传配置不能为空")
+    private Upload upload;
 
     /**
      * 下载配置
      */
-    private Download download = new Download();
+    @NotNull(message = "下载配置不能为空")
+    private Download download;
 
     /**
      * 上传配置
      */
     @Data
+    @Validated
     public static class Upload {
         /**
          * 最大文件大小（MB）
          */
-        private Long maxFileSize = 100L;
+        @NotNull(message = "最大文件大小不能为空")
+        @Positive(message = "最大文件大小必须大于0")
+        private Long maxFileSize;
 
         /**
          * 允许的文件类型
          */
-        private String[] allowedTypes = {
-            "jpg", "jpeg", "png", "gif", "bmp", "webp", // 图片
-            "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", // 文档
-            "mp4", "avi", "mkv", "mov", "wmv", // 视频
-            "mp3", "wav", "flac", "aac", // 音频
-            "zip", "rar", "7z", "tar", "gz" // 压缩包
-        };
+        @NotNull(message = "允许的文件类型不能为空")
+        private String[] allowedTypes;
 
         /**
          * 文件名生成策略：UUID、DATE、ORIGINAL
          */
-        private String fileNameStrategy = "UUID";
+        @NotBlank(message = "文件名生成策略不能为空")
+        private String fileNameStrategy;
 
         /**
          * 是否保留原始文件名
          */
-        private Boolean keepOriginalName = false;
+        @NotNull(message = "是否保留原始文件名不能为空")
+        private Boolean keepOriginalName;
 
         /**
          * 文件路径前缀
          */
-        private String pathPrefix = "";
+        private String pathPrefix;
     }
 
     /**
      * 下载配置
      */
     @Data
+    @Validated
     public static class Download {
         /**
          * 预签名URL过期时间（秒）
          */
-        private Integer presignedUrlExpiry = 3600;
+        @NotNull(message = "预签名URL过期时间不能为空")
+        @Positive(message = "预签名URL过期时间必须大于0")
+        private Integer presignedUrlExpiry;
 
         /**
          * 是否启用断点续传
          */
-        private Boolean enableRangeDownload = true;
+        @NotNull(message = "是否启用断点续传不能为空")
+        private Boolean enableRangeDownload;
 
         /**
          * 缓存控制头
          */
-        private String cacheControl = "max-age=3600";
+        @NotBlank(message = "缓存控制头不能为空")
+        private String cacheControl;
     }
 }

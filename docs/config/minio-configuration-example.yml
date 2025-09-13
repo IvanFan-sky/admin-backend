@@ -1,0 +1,144 @@
+# MinIO对象存储配置示例
+# 所有配置项都是必需的，没有硬编码默认值
+
+admin:
+  minio:
+    # 是否启用MinIO功能（必需）
+    enabled: true
+    
+    # MinIO服务端点（必需）
+    # 开发环境示例：http://localhost:9000
+    # 生产环境示例：http://minio.example.com:9000
+    endpoint: http://localhost:9000
+    
+    # MinIO访问凭证（必需）
+    access-key: minioadmin
+    secret-key: minioadmin
+    
+    # 默认存储桶名称（必需）
+    # 建议不同环境使用不同的存储桶
+    default-bucket: admin-dev
+    
+    # 超时配置（必需，单位：毫秒）
+    connect-timeout: 10000  # 连接超时：10秒
+    write-timeout: 60000    # 写超时：60秒
+    read-timeout: 10000     # 读超时：10秒
+    
+    # 上传配置（必需）
+    upload:
+      # 最大文件大小（必需，单位：MB）
+      max-file-size: 100
+      
+      # 允许的文件类型（必需）
+      allowed-types:
+        # 图片文件
+        - jpg
+        - jpeg
+        - png
+        - gif
+        - bmp
+        - webp
+        # 文档文件
+        - pdf
+        - doc
+        - docx
+        - xls
+        - xlsx
+        - ppt
+        - pptx
+        - txt
+        # 视频文件
+        - mp4
+        - avi
+        - mkv
+        - mov
+        - wmv
+        # 音频文件
+        - mp3
+        - wav
+        - flac
+        - aac
+        # 压缩文件
+        - zip
+        - rar
+        - 7z
+        - tar
+        - gz
+      
+      # 文件名生成策略（必需）
+      # UUID: 使用UUID生成文件名
+      # DATE: 使用日期时间生成文件名
+      # ORIGINAL: 保持原始文件名
+      file-name-strategy: UUID
+      
+      # 是否保留原始文件名（必需）
+      # true: 在文件元数据中保留原始文件名
+      # false: 不保留原始文件名
+      keep-original-name: false
+      
+      # 文件路径前缀（可选）
+      # 用于组织文件存储结构
+      path-prefix: "uploads/"
+    
+    # 下载配置（必需）
+    download:
+      # 预签名URL过期时间（必需，单位：秒）
+      presigned-url-expiry: 3600  # 1小时
+      
+      # 是否启用断点续传（必需）
+      enable-range-download: true
+      
+      # HTTP缓存控制头（必需）
+      cache-control: "max-age=3600"
+
+---
+
+# 生产环境配置示例
+# 使用环境变量进行配置，提高安全性
+
+admin:
+  minio:
+    enabled: ${ADMIN_MINIO_ENABLED:true}
+    endpoint: ${ADMIN_MINIO_ENDPOINT}
+    access-key: ${ADMIN_MINIO_ACCESS_KEY}
+    secret-key: ${ADMIN_MINIO_SECRET_KEY}
+    default-bucket: ${ADMIN_MINIO_DEFAULT_BUCKET}
+    connect-timeout: ${ADMIN_MINIO_CONNECT_TIMEOUT:10000}
+    write-timeout: ${ADMIN_MINIO_WRITE_TIMEOUT:60000}
+    read-timeout: ${ADMIN_MINIO_READ_TIMEOUT:10000}
+    upload:
+      max-file-size: ${ADMIN_MINIO_MAX_FILE_SIZE:100}
+      allowed-types:
+        - jpg
+        - jpeg
+        - png
+        - pdf
+        - doc
+        - docx
+        - xls
+        - xlsx
+      file-name-strategy: ${ADMIN_MINIO_FILE_NAME_STRATEGY:UUID}
+      keep-original-name: ${ADMIN_MINIO_KEEP_ORIGINAL_NAME:false}
+      path-prefix: ${ADMIN_MINIO_PATH_PREFIX:uploads/}
+    download:
+      presigned-url-expiry: ${ADMIN_MINIO_PRESIGNED_URL_EXPIRY:3600}
+      enable-range-download: ${ADMIN_MINIO_ENABLE_RANGE_DOWNLOAD:true}
+      cache-control: ${ADMIN_MINIO_CACHE_CONTROL:max-age=3600}
+
+---
+
+# Docker Compose环境变量示例
+# 在docker-compose.yml中使用的环境变量
+
+# ADMIN_MINIO_ENABLED=true
+# ADMIN_MINIO_ENDPOINT=http://minio:9000
+# ADMIN_MINIO_ACCESS_KEY=admin
+# ADMIN_MINIO_SECRET_KEY=admin123
+# ADMIN_MINIO_DEFAULT_BUCKET=admin-prod
+# ADMIN_MINIO_MAX_FILE_SIZE=100
+# ADMIN_MINIO_FILE_NAME_STRATEGY=UUID
+# ADMIN_MINIO_KEEP_ORIGINAL_NAME=false
+# ADMIN_MINIO_PATH_PREFIX=uploads/
+# ADMIN_MINIO_PRESIGNED_URL_EXPIRY=3600
+# ADMIN_MINIO_ENABLE_RANGE_DOWNLOAD=true
+# ADMIN_MINIO_CACHE_CONTROL=max-age=3600

@@ -1,80 +1,57 @@
 package com.admin.module.infra.api.enums;
 
+import lombok.Getter;
+
 /**
  * 任务状态枚举
  * 
- * 定义导入导出任务的各种状态
- *
  * @author admin
  * @version 1.0
  * @since 2024-01-15
  */
+@Getter
 public enum TaskStatusEnum {
 
     /**
      * 待处理
-     * 任务已创建，等待处理
      */
-    PENDING(0, "待处理"),
+    PENDING("PENDING", "待处理"),
 
     /**
      * 处理中
-     * 任务正在执行中
      */
-    PROCESSING(1, "处理中"),
+    PROCESSING("PROCESSING", "处理中"),
 
     /**
      * 已完成
-     * 任务执行成功完成
      */
-    COMPLETED(2, "已完成"),
+    COMPLETED("COMPLETED", "已完成"),
 
     /**
      * 失败
-     * 任务执行失败
      */
-    FAILED(3, "失败");
+    FAILED("FAILED", "失败"),
 
     /**
-     * 状态码
+     * 已取消
      */
-    private final Integer code;
+    CANCELLED("CANCELLED", "已取消");
 
-    /**
-     * 状态描述
-     */
-    private final String description;
+    private final String code;
+    private final String message;
 
-    TaskStatusEnum(Integer code, String description) {
+    TaskStatusEnum(String code, String message) {
         this.code = code;
-        this.description = description;
+        this.message = message;
     }
 
     /**
-     * 获取状态码
-     *
-     * @return 状态码
+     * 根据代码获取枚举
+     * 
+     * @param code 状态代码
+     * @return 枚举值
      */
-    public Integer getCode() {
-        return code;
-    }
-
-    /**
-     * 获取状态描述
-     *
-     * @return 状态描述
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * 根据状态码获取枚举
-     *
-     * @param code 状态码
-     * @return TaskStatusEnum枚举，如果未找到返回null
-     */
-    public static TaskStatusEnum getByCode(Integer code) {
+    public static TaskStatusEnum getByCode(String code) {
         for (TaskStatusEnum status : values()) {
             if (status.getCode().equals(code)) {
                 return status;
@@ -84,16 +61,20 @@ public enum TaskStatusEnum {
     }
 
     /**
-     * 判断是否为最终状态（已完成或失败）
-     *
-     * @return true-最终状态，false-非最终状态
+     * 是否为最终状态
+     * 
+     * @return true-最终状态 false-中间状态
      */
     public boolean isFinalStatus() {
-        return this == COMPLETED || this == FAILED;
+        return this == COMPLETED || this == FAILED || this == CANCELLED;
     }
 
-    @Override
-    public String toString() {
-        return String.format("[%d] %s", code, description);
+    /**
+     * 是否为运行状态
+     * 
+     * @return true-运行中 false-非运行状态
+     */
+    public boolean isRunning() {
+        return this == PENDING || this == PROCESSING;
     }
 }

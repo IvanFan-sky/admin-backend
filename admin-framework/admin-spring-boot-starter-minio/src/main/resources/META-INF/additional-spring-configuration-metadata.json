@@ -1,0 +1,94 @@
+{
+  "properties": [
+    {
+      "name": "admin.minio.enabled",
+      "type": "java.lang.Boolean",
+      "description": "是否启用MinIO功能",
+      "defaultValue": true
+    },
+    {
+      "name": "admin.minio.endpoint",
+      "type": "java.lang.String",
+      "description": "MinIO服务端点，例如：http://localhost:9000"
+    },
+    {
+      "name": "admin.minio.access-key",
+      "type": "java.lang.String",
+      "description": "MinIO访问密钥"
+    },
+    {
+      "name": "admin.minio.secret-key",
+      "type": "java.lang.String",
+      "description": "MinIO密钥"
+    },
+    {
+      "name": "admin.minio.default-bucket",
+      "type": "java.lang.String",
+      "description": "默认存储桶名称"
+    },
+    {
+      "name": "admin.minio.connect-timeout",
+      "type": "java.lang.Long",
+      "description": "连接超时时间（毫秒）",
+      "defaultValue": 10000
+    },
+    {
+      "name": "admin.minio.write-timeout",
+      "type": "java.lang.Long",
+      "description": "写超时时间（毫秒）",
+      "defaultValue": 60000
+    },
+    {
+      "name": "admin.minio.read-timeout",
+      "type": "java.lang.Long",
+      "description": "读超时时间（毫秒）",
+      "defaultValue": 10000
+    },
+    {
+      "name": "admin.minio.upload.max-file-size",
+      "type": "java.lang.Long",
+      "description": "最大文件大小（MB）",
+      "defaultValue": 100
+    },
+    {
+      "name": "admin.minio.upload.allowed-types",
+      "type": "java.lang.String[]",
+      "description": "允许的文件类型数组"
+    },
+    {
+      "name": "admin.minio.upload.file-name-strategy",
+      "type": "java.lang.String",
+      "description": "文件名生成策略：UUID、DATE、ORIGINAL",
+      "defaultValue": "UUID"
+    },
+    {
+      "name": "admin.minio.upload.keep-original-name",
+      "type": "java.lang.Boolean",
+      "description": "是否保留原始文件名",
+      "defaultValue": false
+    },
+    {
+      "name": "admin.minio.upload.path-prefix",
+      "type": "java.lang.String",
+      "description": "文件路径前缀"
+    },
+    {
+      "name": "admin.minio.download.presigned-url-expiry",
+      "type": "java.lang.Integer",
+      "description": "预签名URL过期时间（秒）",
+      "defaultValue": 3600
+    },
+    {
+      "name": "admin.minio.download.enable-range-download",
+      "type": "java.lang.Boolean",
+      "description": "是否启用断点续传",
+      "defaultValue": true
+    },
+    {
+      "name": "admin.minio.download.cache-control",
+      "type": "java.lang.String",
+      "description": "缓存控制头",
+      "defaultValue": "max-age=3600"
+    }
+  ]
+}

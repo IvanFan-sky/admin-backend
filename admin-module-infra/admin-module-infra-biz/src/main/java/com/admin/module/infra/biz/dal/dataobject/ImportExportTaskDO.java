@@ -1,157 +1,147 @@
 package com.admin.module.infra.biz.dal.dataobject;
 
 import com.admin.common.core.domain.BaseEntity;
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * 导入导出任务数据对象
  * 
- * 对应数据库表 sys_import_export_task
- * 用于管理文件导入导出任务的基本信息和执行状态
- *
  * @author admin
  * @version 1.0
  * @since 2024-01-15
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_import_export_task")
+@TableName("infra_import_export_task")
 public class ImportExportTaskDO extends BaseEntity {
-
-    private static final long serialVersionUID = 1L;
 
     /**
      * 任务ID
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
      * 任务名称
      */
-    @TableField("task_name")
     private String taskName;
 
     /**
      * 任务类型
-     * 1-导入，2-导出
+     * IMPORT-导入 EXPORT-导出
      */
-    @TableField("task_type")
-    private Integer taskType;
+    private String taskType;
 
     /**
-     * 数据类型
-     * user-用户数据，role-角色数据，operation_log-操作日志
+     * 业务类型
+     * USER-用户 ROLE-角色 LOG-日志等
      */
-    @TableField("data_type")
-    private String dataType;
-
-    /**
-     * 文件格式
-     * xlsx, xls, csv
-     */
-    @TableField("file_format")
-    private String fileFormat;
+    private String businessType;
 
     /**
      * 任务状态
-     * 0-待处理，1-处理中，2-已完成，3-失败
+     * PENDING-待处理 PROCESSING-处理中 COMPLETED-已完成 FAILED-失败 CANCELLED-已取消
      */
-    @TableField("status")
-    private Integer status;
+    private String status;
 
     /**
-     * 总记录数
+     * 进度百分比（0-100）
      */
-    @TableField("total_count")
+    private Integer progressPercent;
+
+    /**
+     * 当前操作描述
+     */
+    private String currentOperation;
+
+    /**
+     * 源文件ID（导入时使用）
+     */
+    private Long sourceFileId;
+
+    /**
+     * 结果文件ID（导出时使用）
+     */
+    private Long resultFileId;
+
+    /**
+     * 错误文件ID（导入失败时的错误详情文件）
+     */
+    private Long errorFileId;
+
+    /**
+     * 处理总数
+     */
     private Integer totalCount;
 
     /**
-     * 成功记录数
+     * 成功数量
      */
-    @TableField("success_count")
     private Integer successCount;
 
     /**
-     * 失败记录数
+     * 失败数量
      */
-    @TableField("fail_count")
-    private Integer failCount;
+    private Integer failureCount;
 
     /**
-     * 文件路径
+     * 跳过数量
      */
-    @TableField("file_path")
-    private String filePath;
+    private Integer skipCount;
 
     /**
-     * 文件ID（关联文件管理系统）
+     * 任务开始时间
      */
-    @TableField("file_id")
-    private Long fileId;
+    private LocalDateTime startTime;
 
     /**
-     * 结果文件路径
+     * 任务结束时间
      */
-    @TableField("result_file_path")
-    private String resultFilePath;
+    private LocalDateTime endTime;
+
+    /**
+     * 执行耗时（毫秒）
+     */
+    private Long executionTime;
+
+    /**
+     * 结果摘要
+     */
+    private String resultSummary;
+
+    /**
+     * 任务参数（JSON格式）
+     */
+    private String taskParams;
 
     /**
      * 错误信息
      */
-    @TableField("error_message")
     private String errorMessage;
 
     /**
-     * 开始时间
+     * 执行用户ID
      */
-    @TableField("start_time")
-    private LocalDateTime startTime;
+    private Long executeUserId;
 
     /**
-     * 结束时间
+     * 执行用户名
      */
-    @TableField("end_time")
-    private LocalDateTime endTime;
+    private String executeUserName;
 
     /**
-     * 处理进度
-     * 百分比，0.00-100.00
+     * 是否允许部分失败
      */
-    @TableField("progress")
-    private BigDecimal progress;
+    private Boolean allowPartialFailure;
 
     /**
-     * 导出条件
-     * JSON格式存储查询条件
+     * 优先级（1-5，数字越大优先级越高）
      */
-    @TableField("export_conditions")
-    private String exportConditions;
-
-    /**
-     * 导出字段
-     * JSON格式存储选中的字段
-     */
-    @TableField("selected_fields")
-    private String selectedFields;
-
-    /**
-     * 乐观锁版本号
-     */
-    @TableField(value = "version", fill = FieldFill.INSERT)
-    @Version
-    private Integer version;
-
-    /**
-     * 删除标识
-     * 0-未删除，1-已删除
-     */
-    @TableField("deleted")
-    @TableLogic
-    private Integer deleted;
+    private Integer priority;
 }

@@ -21,7 +21,7 @@
         <knife4j.version>4.5.0</knife4j.version>
         <hutool.version>5.8.24</hutool.version>
         <redisson.version>3.25.2</redisson.version>
-        <minio.version>8.5.7</minio.version>
+        <minio.version>8.5.12</minio.version>
         <easyexcel.version>3.3.2</easyexcel.version>
         <jakarta.validation.version>3.0.2</jakarta.validation.version>
         <hikaricp.version>5.0.1</hikaricp.version>

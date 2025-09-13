@@ -99,6 +99,55 @@ admin:
     expiration: 1800000  # 访问令牌过期时间：30分钟（毫秒）
     refresh-expiration: 2592000000  # 刷新令牌过期时间：30天（毫秒）
   
+  # MinIO对象存储配置
+  minio:
+    enabled: true
+    endpoint: http://localhost:9000
+    access-key: minioadmin
+    secret-key: minioadmin
+    default-bucket: admin-dev
+    connect-timeout: 10000
+    write-timeout: 60000
+    read-timeout: 10000
+    upload:
+      max-file-size: 100  # 最大文件大小（MB）
+      allowed-types:
+        - jpg
+        - jpeg
+        - png
+        - gif
+        - bmp
+        - webp
+        - pdf
+        - doc
+        - docx
+        - xls
+        - xlsx
+        - ppt
+        - pptx
+        - txt
+        - mp4
+        - avi
+        - mkv
+        - mov
+        - wmv
+        - mp3
+        - wav
+        - flac
+        - aac
+        - zip
+        - rar
+        - 7z
+        - tar
+        - gz
+      file-name-strategy: UUID  # 文件名生成策略：UUID、DATE、ORIGINAL
+      keep-original-name: false
+      path-prefix: "uploads/"
+    download:
+      presigned-url-expiry: 3600  # 预签名URL过期时间（秒）
+      enable-range-download: true  # 是否启用断点续传
+      cache-control: "max-age=3600"
+  
   # 日志切面配置
   log:
     aspect:

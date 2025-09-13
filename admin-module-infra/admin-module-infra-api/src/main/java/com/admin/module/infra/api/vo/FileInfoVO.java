@@ -6,80 +6,169 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 文件信息 VO
- *
+ * 文件信息VO
+ * 
  * @author admin
  * @version 1.0
  * @since 2024-01-15
  */
-@Schema(description = "文件信息")
 @Data
-public class
-FileInfoVO {
+@Schema(description = "文件信息响应")
+public class FileInfoVO {
 
-    @Schema(description = "文件ID")
+    /**
+     * 文件ID
+     */
+    @Schema(description = "文件ID", example = "123456")
     private Long id;
 
-    @Schema(description = "文件原始名称")
+    /**
+     * 文件名
+     */
+    @Schema(description = "文件名", example = "avatar_20240115_123456.jpg")
     private String fileName;
 
-    @Schema(description = "文件存储键")
-    private String fileKey;
+    /**
+     * 文件原始名称
+     */
+    @Schema(description = "文件原始名称", example = "用户头像.jpg")
+    private String originalFileName;
 
-    @Schema(description = "文件访问URL")
-    private String fileUrl;
+    /**
+     * 文件路径
+     */
+    @Schema(description = "文件存储路径", example = "2024/01/15/avatar_20240115_123456.jpg")
+    private String filePath;
 
-    @Schema(description = "文件大小（字节）")
+    /**
+     * 文件大小（字节）
+     */
+    @Schema(description = "文件大小（字节）", example = "1024000")
     private Long fileSize;
 
-    @Schema(description = "文件MIME类型")
+    /**
+     * 文件大小（格式化）
+     */
+    @Schema(description = "文件大小（格式化）", example = "1.0 MB")
+    private String fileSizeFormatted;
+
+    /**
+     * 文件类型（MIME类型）
+     */
+    @Schema(description = "文件MIME类型", example = "image/jpeg")
     private String contentType;
 
-    @Schema(description = "文件扩展名")
+    /**
+     * 文件扩展名
+     */
+    @Schema(description = "文件扩展名", example = "jpg")
     private String fileExtension;
 
-    @Schema(description = "文件哈希值")
+    /**
+     * 文件MD5哈希值
+     */
+    @Schema(description = "文件MD5哈希值", example = "d41d8cd98f00b204e9800998ecf8427e")
     private String fileHash;
 
-    @Schema(description = "存储类型")
+    /**
+     * 存储类型
+     */
+    @Schema(description = "存储类型", example = "MINIO")
     private String storageType;
 
-    @Schema(description = "存储桶名称")
-    private String storageBucket;
+    /**
+     * 存储桶名称
+     */
+    @Schema(description = "存储桶名称", example = "default")
+    private String bucketName;
 
-    @Schema(description = "存储路径")
-    private String storagePath;
-
-    @Schema(description = "上传状态：1-上传中，2-上传完成，3-上传失败")
+    /**
+     * 上传状态
+     */
+    @Schema(description = "上传状态：0-上传中，1-上传完成，2-上传失败，3-已删除", example = "1")
     private Integer uploadStatus;
 
-    @Schema(description = "业务类型")
+    /**
+     * 上传状态描述
+     */
+    @Schema(description = "上传状态描述", example = "上传完成")
+    private String uploadStatusDesc;
+
+    /**
+     * 是否为分片上传
+     */
+    @Schema(description = "是否为分片上传", example = "false")
+    private Boolean isChunked;
+
+    /**
+     * 总分片数
+     */
+    @Schema(description = "总分片数", example = "0")
+    private Integer totalChunks;
+
+    /**
+     * 访问URL
+     */
+    @Schema(description = "文件访问URL", example = "http://localhost:9000/default/2024/01/15/avatar_20240115_123456.jpg")
+    private String accessUrl;
+
+    /**
+     * 业务类型
+     */
+    @Schema(description = "业务类型", example = "USER_AVATAR")
     private String businessType;
 
-    @Schema(description = "业务关联ID")
+    /**
+     * 业务ID
+     */
+    @Schema(description = "业务ID", example = "123456")
     private String businessId;
 
-    @Schema(description = "是否公开：0-私有，1-公开")
-    private Integer isPublic;
+    /**
+     * 上传用户ID
+     */
+    @Schema(description = "上传用户ID", example = "123456")
+    private Long uploadUserId;
 
-    @Schema(description = "下载次数")
+    /**
+     * 上传用户名
+     */
+    @Schema(description = "上传用户名", example = "admin")
+    private String uploadUserName;
+
+    /**
+     * 下载次数
+     */
+    @Schema(description = "下载次数", example = "10")
     private Integer downloadCount;
 
-    @Schema(description = "过期时间")
-    private LocalDateTime expireTime;
+    /**
+     * 最后下载时间
+     */
+    @Schema(description = "最后下载时间", example = "2024-01-15T10:30:00")
+    private LocalDateTime lastDownloadTime;
 
-    @Schema(description = "备注")
+    /**
+     * 文件标签
+     */
+    @Schema(description = "文件标签", example = "头像,用户")
+    private String tags;
+
+    /**
+     * 备注
+     */
+    @Schema(description = "备注信息", example = "用户头像上传")
     private String remark;
 
-    @Schema(description = "创建者")
-    private String createBy;
-
-    @Schema(description = "创建时间")
+    /**
+     * 创建时间
+     */
+    @Schema(description = "创建时间", example = "2024-01-15T09:30:00")
     private LocalDateTime createTime;
 
-    @Schema(description = "更新者")
-    private String updateBy;
-
-    @Schema(description = "更新时间")
+    /**
+     * 更新时间
+     */
+    @Schema(description = "更新时间", example = "2024-01-15T09:30:00")
     private LocalDateTime updateTime;
 }

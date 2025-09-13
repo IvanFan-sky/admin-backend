@@ -20,6 +20,11 @@ import java.util.Map;
 public class ObjectInfo {
 
     /**
+     * 存储桶名称
+     */
+    private String bucketName;
+
+    /**
      * 对象名称
      */
     private String objectName;
@@ -45,6 +50,11 @@ public class ObjectInfo {
     private ZonedDateTime lastModified;
 
     /**
+     * 是否为目录
+     */
+    private Boolean isDir;
+
+    /**
      * 用户元数据
      */
     private Map<String, String> userMetadata;
@@ -52,31 +62,35 @@ public class ObjectInfo {
     /**
      * 构造对象信息
      * 
+     * @param bucketName 存储桶名称
      * @param objectName 对象名称
      * @param size 文件大小
      * @param etag ETag值
      * @param contentType 内容类型
      * @param lastModified 最后修改时间
+     * @param isDir 是否为目录
      * @return 对象信息
      */
-    public static ObjectInfo of(String objectName, Long size, String etag, 
-                              String contentType, ZonedDateTime lastModified) {
-        return new ObjectInfo(objectName, size, etag, contentType, lastModified, null);
+    public static ObjectInfo of(String bucketName, String objectName, Long size, String etag, 
+                              String contentType, ZonedDateTime lastModified, Boolean isDir) {
+        return new ObjectInfo(bucketName, objectName, size, etag, contentType, lastModified, isDir, null);
     }
 
     /**
      * 构造对象信息
      * 
+     * @param bucketName 存储桶名称
      * @param objectName 对象名称
      * @param size 文件大小
      * @param etag ETag值
      * @param contentType 内容类型
      * @param lastModified 最后修改时间
+     * @param isDir 是否为目录
      * @param userMetadata 用户元数据
      * @return 对象信息
      */
-    public static ObjectInfo of(String objectName, Long size, String etag, String contentType, 
-                              ZonedDateTime lastModified, Map<String, String> userMetadata) {
-        return new ObjectInfo(objectName, size, etag, contentType, lastModified, userMetadata);
+    public static ObjectInfo of(String bucketName, String objectName, Long size, String etag, String contentType, 
+                              ZonedDateTime lastModified, Boolean isDir, Map<String, String> userMetadata) {
+        return new ObjectInfo(bucketName, objectName, size, etag, contentType, lastModified, isDir, userMetadata);
     }
 }

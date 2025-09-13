@@ -295,29 +295,34 @@ CREATE TABLE `sys_login_log` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统访问记录';
 
 -- =============================================
--- 导入导出管理模块
+-- 文件管理模块
 -- =============================================
 
--- 导入导出任务表
-CREATE TABLE `sys_import_export_task` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '任务ID',
-  `task_name` varchar(100) NOT NULL COMMENT '任务名称',
-  `task_type` tinyint NOT NULL COMMENT '任务类型：1-导入，2-导出',
-  `data_type` varchar(50) NOT NULL COMMENT '数据类型：user, role, operation_log',
-  `file_format` varchar(20) NOT NULL COMMENT '文件格式：xlsx, xls, csv',
-  `status` tinyint DEFAULT '0' COMMENT '任务状态：0-待处理，1-处理中，2-已完成，3-失败',
-  `total_count` int DEFAULT '0' COMMENT '总记录数',
-  `success_count` int DEFAULT '0' COMMENT '成功记录数',
-  `fail_count` int DEFAULT '0' COMMENT '失败记录数',
-  `file_path` varchar(500) DEFAULT NULL COMMENT '文件路径',
-  `file_id` bigint DEFAULT NULL COMMENT '文件ID（关联文件管理系统）',
-  `result_file_path` varchar(500) DEFAULT NULL COMMENT '结果文件路径',
-  `error_message` text COMMENT '错误信息',
-  `start_time` datetime DEFAULT NULL COMMENT '开始时间',
-  `end_time` datetime DEFAULT NULL COMMENT '结束时间',
-  `progress` decimal(5,2) DEFAULT '0.00' COMMENT '处理进度（百分比）',
-  `export_conditions` json DEFAULT NULL COMMENT '导出条件（JSON格式存储查询条件）',
-  `selected_fields` json DEFAULT NULL COMMENT '导出字段（JSON格式存储选中的字段）',
+-- 文件信息表
+CREATE TABLE `infra_file_info` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '文件ID',
+  `file_name` varchar(255) NOT NULL COMMENT '文件名',
+  `original_file_name` varchar(255) NOT NULL COMMENT '文件原始名称',
+  `file_path` varchar(500) NOT NULL COMMENT '文件路径',
+  `file_size` bigint NOT NULL COMMENT '文件大小（字节）',
+  `content_type` varchar(100) NOT NULL COMMENT '文件类型（MIME类型）',
+  `file_extension` varchar(20) DEFAULT NULL COMMENT '文件扩展名',
+  `file_hash` varchar(64) NOT NULL COMMENT '文件MD5哈希值',
+  `storage_type` varchar(20) NOT NULL DEFAULT 'MINIO' COMMENT '存储类型（MINIO, OSS, LOCAL等）',
+  `bucket_name` varchar(100) NOT NULL COMMENT '存储桶名称',
+  `upload_status` tinyint NOT NULL DEFAULT '0' COMMENT '上传状态：0-上传中，1-上传完成，2-上传失败，3-已删除',
+  `is_chunked` tinyint DEFAULT '0' COMMENT '是否为分片上传：0-否，1-是',
+  `total_chunks` int DEFAULT NULL COMMENT '总分片数',
+  `upload_id` varchar(100) DEFAULT NULL COMMENT '上传会话ID（分片上传使用）',
+  `access_url` varchar(500) DEFAULT NULL COMMENT '访问URL',
+  `business_type` varchar(50) DEFAULT NULL COMMENT '业务类型',
+  `business_id` varchar(100) DEFAULT NULL COMMENT '业务ID',
+  `upload_user_id` bigint DEFAULT NULL COMMENT '上传用户ID',
+  `upload_user_name` varchar(50) DEFAULT NULL COMMENT '上传用户名',
+  `download_count` int DEFAULT '0' COMMENT '下载次数',
+  `last_download_time` datetime DEFAULT NULL COMMENT '最后下载时间',
+  `tags` varchar(200) DEFAULT NULL COMMENT '文件标签',
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
   `create_by` varchar(50) DEFAULT NULL COMMENT '创建者',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_by` varchar(50) DEFAULT NULL COMMENT '更新者',
@@ -325,42 +330,94 @@ CREATE TABLE `sys_import_export_task` (
   `version` int DEFAULT '0' COMMENT '乐观锁版本号',
   `deleted` tinyint DEFAULT '0' COMMENT '删除标识：0-未删除，1-已删除',
   PRIMARY KEY (`id`),
-  KEY `idx_task_type_status` (`task_type`, `status`),
-  KEY `idx_create_time` (`create_time`),
-  KEY `idx_data_type` (`data_type`),
-  KEY `idx_create_by` (`create_by`)
+  UNIQUE KEY `uk_infra_file_hash` (`file_hash`),
+  KEY `idx_infra_file_business` (`business_type`, `business_id`),
+  KEY `idx_infra_file_upload_user` (`upload_user_id`),
+  KEY `idx_infra_file_upload_status` (`upload_status`),
+  KEY `idx_infra_file_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文件信息表';
+
+-- 文件分片信息表
+CREATE TABLE `infra_file_chunk` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '分片ID',
+  `file_id` bigint DEFAULT NULL COMMENT '关联文件ID',
+  `upload_id` varchar(100) NOT NULL COMMENT '上传会话ID',
+  `chunk_number` int NOT NULL COMMENT '分片序号（从1开始）',
+  `chunk_size` bigint NOT NULL COMMENT '分片大小（字节）',
+  `chunk_hash` varchar(64) DEFAULT NULL COMMENT '分片MD5哈希值',
+  `etag` varchar(100) DEFAULT NULL COMMENT '分片ETag（MinIO返回的标识）',
+  `upload_status` tinyint NOT NULL DEFAULT '0' COMMENT '上传状态：0-未上传，1-上传完成，2-上传失败',
+  `storage_path` varchar(500) DEFAULT NULL COMMENT '存储路径',
+  `retry_count` int DEFAULT '0' COMMENT '重试次数',
+  `upload_start_time` datetime DEFAULT NULL COMMENT '上传开始时间',
+  `upload_end_time` datetime DEFAULT NULL COMMENT '上传完成时间',
+  `error_message` varchar(500) DEFAULT NULL COMMENT '错误信息',
+  `create_by` varchar(50) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(50) DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `version` int DEFAULT '0' COMMENT '乐观锁版本号',
+  `deleted` tinyint DEFAULT '0' COMMENT '删除标识：0-未删除，1-已删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_infra_chunk_upload` (`upload_id`, `chunk_number`),
+  KEY `idx_infra_chunk_file_id` (`file_id`),
+  KEY `idx_infra_chunk_upload_id` (`upload_id`),
+  KEY `idx_infra_chunk_upload_status` (`upload_status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文件分片信息表';
+
+-- 导入导出任务表
+CREATE TABLE `infra_import_export_task` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '任务ID',
+  `task_name` varchar(100) NOT NULL COMMENT '任务名称',
+  `task_type` varchar(20) NOT NULL COMMENT '任务类型：IMPORT-导入，EXPORT-导出',
+  `business_type` varchar(50) NOT NULL COMMENT '业务类型：USER-用户，ROLE-角色，LOG-日志等',
+  `status` varchar(20) NOT NULL DEFAULT 'PENDING' COMMENT '任务状态：PENDING-待处理，PROCESSING-处理中，COMPLETED-已完成，FAILED-失败，CANCELLED-已取消',
+  `progress_percent` int DEFAULT '0' COMMENT '进度百分比（0-100）',
+  `current_operation` varchar(200) DEFAULT NULL COMMENT '当前操作描述',
+  `source_file_id` bigint DEFAULT NULL COMMENT '源文件ID（导入时使用）',
+  `result_file_id` bigint DEFAULT NULL COMMENT '结果文件ID（导出时使用）',
+  `error_file_id` bigint DEFAULT NULL COMMENT '错误文件ID（导入失败时的错误详情文件）',
+  `total_count` int DEFAULT '0' COMMENT '处理总数',
+  `success_count` int DEFAULT '0' COMMENT '成功数量',
+  `failure_count` int DEFAULT '0' COMMENT '失败数量',
+  `skip_count` int DEFAULT '0' COMMENT '跳过数量',
+  `start_time` datetime DEFAULT NULL COMMENT '任务开始时间',
+  `end_time` datetime DEFAULT NULL COMMENT '任务结束时间',
+  `execution_time` bigint DEFAULT NULL COMMENT '执行耗时（毫秒）',
+  `result_summary` text COMMENT '结果摘要',
+  `task_params` text COMMENT '任务参数（JSON格式）',
+  `error_message` varchar(1000) DEFAULT NULL COMMENT '错误信息',
+  `execute_user_id` bigint DEFAULT NULL COMMENT '执行用户ID',
+  `execute_user_name` varchar(50) DEFAULT NULL COMMENT '执行用户名',
+  `allow_partial_failure` tinyint DEFAULT '1' COMMENT '是否允许部分失败：0-否，1-是',
+  `priority` int DEFAULT '3' COMMENT '优先级（1-5，数字越大优先级越高）',
+  `create_by` varchar(50) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(50) DEFAULT NULL COMMENT '更新者',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `version` int DEFAULT '0' COMMENT '乐观锁版本号',
+  `deleted` tinyint DEFAULT '0' COMMENT '删除标识：0-未删除，1-已删除',
+  PRIMARY KEY (`id`),
+  KEY `idx_infra_task_type` (`task_type`),
+  KEY `idx_infra_task_business_type` (`business_type`),
+  KEY `idx_infra_task_status` (`status`),
+  KEY `idx_infra_task_execute_user` (`execute_user_id`),
+  KEY `idx_infra_task_create_time` (`create_time`),
+  KEY `idx_infra_task_priority_status` (`priority`, `status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='导入导出任务表';
 
 -- 导入错误详情表
-CREATE TABLE `sys_import_error_detail` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
-  `task_id` bigint NOT NULL COMMENT '任务ID',
-  `row_number` int NOT NULL COMMENT '行号',
-  `field_name` varchar(100) DEFAULT NULL COMMENT '字段名称',
-  `field_value` varchar(500) DEFAULT NULL COMMENT '字段值',
-  `error_type` varchar(50) NOT NULL COMMENT '错误类型：FORMAT_ERROR,DUPLICATE_ERROR,VALIDATION_ERROR',
+CREATE TABLE `infra_import_error_detail` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '错误详情ID',
+  `task_id` bigint NOT NULL COMMENT '关联任务ID',
+  `row_number` int NOT NULL COMMENT '错误行号',
+  `column_name` varchar(100) DEFAULT NULL COMMENT '错误列名',
+  `column_value` varchar(500) DEFAULT NULL COMMENT '错误列值',
+  `error_type` varchar(50) NOT NULL COMMENT '错误类型：VALIDATION-校验错误，DUPLICATE-重复数据，CONSTRAINT-约束错误，BUSINESS-业务错误',
+  `error_code` varchar(50) DEFAULT NULL COMMENT '错误代码',
   `error_message` varchar(1000) NOT NULL COMMENT '错误信息',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`),
-  KEY `idx_task_id` (`task_id`),
-  KEY `idx_row_number` (`row_number`),
-  KEY `idx_error_type` (`error_type`),
-  FOREIGN KEY (`task_id`) REFERENCES `sys_import_export_task` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='导入错误详情表';
-
--- 导入导出模板表
-CREATE TABLE `sys_import_export_template` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '模板ID',
-  `template_name` varchar(100) NOT NULL COMMENT '模板名称',
-  `data_type` varchar(50) NOT NULL COMMENT '数据类型：user, role',
-  `template_type` tinyint NOT NULL COMMENT '模板类型：1-导入模板，2-导出模板',
-  `file_format` varchar(20) NOT NULL COMMENT '文件格式：xlsx, csv',
-  `template_config` json NOT NULL COMMENT '模板配置（字段映射、校验规则等）',
-  `template_path` varchar(500) DEFAULT NULL COMMENT '模板文件路径',
-  `is_system` tinyint DEFAULT '0' COMMENT '是否系统模板：0-否，1-是',
-  `status` tinyint DEFAULT '1' COMMENT '状态：0-禁用，1-启用',
-  `sort_order` int DEFAULT '0' COMMENT '排序',
-  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  `original_data` text COMMENT '原始数据（JSON格式）',
+  `suggestion` varchar(500) DEFAULT NULL COMMENT '建议修复方案',
   `create_by` varchar(50) DEFAULT NULL COMMENT '创建者',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_by` varchar(50) DEFAULT NULL COMMENT '更新者',
@@ -368,69 +425,15 @@ CREATE TABLE `sys_import_export_template` (
   `version` int DEFAULT '0' COMMENT '乐观锁版本号',
   `deleted` tinyint DEFAULT '0' COMMENT '删除标识：0-未删除，1-已删除',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_template_name_type` (`template_name`, `data_type`, `template_type`),
-  KEY `idx_data_type` (`data_type`),
-  KEY `idx_template_type` (`template_type`),
-  KEY `idx_status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='导入导出模板表';
+  KEY `idx_infra_error_task_id` (`task_id`),
+  KEY `idx_infra_error_type` (`error_type`),
+  KEY `idx_infra_error_task_row` (`task_id`, `row_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='导入错误详情表';
 
--- 文件信息表
-CREATE TABLE `sys_file_info` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '文件ID',
-  `file_name` varchar(255) NOT NULL COMMENT '文件原始名称',
-  `file_key` varchar(500) NOT NULL COMMENT '文件存储键（包含路径）',
-  `file_url` varchar(1000) DEFAULT NULL COMMENT '文件访问URL',
-  `file_size` bigint NOT NULL COMMENT '文件大小（字节）',
-  `content_type` varchar(100) NOT NULL COMMENT '文件MIME类型',
-  `file_extension` varchar(10) DEFAULT NULL COMMENT '文件扩展名',
-  `file_hash` varchar(64) DEFAULT NULL COMMENT '文件SHA256哈希值（用于去重）',
-  `storage_type` varchar(20) NOT NULL DEFAULT 'MINIO' COMMENT '存储类型：MINIO, OSS',
-  `storage_bucket` varchar(100) NOT NULL COMMENT '存储桶名称',
-  `storage_path` varchar(500) NOT NULL COMMENT '存储路径',
-  `upload_status` tinyint NOT NULL DEFAULT '1' COMMENT '上传状态：1-上传中，2-上传完成，3-上传失败',
-  `business_type` varchar(50) DEFAULT NULL COMMENT '业务类型：avatar, document, import_template',
-  `business_id` varchar(100) DEFAULT NULL COMMENT '业务关联ID',
-  `is_public` tinyint DEFAULT '0' COMMENT '是否公开：0-私有，1-公开',
-  `download_count` int DEFAULT '0' COMMENT '下载次数',
-  `expire_time` datetime DEFAULT NULL COMMENT '过期时间',
-  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  `create_by` varchar(50) DEFAULT NULL COMMENT '创建者',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(50) DEFAULT NULL COMMENT '更新者',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `deleted` tinyint DEFAULT '0' COMMENT '删除标识：0-未删除，1-已删除',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_file_key` (`file_key`),
-  KEY `idx_file_hash` (`file_hash`),
-  KEY `idx_business_type_id` (`business_type`, `business_id`),
-  KEY `idx_create_by` (`create_by`),
-  KEY `idx_create_time` (`create_time`),
-  KEY `idx_expire_time` (`expire_time`),
-  KEY `idx_storage_type` (`storage_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文件信息表';
+-- 添加外键约束
+ALTER TABLE `infra_file_chunk` ADD CONSTRAINT `fk_infra_chunk_file_id` FOREIGN KEY (`file_id`) REFERENCES `infra_file_info` (`id`) ON DELETE CASCADE;
+ALTER TABLE `infra_import_export_task` ADD CONSTRAINT `fk_infra_task_source_file` FOREIGN KEY (`source_file_id`) REFERENCES `infra_file_info` (`id`) ON DELETE SET NULL;
+ALTER TABLE `infra_import_export_task` ADD CONSTRAINT `fk_infra_task_result_file` FOREIGN KEY (`result_file_id`) REFERENCES `infra_file_info` (`id`) ON DELETE SET NULL;
+ALTER TABLE `infra_import_export_task` ADD CONSTRAINT `fk_infra_task_error_file` FOREIGN KEY (`error_file_id`) REFERENCES `infra_file_info` (`id`) ON DELETE SET NULL;
+ALTER TABLE `infra_import_error_detail` ADD CONSTRAINT `fk_infra_error_task` FOREIGN KEY (`task_id`) REFERENCES `infra_import_export_task` (`id`) ON DELETE CASCADE;
 
--- 文件分片表
-CREATE TABLE `sys_file_chunk` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '分片ID',
-  `upload_id` varchar(100) NOT NULL COMMENT '上传会话ID',
-  `file_name` varchar(255) NOT NULL COMMENT '文件名称',
-  `chunk_number` int NOT NULL COMMENT '分片序号（从1开始）',
-  `chunk_size` bigint NOT NULL COMMENT '分片大小（字节）',
-  `total_chunks` int NOT NULL COMMENT '总分片数',
-  `total_size` bigint NOT NULL COMMENT '文件总大小',
-  `file_hash` varchar(64) DEFAULT NULL COMMENT '文件完整哈希值',
-  `chunk_hash` varchar(64) NOT NULL COMMENT '分片哈希值',
-  `chunk_key` varchar(500) NOT NULL COMMENT '分片存储键',
-  `upload_status` tinyint NOT NULL DEFAULT '1' COMMENT '上传状态：1-上传中，2-上传完成，3-上传失败',
-  `business_type` varchar(50) DEFAULT NULL COMMENT '业务类型',
-  `business_id` varchar(100) DEFAULT NULL COMMENT '业务关联ID',
-  `create_by` varchar(50) DEFAULT NULL COMMENT '创建者',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_upload_chunk` (`upload_id`, `chunk_number`),
-  KEY `idx_upload_id` (`upload_id`),
-  KEY `idx_chunk_hash` (`chunk_hash`),
-  KEY `idx_create_time` (`create_time`),
-  KEY `idx_business_type_id` (`business_type`, `business_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文件分片表';

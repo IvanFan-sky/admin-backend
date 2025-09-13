@@ -1,22 +1,23 @@
 package com.admin.module.infra.biz.dal.dataobject;
 
+import com.admin.common.core.domain.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
-import java.time.LocalDateTime;
+import lombok.EqualsAndHashCode;
 
 /**
- * 文件分片 DO
- *
+ * 文件分片信息数据对象
+ * 
  * @author admin
  * @version 1.0
  * @since 2024-01-15
  */
-@TableName("sys_file_chunk")
 @Data
-public class FileChunkDO {
+@EqualsAndHashCode(callSuper = true)
+@TableName("infra_file_chunk")
+public class FileChunkDO extends BaseEntity {
 
     /**
      * 分片ID
@@ -25,14 +26,14 @@ public class FileChunkDO {
     private Long id;
 
     /**
+     * 关联文件ID
+     */
+    private Long fileId;
+
+    /**
      * 上传会话ID
      */
     private String uploadId;
-
-    /**
-     * 文件名称
-     */
-    private String fileName;
 
     /**
      * 分片序号（从1开始）
@@ -45,57 +46,51 @@ public class FileChunkDO {
     private Long chunkSize;
 
     /**
-     * 总分片数
-     */
-    private Integer totalChunks;
-
-    /**
-     * 文件总大小
-     */
-    private Long totalSize;
-
-    /**
-     * 文件完整哈希值
-     */
-    private String fileHash;
-
-    /**
-     * 分片哈希值
+     * 分片MD5哈希值
      */
     private String chunkHash;
 
     /**
-     * 分片存储键
+     * 分片ETag（MinIO返回的标识）
      */
-    private String chunkKey;
+    private String etag;
 
     /**
-     * 上传状态：1-上传中，2-上传完成，3-上传失败
+     * 上传状态
+     * 0-未上传 1-上传完成 2-上传失败
      */
     private Integer uploadStatus;
 
     /**
-     * 业务类型
+     * 存储路径
      */
-    private String businessType;
+    private String storagePath;
 
     /**
-     * 业务关联ID
+     * 重试次数
      */
-    private String businessId;
+    private Integer retryCount;
 
     /**
-     * 创建者
+     * 上传开始时间
      */
-    private String createBy;
+    private java.time.LocalDateTime uploadStartTime;
 
     /**
-     * 创建时间
+     * 上传完成时间
      */
-    private LocalDateTime createTime;
+    private java.time.LocalDateTime uploadEndTime;
 
     /**
-     * 更新时间
+     * 错误信息
      */
-    private LocalDateTime updateTime;
+    private String errorMessage;
+
+    /**
+     * 删除标识
+     * 0-未删除，1-已删除
+     */
+    @com.baomidou.mybatisplus.annotation.TableField("deleted")
+    @com.baomidou.mybatisplus.annotation.TableLogic
+    private Integer deleted;
 }

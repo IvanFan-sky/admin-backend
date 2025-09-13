@@ -1,18 +1,18 @@
 package com.admin.module.infra.biz.convert;
 
-import com.admin.common.core.domain.PageResult;
-import com.admin.module.infra.api.dto.FilePageDTO;
+import com.admin.module.infra.api.enums.FileUploadStatusEnum;
 import com.admin.module.infra.api.vo.FileInfoVO;
-import com.admin.module.infra.api.vo.FileUploadVO;
 import com.admin.module.infra.biz.dal.dataobject.FileInfoDO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
 /**
  * 文件转换器
- *
+ * 
  * @author admin
  * @version 1.0
  * @since 2024-01-15
@@ -23,22 +23,48 @@ public interface FileConvert {
     FileConvert INSTANCE = Mappers.getMapper(FileConvert.class);
 
     /**
-     * 转换为文件信息 VO
+     * DO转VO
      */
-    FileInfoVO convertToVO(FileInfoDO fileDO);
+    @Mapping(target = "fileSizeFormatted", source = "fileSize", qualifiedByName = "formatFileSize")
+    @Mapping(target = "uploadStatusDesc", source = "uploadStatus", qualifiedByName = "formatUploadStatus")
+    FileInfoVO convert(FileInfoDO fileInfoDO);
 
     /**
-     * 转换为文件信息 VO 列表
+     * DO列表转VO列表
      */
-    List<FileInfoVO> convertToVOList(List<FileInfoDO> fileList);
+    List<FileInfoVO> convertList(List<FileInfoDO> fileInfoDOList);
 
     /**
-     * 转换为分页结果
+     * 格式化文件大小
      */
-    PageResult<FileInfoVO> convertToPageResult(PageResult<FileInfoDO> pageResult);
+    @Named("formatFileSize")
+    default String formatFileSize(Long fileSize) {
+        if (fileSize == null || fileSize <= 0) {
+            return "0 B";
+        }
+        
+        String[] units = {"B", "KB", "MB", "GB", "TB"};
+        int unitIndex = 0;
+        double size = fileSize.doubleValue();
+        
+        while (size >= 1024 && unitIndex < units.length - 1) {
+            size /= 1024;
+            unitIndex++;
+        }
+        
+        return String.format("%.1f %s", size, units[unitIndex]);
+    }
 
     /**
-     * 转换为文件上传结果 VO
+     * 格式化上传状态
      */
-    FileUploadVO convertToUploadVO(FileInfoDO fileDO);
+    @Named("formatUploadStatus")
+    default String formatUploadStatus(Integer uploadStatus) {
+        if (uploadStatus == null) {
+            return "未知";
+        }
+        
+        FileUploadStatusEnum statusEnum = FileUploadStatusEnum.getByCode(uploadStatus);
+        return statusEnum != null ? statusEnum.getMessage() : "未知";
+    }
 }

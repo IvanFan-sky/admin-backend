@@ -171,4 +171,55 @@ public interface MinioService {
      * @return 是否复制成功
      */
     boolean copyObject(String sourceBucket, String sourceObject, String targetBucket, String targetObject);
+
+    /**
+     * 初始化分片上传
+     * 
+     * @param bucketName 存储桶名称
+     * @param objectName 对象名称
+     * @param contentType 内容类型
+     * @return 上传ID
+     */
+    String initMultipartUpload(String bucketName, String objectName, String contentType);
+
+    /**
+     * 合并分片
+     * 
+     * @param bucketName 存储桶名称
+     * @param objectName 对象名称
+     * @param uploadId 上传ID
+     * @param parts 分片信息列表
+     * @return 合并结果ETag
+     */
+    String completeMultipartUpload(String bucketName, String objectName, String uploadId, List<PartInfo> parts);
+
+    /**
+     * 取消分片上传
+     * 
+     * @param bucketName 存储桶名称
+     * @param objectName 对象名称
+     * @param uploadId 上传ID
+     */
+    void abortMultipartUpload(String bucketName, String objectName, String uploadId);
+
+    /**
+     * 分片信息
+     */
+    class PartInfo {
+        private int partNumber;
+        private String etag;
+
+        public PartInfo() {}
+
+        public PartInfo(int partNumber, String etag) {
+            this.partNumber = partNumber;
+            this.etag = etag;
+        }
+
+        public int getPartNumber() { return partNumber; }
+        public void setPartNumber(int partNumber) { this.partNumber = partNumber; }
+
+        public String getEtag() { return etag; }
+        public void setEtag(String etag) { this.etag = etag; }
+    }
 }
