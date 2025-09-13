@@ -2,6 +2,7 @@ package com.admin;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * Admin管理系统启动类
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @since 2024-01-15
  */
 @SpringBootApplication
+@ComponentScan(basePackages = {"com.admin"})
 public class AdminApplication {
 
     /**

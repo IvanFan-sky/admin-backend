@@ -4,19 +4,21 @@ import com.admin.module.infra.biz.dal.dataobject.ImportExportTaskDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 导入导出任务Mapper
+ * 基础设施模块 - 导入导出任务数据访问层
  * 
  * @author admin
  * @version 1.0
  * @since 2024-01-15
  */
 @Mapper
-public interface ImportExportTaskMapper extends BaseMapper<ImportExportTaskDO> {
+@Component("infraImportExportTaskMapper")
+public interface InfraImportExportTaskMapper extends BaseMapper<ImportExportTaskDO> {
 
     /**
      * 根据状态查找任务

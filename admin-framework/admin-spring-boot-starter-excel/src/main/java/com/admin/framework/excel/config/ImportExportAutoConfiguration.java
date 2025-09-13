@@ -63,14 +63,7 @@ public class ImportExportAutoConfiguration {
         return new ImportExportFileServiceImpl(null); // MinioService由依赖注入提供
     }
 
-    /**
-     * 导入导出任务服务
-     */
-    @Bean
-    @ConditionalOnMissingBean
-    public ImportExportTaskService importExportTaskService() {
-        return new ImportExportTaskServiceImpl(null, null, taskExecutor()); // 依赖由注入提供
-    }
+    // ImportExportTaskService 通过 @Service 注解自动注册，无需手动配置Bean
 
     /**
      * 导入导出任务执行器

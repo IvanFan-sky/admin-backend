@@ -80,7 +80,7 @@
         </if>
     </select>
 
-    <!-- 按登录方式统计 -->
+    <!-- 获取登录类型统计 -->
     <select id="getLoginTypeStatistics" resultType="com.admin.module.system.api.vo.log.LoginTypeStatisticsVO">
         SELECT 
             login_type as loginType,
@@ -97,7 +97,7 @@
         ORDER BY count DESC
     </select>
 
-    <!-- 按登录地点统计 -->
+    <!-- 获取登录地区统计 -->
     <select id="getLocationStatistics" resultType="com.admin.module.system.api.vo.log.LoginLocationStatisticsVO">
         SELECT 
             login_location as location,
@@ -119,7 +119,7 @@
         </if>
     </select>
 
-    <!-- 按浏览器统计 -->
+    <!-- 获取浏览器统计 -->
     <select id="getBrowserStatistics" resultType="com.admin.module.system.api.vo.log.BrowserStatisticsVO">
         SELECT 
             browser,

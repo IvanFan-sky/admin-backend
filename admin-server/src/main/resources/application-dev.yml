@@ -8,7 +8,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/admin_dev?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: 123456
+    password: root
     hikari:
       minimum-idle: 5
       maximum-pool-size: 20
@@ -103,9 +103,9 @@ admin:
   minio:
     enabled: true
     endpoint: http://localhost:9000
-    access-key: minioadmin
-    secret-key: minioadmin
-    default-bucket: admin-dev
+    access-key: SNEBisUz4IWDRdyvzQkN
+    secret-key: dkPWXFXSgbUqqBFJrAYPpoptuAmJiu24pc8qGNK8
+    default-bucket: anyapp
     connect-timeout: 10000
     write-timeout: 60000
     read-timeout: 10000

@@ -12,6 +12,7 @@ import com.admin.framework.security.utils.SecurityContextHolder;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -33,13 +34,21 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class
 ImportExportTaskServiceImpl implements ImportExportTaskService {
 
     private final ImportExportTaskMapper taskMapper;
     private final RedisTemplate<String, Object> redisTemplate;
     private final Executor taskExecutor;
+    
+    public ImportExportTaskServiceImpl(
+            ImportExportTaskMapper taskMapper,
+            RedisTemplate<String, Object> redisTemplate,
+            @Qualifier("importExportTaskExecutor") Executor taskExecutor) {
+        this.taskMapper = taskMapper;
+        this.redisTemplate = redisTemplate;
+        this.taskExecutor = taskExecutor;
+    }
     
     // 并发控制：每个用户最多同时执行的任务数
     private static final int MAX_CONCURRENT_TASKS_PER_USER = 2;

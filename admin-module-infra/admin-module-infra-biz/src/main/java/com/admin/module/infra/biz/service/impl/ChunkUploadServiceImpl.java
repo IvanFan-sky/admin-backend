@@ -14,6 +14,7 @@ import com.admin.module.infra.api.vo.ChunkInfoVO;
 import com.admin.module.infra.api.vo.ChunkUploadInitVO;
 import com.admin.module.infra.api.vo.ChunkUploadSessionVO;
 import com.admin.module.infra.api.vo.ChunkUploadVO;
+
 import com.admin.module.infra.biz.convert.FileConvert;
 import com.admin.module.infra.biz.dal.dataobject.FileChunkDO;
 import com.admin.module.infra.biz.dal.dataobject.FileInfoDO;
@@ -52,7 +53,6 @@ public class ChunkUploadServiceImpl implements ChunkUploadService {
     private final ContentTypeDetectionService contentTypeDetectionService;
     private final FileInfoMapper fileInfoMapper;
     private final FileChunkMapper fileChunkMapper;
-    private final FileConvert fileConvert;
 
     @Value("${admin.minio.default-bucket}")
     private String defaultBucket;

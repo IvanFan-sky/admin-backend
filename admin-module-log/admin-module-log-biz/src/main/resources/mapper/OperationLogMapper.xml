@@ -34,10 +34,10 @@
                 AND oper_location LIKE CONCAT('%', #{query.operLocation}, '%')
             </if>
             <if test="query.minCostTime != null">
-                AND cost_time >= #{query.minCostTime}
+                AND cost_time &gt;= #{query.minCostTime}
             </if>
             <if test="query.maxCostTime != null">
-                AND cost_time <= #{query.maxCostTime}
+                AND cost_time &lt;= #{query.maxCostTime}
             </if>
             <if test="query.startTime != null and query.endTime != null">
                 AND oper_time BETWEEN #{query.startTime} AND #{query.endTime}
