@@ -247,6 +247,21 @@ public enum ErrorCode {
     WEBSOCKET_CONNECTION_NOT_FOUND(1105002, "WebSocket连接不存在"),
 
     // =============================================
+    // 支付模块业务错误码 (120xxxx)
+    // =============================================
+    
+    PAYMENT_ORDER_NOT_FOUND(1200001, "支付订单不存在"),
+    PAYMENT_ORDER_EXISTS(1200002, "支付订单已存在"),
+    PAYMENT_ORDER_STATUS_ERROR(1200003, "支付订单状态错误"),
+    PAYMENT_ORDER_EXPIRED(1200004, "支付订单已过期"),
+    PAYMENT_METHOD_NOT_SUPPORTED(1200005, "不支持的支付方式"),
+    PAYMENT_CHANNEL_NOT_FOUND(1200006, "支付渠道不存在"),
+    PAYMENT_CHANNEL_SERVICE_NOT_FOUND(1200007, "支付渠道服务不存在"),
+    PAYMENT_CHANNEL_CONFIG_NOT_FOUND(1200008, "支付渠道配置不存在"),
+    PAYMENT_CREATE_FAILED(1200009, "创建支付订单失败"),
+    PAYMENT_AMOUNT_ERROR(1200010, "支付金额错误"),
+
+    // =============================================
     // 系统通用业务错误码 (999xxx)
     // =============================================
     

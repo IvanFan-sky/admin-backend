@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.admin.module.payment.biz.dal.mapper.PaymentOrderMapper">
+
+    <!-- 根据订单号查询支付订单 -->
+    <select id="selectByOrderNo" resultType="com.admin.module.payment.biz.dal.dataobject.PaymentOrderDO">
+        SELECT * FROM payment_order
+        WHERE order_no = #{orderNo}
+        AND deleted = 0
+    </select>
+
+    <!-- 根据商户订单号查询支付订单 -->
+    <select id="selectByMerchantOrderNo" resultType="com.admin.module.payment.biz.dal.dataobject.PaymentOrderDO">
+        SELECT * FROM payment_order
+        WHERE merchant_order_no = #{merchantOrderNo}
+        AND deleted = 0
+    </select>
+
+    <!-- 分页查询支付订单 -->
+    <select id="selectPage" resultType="com.admin.module.payment.biz.dal.dataobject.PaymentOrderDO">
+        SELECT * FROM payment_order
+        <where>
+            deleted = 0
+            <if test="query.orderNo != null and query.orderNo != ''">
+                AND order_no = #{query.orderNo}
+            </if>
+            <if test="query.merchantOrderNo != null and query.merchantOrderNo != ''">
+                AND merchant_order_no = #{query.merchantOrderNo}
+            </if>
+            <if test="query.userId != null">
+                AND user_id = #{query.userId}
+            </if>
+            <if test="query.channelCode != null and query.channelCode != ''">
+                AND channel_code = #{query.channelCode}
+            </if>
+            <if test="query.paymentMethod != null and query.paymentMethod != ''">
+                AND payment_method = #{query.paymentMethod}
+            </if>
+            <if test="query.status != null">
+                AND status = #{query.status}
+            </if>
+            <if test="query.createTimeStart != null">
+                AND create_time &gt;= #{query.createTimeStart}
+            </if>
+            <if test="query.createTimeEnd != null">
+                AND create_time &lt;= #{query.createTimeEnd}
+            </if>
+            <if test="query.successTimeStart != null">
+                AND success_time &gt;= #{query.successTimeStart}
+            </if>
+            <if test="query.successTimeEnd != null">
+                AND success_time &lt;= #{query.successTimeEnd}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查询过期的待支付订单 -->
+    <select id="selectExpiredOrders" resultType="com.admin.module.payment.biz.dal.dataobject.PaymentOrderDO">
+        SELECT * FROM payment_order
+        WHERE status IN (0, 1)
+        AND expire_time &lt; #{expireTime}
+        AND deleted = 0
+        ORDER BY create_time ASC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 批量更新订单状态为已关闭 -->
+    <update id="batchUpdateStatusToClosed">
+        UPDATE payment_order
+        SET status = 4,
+            updater = #{updater},
+            update_time = NOW()
+        WHERE id IN
+        <foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+        AND deleted = 0
+    </update>
+
+    <!-- 更新订单支付成功信息 -->
+    <update id="updatePaymentSuccess">
+        UPDATE payment_order
+        SET status = 2,
+            channel_order_no = #{channelOrderNo},
+            success_time = #{successTime},
+            updater = #{updater},
+            update_time = NOW()
+        WHERE order_no = #{orderNo}
+        AND deleted = 0
+    </update>
+
+    <!-- 更新订单状态 -->
+    <update id="updateStatus">
+        UPDATE payment_order
+        SET status = #{status},
+            updater = #{updater},
+            update_time = NOW()
+        WHERE order_no = #{orderNo}
+        AND deleted = 0
+    </update>
+
+</mapper>

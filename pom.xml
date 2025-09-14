@@ -27,6 +27,7 @@
         <module>admin-module-log</module>
         <module>admin-module-infra</module>
         <module>admin-module-notification</module>
+        <module>admin-module-payment</module>
         <module>admin-common</module>
         <module>admin-server</module>
     </modules>

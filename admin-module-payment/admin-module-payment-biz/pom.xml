@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>admin-module-payment</artifactId>
+        <groupId>com.admin</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>admin-module-payment-biz</artifactId>
+    <name>${project.artifactId}</name>
+    <description>支付管理模块 Business</description>
+
+    <dependencies>
+        <!-- 同模块API -->
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-module-payment-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- 框架组件 -->
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-mybatis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-redis</artifactId>
+        </dependency>
+
+        <!-- 支付相关依赖 - 预留 -->
+        <!-- 微信支付SDK -->
+        <!--
+        <dependency>
+            <groupId>com.github.wechatpay-apiv3</groupId>
+            <artifactId>wechatpay-java</artifactId>
+            <version>0.2.12</version>
+        </dependency>
+        -->
+        
+        <!-- 支付宝SDK -->
+        <!--
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.38.200.ALL</version>
+        </dependency>
+        -->
+
+    </dependencies>
+
+</project>

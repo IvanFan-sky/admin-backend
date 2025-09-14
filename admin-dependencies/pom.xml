@@ -194,6 +194,16 @@
                 <artifactId>admin-module-log-biz</artifactId>
                 <version>1.0.0</version>
             </dependency>
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-module-payment-api</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-module-payment-biz</artifactId>
+                <version>1.0.0</version>
+            </dependency>
             
         </dependencies>
     </dependencyManagement>
