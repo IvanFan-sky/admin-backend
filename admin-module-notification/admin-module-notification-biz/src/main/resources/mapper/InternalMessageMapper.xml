@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.admin.module.notification.biz.dal.mapper.InternalMessageMapper">
+
+    <!-- 分页查询站内信列表 -->
+    <select id="selectPage" resultType="com.admin.module.notification.biz.dal.dataobject.InternalMessageDO">
+        SELECT * FROM internal_message
+        <where>
+            deleted = 0
+            <if test="queryDTO.title != null and queryDTO.title != ''">
+                AND title LIKE CONCAT('%', #{queryDTO.title}, '%')
+            </if>
+            <if test="queryDTO.type != null">
+                AND type = #{queryDTO.type}
+            </if>
+            <if test="queryDTO.priority != null">
+                AND priority = #{queryDTO.priority}
+            </if>
+            <if test="queryDTO.sendType != null">
+                AND send_type = #{queryDTO.sendType}
+            </if>
+            <if test="queryDTO.status != null">
+                AND status = #{queryDTO.status}
+            </if>
+            <if test="queryDTO.senderId != null">
+                AND sender_id = #{queryDTO.senderId}
+            </if>
+            <if test="queryDTO.receiverId != null">
+                AND receiver_id = #{queryDTO.receiverId}
+            </if>
+            <if test="queryDTO.receiverType != null">
+                AND receiver_type = #{queryDTO.receiverType}
+            </if>
+            <if test="queryDTO.createTimeStart != null">
+                AND create_time &gt;= #{queryDTO.createTimeStart}
+            </if>
+            <if test="queryDTO.createTimeEnd != null">
+                AND create_time &lt;= #{queryDTO.createTimeEnd}
+            </if>
+            <if test="queryDTO.sendTimeStart != null">
+                AND send_time &gt;= #{queryDTO.sendTimeStart}
+            </if>
+            <if test="queryDTO.sendTimeEnd != null">
+                AND send_time &lt;= #{queryDTO.sendTimeEnd}
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <!-- 查询站内信列表 -->
+    <select id="selectList" resultType="com.admin.module.notification.biz.dal.dataobject.InternalMessageDO">
+        SELECT * FROM internal_message
+        <where>
+            deleted = 0
+            <if test="title != null and title != ''">
+                AND title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="senderId != null">
+                AND sender_id = #{senderId}
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <!-- 查询草稿站内信列表 -->
+    <select id="selectDraftList" resultType="com.admin.module.notification.biz.dal.dataobject.InternalMessageDO">
+        SELECT * FROM internal_message
+        WHERE deleted = 0
+        AND status = 0
+        <if test="senderId != null">
+            AND sender_id = #{senderId}
+        </if>
+        ORDER BY update_time DESC
+    </select>
+
+    <!-- 查询已发送站内信列表 -->
+    <select id="selectSentList" resultType="com.admin.module.notification.biz.dal.dataobject.InternalMessageDO">
+        SELECT * FROM internal_message
+        WHERE deleted = 0
+        AND status = 1
+        <if test="senderId != null">
+            AND sender_id = #{senderId}
+        </if>
+        ORDER BY send_time DESC
+    </select>
+
+    <!-- 查询待发送的定时站内信列表 -->
+    <select id="selectScheduledList" resultType="com.admin.module.notification.biz.dal.dataobject.InternalMessageDO">
+        SELECT * FROM internal_message
+        WHERE deleted = 0
+        AND status = 0
+        AND scheduled_time IS NOT NULL
+        AND scheduled_time <= #{currentTime}
+        ORDER BY scheduled_time ASC
+    </select>
+
+    <!-- 查询已过期的站内信列表 -->
+    <select id="selectExpiredList" resultType="com.admin.module.notification.biz.dal.dataobject.InternalMessageDO">
+        SELECT * FROM internal_message
+        WHERE deleted = 0
+        AND status = 1
+        AND expire_time IS NOT NULL
+        AND expire_time <= #{currentTime}
+        ORDER BY expire_time ASC
+    </select>
+
+    <!-- 查询即将过期的站内信列表 -->
+    <select id="selectSoonExpiredList" resultType="com.admin.module.notification.biz.dal.dataobject.InternalMessageDO">
+        SELECT * FROM internal_message
+        WHERE deleted = 0
+        AND status = 1
+        AND expire_time IS NOT NULL
+        AND expire_time BETWEEN #{startTime} AND #{endTime}
+        ORDER BY expire_time ASC
+    </select>
+
+    <!-- 按类型查询站内信列表 -->
+    <select id="selectListByType" resultType="com.admin.module.notification.biz.dal.dataobject.InternalMessageDO">
+        SELECT * FROM internal_message
+        WHERE deleted = 0
+        AND type = #{type}
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY id DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 按优先级查询站内信列表 -->
+    <select id="selectListByPriority" resultType="com.admin.module.notification.biz.dal.dataobject.InternalMessageDO">
+        SELECT * FROM internal_message
+        WHERE deleted = 0
+        AND priority = #{priority}
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        ORDER BY id DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 批量更新站内信状态 -->
+    <update id="updateStatusBatch">
+        UPDATE internal_message
+        SET status = #{status}, updater = #{updater}, update_time = NOW()
+        WHERE deleted = 0
+        AND id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 更新发送统计信息 -->
+    <update id="updateSendStatistics">
+        UPDATE internal_message
+        SET success_count = #{successCount},
+            failure_count = #{failureCount},
+            send_time = #{sendTime},
+            status = 1,
+            update_time = NOW()
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <!-- 增加阅读数量 -->
+    <update id="incrementReadCount">
+        UPDATE internal_message
+        SET read_count = COALESCE(read_count, 0) + #{increment},
+            update_time = NOW()
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+    <!-- 增加回执数量 -->
+    <update id="incrementReceiptCount">
+        UPDATE internal_message
+        SET receipt_count = COALESCE(receipt_count, 0) + #{increment},
+            update_time = NOW()
+        WHERE id = #{id} AND deleted = 0
+    </update>
+
+</mapper>

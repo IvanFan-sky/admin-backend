@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.admin.module.notification.biz.dal.mapper.NotificationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.admin.module.notification.biz.dal.dataobject.NotificationDO">
+        <id column="id" property="id" />
+        <result column="type_id" property="typeId" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="level" property="level" />
+        <result column="target_type" property="targetType" />
+        <result column="target_user_ids" property="targetUserIds" />
+        <result column="target_role_ids" property="targetRoleIds" />
+        <result column="target_dept_ids" property="targetDeptIds" />
+        <result column="publish_status" property="publishStatus" />
+        <result column="publish_time" property="publishTime" />
+        <result column="scheduled_time" property="scheduledTime" />
+        <result column="extra_data" property="extraData" />
+        <result column="creator" property="creator" />
+        <result column="create_time" property="createTime" />
+        <result column="updater" property="updater" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+        <result column="tenant_id" property="tenantId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, type_id, title, content, level, target_type, target_user_ids, target_role_ids, 
+        target_dept_ids, publish_status, publish_time, scheduled_time, extra_data, 
+        creator, create_time, updater, update_time, deleted, tenant_id
+    </sql>
+
+    <!-- 根据条件查询通知列表 -->
+    <select id="selectNotificationList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM notification
+        <where>
+            deleted = 0
+            <if test="typeId != null">
+                AND type_id = #{typeId}
+            </if>
+            <if test="title != null and title != ''">
+                AND title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="level != null">
+                AND level = #{level}
+            </if>
+            <if test="publishStatus != null">
+                AND publish_status = #{publishStatus}
+            </if>
+            <if test="beginTime != null">
+                AND create_time &gt;= #{beginTime}
+            </if>
+            <if test="endTime != null">
+                AND create_time &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据发布状态查询通知列表 -->
+    <select id="selectByPublishStatus" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM notification
+        WHERE deleted = 0 AND publish_status = #{publishStatus}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据通知类型查询通知列表 -->
+    <select id="selectByTypeId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM notification
+        WHERE deleted = 0 AND type_id = #{typeId}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据目标类型查询通知列表 -->
+    <select id="selectByTargetType" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM notification
+        WHERE deleted = 0 AND target_type = #{targetType}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查询指定时间范围内的已发布通知 -->
+    <select id="selectPublishedInTimeRange" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM notification
+        WHERE deleted = 0 
+            AND publish_status = 1
+            AND publish_time &gt;= #{startTime}
+            AND publish_time &lt;= #{endTime}
+        ORDER BY publish_time DESC
+    </select>
+
+    <!-- 查询需要推送给指定用户的通知 -->
+    <select id="selectNotificationsForUser" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM notification
+        WHERE deleted = 0 
+            AND publish_status = 1
+            AND (
+                target_type = 0 
+                OR (target_type = 1 AND FIND_IN_SET(#{userId}, target_user_ids))
+                OR (target_type = 2 AND EXISTS (
+                    SELECT 1 FROM (
+                        <foreach collection="roleIds" item="roleId" separator=" UNION ALL ">
+                            SELECT #{roleId} as role_id
+                        </foreach>
+                    ) r WHERE FIND_IN_SET(r.role_id, target_role_ids)
+                ))
+            )
+        ORDER BY publish_time DESC
+    </select>
+
+    <!-- 查询需要推送给指定角色的通知 -->
+    <select id="selectNotificationsForRoles" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM notification
+        WHERE deleted = 0 
+            AND publish_status = 1
+            AND target_type = 2
+            AND EXISTS (
+                SELECT 1 FROM (
+                    <foreach collection="roleIds" item="roleId" separator=" UNION ALL ">
+                        SELECT #{roleId} as role_id
+                    </foreach>
+                ) r WHERE FIND_IN_SET(r.role_id, target_role_ids)
+            )
+        ORDER BY publish_time DESC
+    </select>
+
+</mapper>

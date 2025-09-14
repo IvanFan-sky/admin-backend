@@ -167,7 +167,87 @@ public enum ErrorCode {
     FILE_STORAGE_SERVICE_ERROR(1000008, "文件存储服务异常"),
 
     // =============================================
-    // 通用业务错误码 (9999xx)
+    // 通知管理业务错误码 (1100xxx)
+    // =============================================
+    
+    NOTIFICATION_NOT_FOUND(1100001, "通知不存在"),
+    NOTIFICATION_TITLE_EMPTY(1100002, "通知标题不能为空"),
+    NOTIFICATION_CONTENT_EMPTY(1100003, "通知内容不能为空"),
+    NOTIFICATION_ALREADY_PUBLISHED(1100004, "通知已发布，不能修改"),
+    NOTIFICATION_ALREADY_WITHDRAWN(1100005, "通知已撤回，不能操作"),
+    NOTIFICATION_PUBLISH_FAILED(1100006, "通知发布失败"),
+    NOTIFICATION_WITHDRAW_FAILED(1100007, "通知撤回失败"),
+
+    // =============================================
+    // 通知类型管理业务错误码 (1101xxx)
+    // =============================================
+    
+    NOTIFICATION_TYPE_NOT_FOUND(1101001, "通知类型不存在"),
+    NOTIFICATION_TYPE_CODE_EXISTS(1101002, "通知类型编码已存在"),
+    NOTIFICATION_TYPE_NAME_EXISTS(1101003, "通知类型名称已存在"),
+    NOTIFICATION_TYPE_IN_USE(1101004, "通知类型已被使用，不能删除"),
+    NOTIFICATION_TYPE_SYSTEM_CANNOT_DELETE(1101005, "系统内置通知类型不能删除"),
+
+    // =============================================
+    // 站内信管理业务错误码 (1102xxx)
+    // =============================================
+    
+    INTERNAL_MESSAGE_NOT_FOUND(1102001, "站内信不存在"),
+    INTERNAL_MESSAGE_RECEIVER_EMPTY(1102002, "站内信接收者不能为空"),
+    INTERNAL_MESSAGE_ALREADY_SENT(1102003, "站内信已发送，不能修改"),
+    INTERNAL_MESSAGE_SEND_FAILED(1102004, "站内信发送失败"),
+    INTERNAL_MESSAGE_WITHDRAW_FAILED(1102005, "站内信撤回失败"),
+    INTERNAL_MESSAGE_NOT_DRAFT(1102006, "站内信不是草稿状态"),
+    INTERNAL_MESSAGE_SCHEDULED(1102007, "站内信已设置定时发送"),
+    INTERNAL_MESSAGE_NOT_SENT(1102008, "站内信未发送状态"),
+    INTERNAL_MESSAGE_NO_RECEIVERS(1102009, "站内信没有接收人"),
+
+    // =============================================
+    // 用户站内信管理业务错误码 (1102xxx)
+    // =============================================
+    
+    USER_INTERNAL_MESSAGE_NOT_FOUND(1102010, "用户站内信不存在"),
+
+    // =============================================
+    // 通知管理业务错误码 (1104xxx)
+    // =============================================
+    
+    NOTIFICATION_NOT_FOUND(1104001, "通知不存在"),
+    NOTIFICATION_ALREADY_PUBLISHED(1104002, "通知已发布"),
+    NOTIFICATION_ALREADY_WITHDRAWN(1104003, "通知已撤回"),
+    NOTIFICATION_PUBLISH_FAILED(1104004, "通知发布失败"),
+
+    // =============================================
+    // 系统公告管理业务错误码 (1103xxx)
+    // =============================================
+    
+    SYSTEM_ANNOUNCEMENT_NOT_FOUND(1103001, "系统公告不存在"),
+    SYSTEM_ANNOUNCEMENT_TITLE_EMPTY(1103002, "系统公告标题不能为空"),
+    SYSTEM_ANNOUNCEMENT_CONTENT_EMPTY(1103003, "系统公告内容不能为空"),
+    SYSTEM_ANNOUNCEMENT_ALREADY_PUBLISHED(1103004, "系统公告已发布，不能修改"),
+    SYSTEM_ANNOUNCEMENT_PUBLISH_FAILED(1103005, "系统公告发布失败"),
+    SYSTEM_ANNOUNCEMENT_PUBLISHED_CANNOT_DELETE(1103006, "已发布的公告不能删除"),
+    SYSTEM_ANNOUNCEMENT_NOT_DRAFT_CANNOT_PUBLISH(1103007, "非草稿状态的公告不能发布"),
+    SYSTEM_ANNOUNCEMENT_NOT_PUBLISHED_CANNOT_WITHDRAW(1103008, "非已发布状态的公告不能撤回"),
+
+    // =============================================
+    // 用户通知管理业务错误码 (1104xxx)
+    // =============================================
+    
+    USER_NOTIFICATION_NOT_FOUND(1104001, "用户通知不存在"),
+    USER_NOTIFICATION_ALREADY_READ(1104002, "用户通知已读，不能重复操作"),
+    USER_NOTIFICATION_MARK_READ_FAILED(1104003, "用户通知标记已读失败"),
+    USER_NOTIFICATION_DELETE_FAILED(1104004, "用户通知删除失败"),
+
+    // =============================================
+    // 通知推送业务错误码 (1105xxx)
+    // =============================================
+    
+    NOTIFICATION_PUSH_FAILED(1105001, "通知推送失败"),
+    WEBSOCKET_CONNECTION_NOT_FOUND(1105002, "WebSocket连接不存在"),
+
+    // =============================================
+    // 系统通用业务错误码 (999xxx)
     // =============================================
     
     SYSTEM_ERROR(999999, "系统异常"),

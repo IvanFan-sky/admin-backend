@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.admin</groupId>
+        <artifactId>admin-module-notification</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>admin-module-notification-biz</artifactId>
+    <packaging>jar</packaging>
+    
+    <name>admin-module-notification-biz</name>
+    <description>Admin管理系统后端 - 通知管理模块业务实现</description>
+
+    <dependencies>
+        <!-- 同模块API -->
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-module-notification-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <!-- 框架组件 -->
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-mybatis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-redis</artifactId>
+        </dependency>
+        
+        <!-- WebSocket支持 -->
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        
+        <!-- MapStruct对象转换 -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
+    </dependencies>
+
+</project>

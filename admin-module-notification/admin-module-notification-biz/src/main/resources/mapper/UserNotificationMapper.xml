@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.admin.module.notification.biz.dal.mapper.UserNotificationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.admin.module.notification.biz.dal.dataobject.UserNotificationDO">
+        <id column="id" property="id" />
+        <result column="notification_id" property="notificationId" />
+        <result column="user_id" property="userId" />
+        <result column="read_status" property="readStatus" />
+        <result column="read_time" property="readTime" />
+        <result column="push_status" property="pushStatus" />
+        <result column="push_time" property="pushTime" />
+        <result column="push_channel" property="pushChannel" />
+        <result column="push_result" property="pushResult" />
+        <result column="creator" property="creator" />
+        <result column="create_time" property="createTime" />
+        <result column="updater" property="updater" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+        <result column="tenant_id" property="tenantId" />
+    </resultMap>
+
+    <!-- 用户通知详情结果映射 -->
+    <resultMap id="UserNotificationDetailMap" type="com.admin.module.notification.biz.dal.dataobject.UserNotificationDO">
+        <id column="id" property="id" />
+        <result column="notification_id" property="notificationId" />
+        <result column="user_id" property="userId" />
+        <result column="read_status" property="readStatus" />
+        <result column="read_time" property="readTime" />
+        <result column="push_status" property="pushStatus" />
+        <result column="push_time" property="pushTime" />
+        <result column="push_channel" property="pushChannel" />
+        <result column="push_result" property="pushResult" />
+        <result column="creator" property="creator" />
+        <result column="create_time" property="createTime" />
+        <result column="updater" property="updater" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted" property="deleted" />
+        <result column="tenant_id" property="tenantId" />
+        <!-- 关联通知信息 -->
+        <result column="notification_title" property="notificationTitle" />
+        <result column="notification_content" property="notificationContent" />
+        <result column="notification_level" property="notificationLevel" />
+        <result column="notification_type_name" property="notificationTypeName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, notification_id, user_id, read_status, read_time, push_status, push_time, 
+        push_channel, push_result, creator, create_time, updater, update_time, deleted, tenant_id
+    </sql>
+
+    <!-- 分页查询用户通知列表 -->
+    <select id="selectUserNotificationPage" resultMap="UserNotificationDetailMap">
+        SELECT 
+            un.id, un.notification_id, un.user_id, un.read_status, un.read_time, 
+            un.push_status, un.push_time, un.push_channel, un.push_result,
+            un.creator, un.create_time, un.updater, un.update_time, un.deleted, un.tenant_id,
+            n.title as notification_title, n.content as notification_content, 
+            n.level as notification_level, nt.name as notification_type_name
+        FROM user_notification un
+        LEFT JOIN notification n ON un.notification_id = n.id AND n.deleted = 0
+        LEFT JOIN notification_type nt ON n.type_id = nt.id AND nt.deleted = 0
+        <where>
+            un.deleted = 0
+            <if test="query.userId != null">
+                AND un.user_id = #{query.userId}
+            </if>
+            <if test="query.notificationId != null">
+                AND un.notification_id = #{query.notificationId}
+            </if>
+            <if test="query.readStatus != null">
+                AND un.read_status = #{query.readStatus}
+            </if>
+            <if test="query.pushStatus != null">
+                AND un.push_status = #{query.pushStatus}
+            </if>
+            <if test="query.createTime != null and query.createTime.size() == 2">
+                AND un.create_time >= #{query.createTime[0]}
+                AND un.create_time <= #{query.createTime[1]}
+            </if>
+        </where>
+        ORDER BY un.create_time DESC
+    </select>
+
+    <!-- 查询用户通知列表 -->
+    <select id="selectUserNotificationList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM user_notification
+        <where>
+            deleted = 0
+            <if test="query.userId != null">
+                AND user_id = #{query.userId}
+            </if>
+            <if test="query.notificationId != null">
+                AND notification_id = #{query.notificationId}
+            </if>
+            <if test="query.readStatus != null">
+                AND read_status = #{query.readStatus}
+            </if>
+            <if test="query.pushStatus != null">
+                AND push_status = #{query.pushStatus}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据用户ID和通知ID查询 -->
+    <select id="selectByUserIdAndNotificationId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM user_notification
+        WHERE deleted = 0 
+            AND user_id = #{userId} 
+            AND notification_id = #{notificationId}
+        LIMIT 1
+    </select>
+
+    <!-- 根据用户ID查询未读通知数量 -->
+    <select id="selectUnreadCountByUserId" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM user_notification
+        WHERE deleted = 0 
+            AND user_id = #{userId} 
+            AND read_status = 0
+    </select>
+
+    <!-- 根据用户ID查询未读通知列表 -->
+    <select id="selectUnreadByUserId" resultMap="UserNotificationDetailMap">
+        SELECT 
+            un.id, un.notification_id, un.user_id, un.read_status, un.read_time, 
+            un.push_status, un.push_time, un.push_channel, un.push_result,
+            un.creator, un.create_time, un.updater, un.update_time, un.deleted, un.tenant_id,
+            n.title as notification_title, n.content as notification_content, 
+            n.level as notification_level, nt.name as notification_type_name
+        FROM user_notification un
+        LEFT JOIN notification n ON un.notification_id = n.id AND n.deleted = 0
+        LEFT JOIN notification_type nt ON n.type_id = nt.id AND nt.deleted = 0
+        WHERE un.deleted = 0 
+            AND un.user_id = #{userId} 
+            AND un.read_status = 0
+        ORDER BY un.create_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 批量标记为已读 -->
+    <update id="markAsReadBatch">
+        UPDATE user_notification
+        SET read_status = 1, read_time = NOW(), updater = #{updater}, update_time = NOW()
+        WHERE deleted = 0 
+            AND user_id = #{userId}
+            AND id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 标记用户所有通知为已读 -->
+    <update id="markAllAsReadByUserId">
+        UPDATE user_notification
+        SET read_status = 1, read_time = NOW(), updater = #{updater}, update_time = NOW()
+        WHERE deleted = 0 
+            AND user_id = #{userId} 
+            AND read_status = 0
+    </update>
+
+
+    <!-- 更新推送状态 -->
+    <update id="updatePushStatus">
+        UPDATE user_notification
+        SET push_status = #{pushStatus}, 
+            push_time = #{pushTime}, 
+            push_result = #{pushResult},
+            updater = #{updater}, 
+            update_time = NOW()
+        WHERE deleted = 0 AND id = #{id}
+    </update>
+
+    <!-- 批量更新推送状态 -->
+    <update id="updatePushStatusBatch">
+        UPDATE user_notification
+        SET push_status = #{pushStatus}, 
+            push_time = #{pushTime}, 
+            push_result = #{pushResult},
+            updater = #{updater}, 
+            update_time = NOW()
+        WHERE deleted = 0 AND id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 根据用户ID查询通知列表 -->
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM user_notification
+        WHERE deleted = 0 
+            AND user_id = #{userId}
+        <if test="readStatus != null">
+            AND read_status = #{readStatus}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据通知ID查询用户列表 -->
+    <select id="selectByNotificationId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM user_notification
+        WHERE deleted = 0 
+            AND notification_id = #{notificationId}
+        <if test="readStatus != null">
+            AND read_status = #{readStatus}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查询用户未读通知数量 -->
+    <select id="countUnreadByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM user_notification
+        WHERE deleted = 0 
+            AND user_id = #{userId} 
+            AND read_status = 0
+    </select>
+
+    <!-- 查询通知的阅读统计 -->
+    <select id="selectReadStatsByNotificationId" resultType="java.util.Map">
+        SELECT 
+            COUNT(1) as totalCount,
+            SUM(CASE WHEN read_status = 1 THEN 1 ELSE 0 END) as readCount,
+            SUM(CASE WHEN read_status = 0 THEN 1 ELSE 0 END) as unreadCount,
+            ROUND(SUM(CASE WHEN read_status = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(1), 2) as readRate
+        FROM user_notification
+        WHERE deleted = 0 
+            AND notification_id = #{notificationId}
+    </select>
+
+    <!-- 批量插入用户通知记录 -->
+    <insert id="batchInsert">
+        INSERT INTO user_notification (
+            notification_id, user_id, read_status, push_status, push_channel,
+            creator, create_time, updater, update_time, deleted, tenant_id
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.notificationId}, #{item.userId}, #{item.readStatus}, 
+                #{item.pushStatus}, #{item.pushChannel}, #{item.creator}, 
+                #{item.createTime}, #{item.updater}, #{item.updateTime}, 
+                #{item.deleted}, #{item.tenantId}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 批量标记为已读 -->
+    <update id="batchMarkAsRead">
+        UPDATE user_notification
+        SET read_status = 1, 
+            read_time = #{readTime}, 
+            updater = 'system', 
+            update_time = NOW()
+        WHERE deleted = 0 
+            AND user_id = #{userId}
+            AND notification_id IN
+        <foreach collection="notificationIds" item="notificationId" open="(" separator="," close=")">
+            #{notificationId}
+        </foreach>
+            AND read_status = 0
+    </update>
+
+    <!-- 批量标记为未读 -->
+    <update id="batchMarkAsUnread">
+        UPDATE user_notification
+        SET read_status = 0, 
+            read_time = NULL, 
+            updater = 'system', 
+            update_time = NOW()
+        WHERE deleted = 0 
+            AND user_id = #{userId}
+            AND notification_id IN
+        <foreach collection="notificationIds" item="notificationId" open="(" separator="," close=")">
+            #{notificationId}
+        </foreach>
+            AND read_status = 1
+    </update>
+
+    <!-- 批量删除用户通知 -->
+    <update id="batchDeleteByUserAndNotifications">
+        UPDATE user_notification
+        SET deleted = 1, 
+            updater = 'system', 
+            update_time = NOW()
+        WHERE deleted = 0 
+            AND user_id = #{userId}
+            AND notification_id IN
+        <foreach collection="notificationIds" item="notificationId" open="(" separator="," close=")">
+            #{notificationId}
+        </foreach>
+    </update>
+
+    <!-- 查询用户在指定时间范围内的通知 -->
+    <select id="selectByUserIdAndTimeRange" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM user_notification
+        WHERE deleted = 0 
+            AND user_id = #{userId}
+            AND create_time >= #{startTime}
+            AND create_time <= #{endTime}
+        <if test="readStatus != null">
+            AND read_status = #{readStatus}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 统计用户通知的各种状态数量 -->
+    <select id="countStatusByUserId" resultType="java.util.Map">
+        SELECT 
+            COUNT(1) as totalCount,
+            SUM(CASE WHEN read_status = 1 THEN 1 ELSE 0 END) as readCount,
+            SUM(CASE WHEN read_status = 0 THEN 1 ELSE 0 END) as unreadCount,
+            SUM(CASE WHEN push_status = 1 THEN 1 ELSE 0 END) as pushedCount,
+            SUM(CASE WHEN push_status = 0 THEN 1 ELSE 0 END) as unpushedCount
+        FROM user_notification
+        WHERE deleted = 0 
+            AND user_id = #{userId}
+    </select>
+
+    <!-- 清理指定时间之前的已读通知 -->
+    <update id="cleanupReadNotificationsBefore">
+        UPDATE user_notification
+        SET deleted = 1, 
+            updater = 'system', 
+            update_time = NOW()
+        WHERE deleted = 0 
+            AND read_status = 1
+            AND read_time &lt; #{beforeTime}
+    </update>
+
+    <!-- 根据通知ID删除所有相关的用户通知记录 -->
+    <update id="deleteByNotificationId">
+        UPDATE user_notification
+        SET deleted = 1, 
+            updater = 'system', 
+            update_time = NOW()
+        WHERE deleted = 0 
+            AND notification_id = #{notificationId}
+    </update>
+
+</mapper>

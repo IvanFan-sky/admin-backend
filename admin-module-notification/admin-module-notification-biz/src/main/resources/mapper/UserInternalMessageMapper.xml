@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.admin.module.notification.biz.dal.mapper.UserInternalMessageMapper">
+
+    <!-- 分页查询用户站内信 -->
+    <select id="selectPage" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT * FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND receive_status = 1
+        AND delete_status = 0
+        <if test="readStatus != null">
+            AND read_status = #{readStatus}
+        </if>
+        <if test="favoriteStatus != null">
+            AND favorite_status = #{favoriteStatus}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查询用户站内信列表 -->
+    <select id="selectList" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT * FROM user_internal_message
+        WHERE user_id = #{userId}
+        <if test="receiveStatus != null">
+            AND receive_status = #{receiveStatus}
+        </if>
+        <if test="readStatus != null">
+            AND read_status = #{readStatus}
+        </if>
+        <if test="deleteStatus != null">
+            AND delete_status = #{deleteStatus}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查询用户未读站内信列表 -->
+    <select id="selectUnreadList" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT * FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND receive_status = 1
+        AND read_status = 0
+        AND delete_status = 0
+        ORDER BY create_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 查询用户收藏站内信列表 -->
+    <select id="selectFavoriteList" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT * FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND receive_status = 1
+        AND favorite_status = 1
+        AND delete_status = 0
+        ORDER BY favorite_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 查询用户已删除站内信列表 -->
+    <select id="selectDeletedList" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT * FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND delete_status = 1
+        ORDER BY delete_time DESC
+    </select>
+
+    <!-- 查询用户已读站内信列表 -->
+    <select id="selectReadList" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT * FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND receive_status = 1
+        AND read_status = 1
+        AND delete_status = 0
+        ORDER BY read_time DESC
+    </select>
+
+    <!-- 查询站内信的接收用户列表 -->
+    <select id="selectByMessageId" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT * FROM user_internal_message
+        WHERE message_id = #{messageId}
+        <if test="receiveStatus != null">
+            AND receive_status = #{receiveStatus}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查询用户站内信详情 -->
+    <select id="selectByUserIdAndMessageId" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT * FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND message_id = #{messageId}
+        AND receive_status = 1
+    </select>
+
+    <!-- 分页查询用户站内信列表 -->
+    <select id="selectUserPage" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT * FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND receive_status = 1
+        AND delete_status = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 统计用户未读站内信数量 -->
+    <select id="countUnread" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND receive_status = 1
+        AND read_status = 0
+        AND delete_status = 0
+    </select>
+
+    <!-- 根据用户ID和用户站内信ID查询记录 -->
+    <select id="selectByUserIdAndId" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT * FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND id = #{id}
+        AND receive_status = 1
+        AND delete_status = 0
+    </select>
+
+    <!-- 查询用户站内信列表（带参数） -->
+    <select id="selectUserList" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT * FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND receive_status = 1
+        AND delete_status = 0
+        <if test="type != null">
+            AND message_id IN (SELECT id FROM internal_message WHERE type = #{type} AND deleted = 0)
+        </if>
+        <if test="readStatus != null">
+            AND read_status = #{readStatus}
+        </if>
+        ORDER BY create_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 按类型统计用户未读数量 -->
+    <select id="countUnreadByType" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM user_internal_message uim
+        JOIN internal_message im ON uim.message_id = im.id
+        WHERE uim.user_id = #{userId}
+        AND uim.receive_status = 1
+        AND uim.read_status = 0
+        AND uim.delete_status = 0
+        AND im.type = #{type}
+        AND im.deleted = 0
+    </select>
+
+    <!-- 查询用户统计信息 -->
+    <select id="selectUserStatistics" resultType="java.util.Map">
+        SELECT 
+            COUNT(*) as totalCount,
+            SUM(CASE WHEN read_status = 0 THEN 1 ELSE 0 END) as unreadCount,
+            SUM(CASE WHEN read_status = 1 THEN 1 ELSE 0 END) as readCount,
+            SUM(CASE WHEN favorite_status = 1 THEN 1 ELSE 0 END) as favoriteCount,
+            SUM(CASE WHEN delete_status = 1 THEN 1 ELSE 0 END) as deletedCount,
+            SUM(CASE WHEN receipt_status = 1 THEN 1 ELSE 0 END) as receiptedCount
+        FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND receive_status = 1
+    </select>
+
+    <!-- 查询用户类型统计 -->
+    <select id="selectUserTypeCount" resultType="java.util.Map">
+        SELECT 
+            im.type,
+            im.type_name,
+            COUNT(*) as total_count,
+            SUM(CASE WHEN uim.read_status = 0 THEN 1 ELSE 0 END) as unread_count,
+            SUM(CASE WHEN uim.read_status = 1 THEN 1 ELSE 0 END) as read_count,
+            SUM(CASE WHEN uim.favorite_status = 1 THEN 1 ELSE 0 END) as favorite_count,
+            SUM(CASE WHEN uim.delete_status = 1 THEN 1 ELSE 0 END) as deleted_count
+        FROM user_internal_message uim
+        JOIN internal_message im ON uim.message_id = im.id
+        WHERE uim.user_id = #{userId}
+        AND uim.receive_status = 1
+        AND im.deleted = 0
+        GROUP BY im.type, im.type_name
+        ORDER BY im.type
+    </select>
+
+    <!-- 统计用户站内信总数 -->
+    <select id="selectTotalCount" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND receive_status = 1
+        AND delete_status = 0
+    </select>
+
+    <!-- 批量插入用户站内信 -->
+    <insert id="insertBatch">
+        INSERT INTO user_internal_message (
+            user_id, message_id, receive_status, read_status, favorite_status, delete_status,
+            receipt_status, creator, create_time, updater, update_time
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.userId}, #{item.messageId}, #{item.receiveStatus}, #{item.readStatus},
+                #{item.favoriteStatus}, #{item.deleteStatus}, #{item.receiptStatus},
+                #{item.creator}, #{item.createTime}, #{item.updater}, #{item.updateTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 批量标记为已读 -->
+    <update id="markAsReadBatch">
+        UPDATE user_internal_message SET
+        read_status = 1,
+        read_time = #{readTime},
+        updater = #{updater},
+        update_time = NOW()
+        WHERE user_id = #{userId}
+        AND message_id IN
+        <foreach collection='messageIds' item='messageId' open='(' separator=',' close=')'>
+            #{messageId}
+        </foreach>
+        AND receive_status = 1
+        AND read_status = 0
+    </update>
+
+    <!-- 标记为已读 -->
+    <update id="markAsRead">
+        UPDATE user_internal_message SET
+        read_status = 1,
+        read_time = #{readTime},
+        updater = #{updater},
+        update_time = NOW()
+        WHERE user_id = #{userId}
+        AND message_id = #{messageId}
+        AND receive_status = 1
+        AND read_status = 0
+    </update>
+
+    <!-- 标记全部为已读 -->
+    <update id="markAllAsRead">
+        UPDATE user_internal_message SET
+        read_status = 1,
+        read_time = #{readTime},
+        updater = #{updater},
+        update_time = NOW()
+        WHERE user_id = #{userId}
+        AND receive_status = 1
+        AND read_status = 0
+        AND delete_status = 0
+    </update>
+
+    <!-- 切换收藏状态 -->
+    <update id="toggleFavorite">
+        UPDATE user_internal_message SET
+        favorite_status = #{favoriteStatus},
+        favorite_time = #{favoriteTime},
+        updater = #{updater},
+        update_time = NOW()
+        WHERE user_id = #{userId}
+        AND message_id = #{messageId}
+        AND receive_status = 1
+    </update>
+
+    <!-- 切换删除状态 -->
+    <update id="toggleDelete">
+        UPDATE user_internal_message SET
+        delete_status = #{deleteStatus},
+        delete_time = #{deleteTime},
+        updater = #{updater},
+        update_time = NOW()
+        WHERE user_id = #{userId}
+        AND message_id = #{messageId}
+    </update>
+
+    <!-- 提交回执 -->
+    <update id="submitReceipt">
+        UPDATE user_internal_message SET
+        receipt_status = 1,
+        receipt_content = #{receiptContent},
+        receipt_time = #{receiptTime},
+        updater = #{updater},
+        update_time = NOW()
+        WHERE user_id = #{userId}
+        AND message_id = #{messageId}
+        AND receive_status = 1
+        AND receipt_status = 0
+    </update>
+
+
+    <!-- 查询最近列表 -->
+    <select id="selectRecentList" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT * FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND receive_status = 1
+        AND delete_status = 0
+        ORDER BY create_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 按类型查询列表 -->
+    <select id="selectListByType" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT uim.* FROM user_internal_message uim
+        JOIN internal_message im ON uim.message_id = im.id
+        WHERE uim.user_id = #{userId}
+        AND uim.receive_status = 1
+        AND uim.delete_status = 0
+        AND im.type = #{type}
+        AND im.deleted = 0
+        ORDER BY uim.create_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 按优先级查询列表 -->
+    <select id="selectListByPriority" resultType="com.admin.module.notification.biz.dal.dataobject.UserInternalMessageDO">
+        SELECT uim.* FROM user_internal_message uim
+        JOIN internal_message im ON uim.message_id = im.id
+        WHERE uim.user_id = #{userId}
+        AND uim.receive_status = 1
+        AND uim.delete_status = 0
+        AND im.priority = #{priority}
+        AND im.deleted = 0
+        ORDER BY uim.create_time DESC
+        <if test="limit != null">
+            LIMIT #{limit}
+        </if>
+    </select>
+
+    <!-- 按类型标记已读 -->
+    <update id="markAsReadByType">
+        UPDATE user_internal_message uim
+        JOIN internal_message im ON uim.message_id = im.id
+        SET uim.read_status = 1,
+            uim.read_time = #{readTime},
+            uim.update_time = NOW()
+        WHERE uim.user_id = #{userId}
+        AND uim.receive_status = 1
+        AND uim.read_status = 0
+        AND uim.delete_status = 0
+        AND im.type = #{type}
+        AND im.deleted = 0
+    </update>
+
+    <!-- 批量标记为已删除 -->
+    <update id="markAsDeletedBatch">
+        UPDATE user_internal_message SET
+        delete_status = 1,
+        delete_time = #{deleteTime},
+        update_time = NOW()
+        WHERE user_id = #{userId}
+        AND id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND receive_status = 1
+        AND delete_status = 0
+    </update>
+
+    <!-- 删除过期消息 -->
+    <delete id="deleteExpiredMessages">
+        DELETE FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND create_time &lt; #{expireTime}
+        AND delete_status = 1
+    </delete>
+
+    <!-- 删除已读消息 -->
+    <delete id="deleteReadMessages">
+        DELETE FROM user_internal_message
+        WHERE user_id = #{userId}
+        AND read_status = 1
+        AND read_time &lt; #{expireTime}
+        AND delete_status = 1
+    </delete>
+
+    <!-- 批量更新接收状态 -->
+    <update id="updateReceiveStatusBatch">
+        UPDATE user_internal_message SET
+        receive_status = #{receiveStatus},
+        updater = #{updater},
+        update_time = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 批量更新读取状态 -->
+    <update id="updateReadStatusBatch">
+        UPDATE user_internal_message SET
+        read_status = #{readStatus},
+        updater = #{updater},
+        update_time = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 批量更新回执状态 -->
+    <update id="updateReceiptStatusBatch">
+        UPDATE user_internal_message SET
+        receipt_status = #{receiptStatus},
+        updater = #{updater},
+        update_time = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 批量更新收藏状态 -->
+    <update id="updateFavoriteStatusBatch">
+        UPDATE user_internal_message SET
+        favorite_status = #{favoriteStatus},
+        updater = #{updater},
+        update_time = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 批量更新删除状态 -->
+    <update id="updateDeleteStatusBatch">
+        UPDATE user_internal_message SET
+        delete_status = #{deleteStatus},
+        updater = #{updater},
+        update_time = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+</mapper>

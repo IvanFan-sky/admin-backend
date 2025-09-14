@@ -9,6 +9,7 @@
         <groupId>com.admin</groupId>
         <artifactId>admin-backend</artifactId>
         <version>1.0.0</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>admin-framework</artifactId>
@@ -24,6 +25,7 @@
         <module>admin-spring-boot-starter-redis</module>
         <module>admin-spring-boot-starter-excel</module>
         <module>admin-spring-boot-starter-minio</module>
+        <module>admin-spring-boot-starter-websocket</module>
     </modules>
 
 </project>

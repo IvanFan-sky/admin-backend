@@ -32,6 +32,12 @@
             <artifactId>admin-module-log-biz</artifactId>
         </dependency>
         
+        <!-- WebSocket支持 -->
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-spring-boot-starter-websocket</artifactId>
+        </dependency>
+        
         <!-- Spring Boot Actuator -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

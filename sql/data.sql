@@ -176,3 +176,19 @@ INSERT INTO `sys_config` (`config_name`, `config_key`, `config_value`, `config_t
 ('账号自助-验证码开关', 'sys.account.captchaEnabled', 'true', 1, '是否开启验证码功能（true开启，false关闭）', 'admin', NOW()),
 ('账号自助-是否开启用户注册功能', 'sys.account.registerUser', 'false', 1, '是否开启注册用户功能（true开启，false关闭）', 'admin', NOW()),
 ('用户登录-黑名单列表', 'sys.login.blackIPList', '', 1, '设置登录IP黑名单限制，多个匹配项以;分隔，支持匹配（*通配、网段）', 'admin', NOW());
+
+-- =============================================
+-- 通知管理模块初始数据
+-- =============================================
+
+-- 通知类型初始数据
+INSERT INTO `sys_notification_type` (`type_code`, `type_name`, `description`, `icon`, `color`, `sort`, `status`, `create_by`, `create_time`) VALUES
+('SYSTEM_ANNOUNCEMENT', '系统公告', '系统级别的重要公告通知', 'announcement', '#1890ff', 1, 1, 'system', NOW()),
+('PRIVATE_MESSAGE', '站内信', '用户之间的私信通知', 'message', '#52c41a', 2, 1, 'system', NOW()),
+('SYSTEM_NOTICE', '系统通知', '系统操作相关的通知', 'notification', '#faad14', 3, 1, 'system', NOW()),
+('SECURITY_ALERT', '安全提醒', '账户安全相关的提醒', 'security-scan', '#f5222d', 4, 1, 'system', NOW());
+
+-- 示例通知数据
+INSERT INTO `sys_notification` (`type_id`, `title`, `content`, `summary`, `level`, `target_type`, `publish_type`, `publish_time`, `status`, `create_by`, `create_time`) VALUES
+(1, '系统维护通知', '系统将于今晚22:00-24:00进行维护升级，期间可能影响正常使用，请提前做好相关准备。', '系统维护通知', 2, 1, 1, NOW(), 1, 'admin', NOW()),
+(3, '欢迎使用通知管理系统', '欢迎使用我们的通知管理系统！您可以在这里接收系统公告、站内信等各类通知消息。', '欢迎使用通知管理系统', 1, 1, 1, NOW(), 1, 'system', NOW());
