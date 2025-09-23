@@ -26,6 +26,12 @@
         <jakarta.validation.version>3.0.2</jakarta.validation.version>
         <hikaricp.version>5.0.1</hikaricp.version>
         <lombok.version>1.18.38</lombok.version>
+        
+        <!-- Spring AI 相关版本 -->
+        <spring-ai.version>1.0.0-M4</spring-ai.version>
+        <pgvector.version>0.1.6</pgvector.version>
+        <apache-tika.version>2.9.1</apache-tika.version>
+        <reactor-core.version>3.6.1</reactor-core.version>
     </properties>
 
     <dependencyManagement>
@@ -117,6 +123,102 @@
                 <version>${hutool.version}</version>
             </dependency>
             
+            <!-- Spring AI 相关依赖 -->
+            <!-- Spring AI BOM -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Spring AI Core -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-core</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <!-- OpenAI 支持 -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <!-- Ollama 本地模型支持 -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <!-- Azure OpenAI 支持 -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-azure-openai-spring-boot-starter</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <!-- 向量数据库 - PostgreSQL PGVector -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-pgvector-store-spring-boot-starter</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <!-- Spring AI Advisors for RAG -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-advisors-vector-store</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <!-- 文档处理和解析 -->
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-pdf-document-reader</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-transformers</artifactId>
+                <version>${spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId>
+                <version>${apache-tika.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-parsers-standard-package</artifactId>
+                <version>${apache-tika.version}</version>
+            </dependency>
+
+            <!-- PostgreSQL 驱动和 PGVector 扩展 -->
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+            </dependency>
+
+            <dependency>
+                <groupId>com.pgvector</groupId>
+                <artifactId>pgvector</artifactId>
+                <version>${pgvector.version}</version>
+            </dependency>
+
+            <!-- 响应式编程支持 -->
+            <dependency>
+                <groupId>io.projectreactor</groupId>
+                <artifactId>reactor-core</artifactId>
+                <version>${reactor-core.version}</version>
+            </dependency>
+            
             <!-- 项目内模块依赖 -->
             <dependency>
                 <groupId>com.admin</groupId>
@@ -202,6 +304,18 @@
             <dependency>
                 <groupId>com.admin</groupId>
                 <artifactId>admin-module-payment-biz</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            
+            <!-- AI模块 -->
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-module-ai-api</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.admin</groupId>
+                <artifactId>admin-module-ai-biz</artifactId>
                 <version>1.0.0</version>
             </dependency>
             

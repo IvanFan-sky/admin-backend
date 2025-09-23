@@ -1,0 +1,108 @@
+# AI模块配置
+admin:
+  ai:
+    # RAG配置
+    rag:
+      enabled: true
+      chunk-size: 500
+      chunk-overlap: 100
+      top-k: 5
+      similarity-threshold: 0.7
+      max-document-size: 10485760 # 10MB
+      supported-formats: ["pdf", "txt", "md", "docx"]
+    
+    # 对话配置
+    chat:
+      max-history-length: 20
+      session-timeout-minutes: 60
+      max-concurrent-sessions: 100
+      max-message-length: 10000
+      enable-streaming: true
+      streaming-timeout-seconds: 30
+    
+    # 知识库配置
+    knowledge-base:
+      upload-path: "./uploads/knowledge"
+      max-file-size: 10485760 # 10MB
+      batch-size: 100
+      auto-index: true
+      indexing-threads: 2
+
+# Spring AI配置
+spring:
+  ai:
+    # DeepSeek配置（主要推荐）
+    deepseek:
+      api-key: ${AI_DEEPSEEK_API_KEY:your-deepseek-api-key}
+      base-url: ${AI_DEEPSEEK_BASE_URL:https://api.deepseek.com}
+      chat:
+        options:
+          model: deepseek-chat
+          max-tokens: 4096
+          temperature: 0.7
+    
+    # Kimi配置（主要推荐）
+    moonshot:
+      api-key: ${AI_KIMI_API_KEY:your-kimi-api-key}
+      base-url: ${AI_KIMI_BASE_URL:https://api.moonshot.cn/v1}
+      chat:
+        options:
+          model: moonshot-v1-32k
+          max-tokens: 32000
+          temperature: 0.7
+          
+    # GLM配置（主要推荐）
+    zhipu:
+      api-key: ${AI_GLM_API_KEY:your-glm-api-key}
+      base-url: ${AI_GLM_BASE_URL:https://open.bigmodel.cn/api/paas/v4}
+      chat:
+        options:
+          model: glm-4.5
+          max-tokens: 4096
+          temperature: 0.7
+    
+    # OpenAI配置（备选）
+    openai:
+      api-key: ${AI_OPENAI_API_KEY:}
+      base-url: ${AI_OPENAI_BASE_URL:https://api.openai.com}
+      chat:
+        options:
+          model: gpt-4o
+          max-tokens: 4096
+          temperature: 0.7
+    
+    # Azure OpenAI配置（可选）
+    azure:
+      openai:
+        api-key: ${AI_AZURE_OPENAI_API_KEY:}
+        endpoint: ${AI_AZURE_OPENAI_ENDPOINT:}
+        chat:
+          options:
+            deployment-name: ${AI_AZURE_OPENAI_DEPLOYMENT:}
+            max-tokens: 4096
+            temperature: 0.7
+    
+    # Ollama配置（可选）
+    ollama:
+      base-url: ${AI_OLLAMA_BASE_URL:http://localhost:11434}
+      chat:
+        options:
+          model: llama2
+          temperature: 0.7
+    
+    # 向量存储配置（PostgreSQL PGVector）
+    vectorstore:
+      pgvector:
+        enabled: ${AI_VECTOR_STORE_ENABLED:false}
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 1536
+
+# 数据源配置（如果需要单独的向量数据库）
+# spring:
+#   datasource:
+#     vector:
+#       url: ${AI_VECTOR_DB_URL:jdbc:postgresql://localhost:5432/admin_ai_vector}
+#       username: ${AI_VECTOR_DB_USERNAME:postgres}
+#       password: ${AI_VECTOR_DB_PASSWORD:password}
+#       driver-class-name: org.postgresql.Driver

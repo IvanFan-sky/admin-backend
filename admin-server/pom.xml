@@ -35,6 +35,10 @@
             <groupId>com.admin</groupId>
             <artifactId>admin-module-payment-biz</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.admin</groupId>
+            <artifactId>admin-module-ai-biz</artifactId>
+        </dependency>
         
         <!-- WebSocket支持 -->
         <dependency>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.admin.module.ai.biz.dal.mapper.AiChatSessionMapper">
+    
+    <!-- 根据用户ID查询会话列表 -->
+    <select id="selectByUserId" resultType="com.admin.module.ai.biz.dal.dataobject.AiChatSessionDO">
+        SELECT * FROM ai_chat_session
+        WHERE user_id = #{userId}
+        AND deleted = 0
+        ORDER BY update_time DESC
+    </select>
+    
+    <!-- 根据会话ID查询会话信息 -->
+    <select id="selectBySessionId" resultType="com.admin.module.ai.biz.dal.dataobject.AiChatSessionDO">
+        SELECT * FROM ai_chat_session
+        WHERE session_id = #{sessionId}
+        AND deleted = 0
+        LIMIT 1
+    </select>
+    
+    <!-- 更新会话统计信息 -->
+    <update id="updateSessionStats">
+        UPDATE ai_chat_session SET
+            message_count = message_count + #{messageCount},
+            total_tokens = total_tokens + IFNULL(#{tokenCount}, 0),
+            total_cost = total_cost + IFNULL(#{cost}, 0),
+            update_time = NOW()
+        WHERE session_id = #{sessionId}
+        AND deleted = 0
+    </update>
+    
+</mapper>
